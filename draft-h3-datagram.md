@@ -27,10 +27,9 @@ The QUIC DATAGRAM extension {{!I-D.pauly-quic-datagram}} provides application
 protocols running over QUIC {{!I-D.ietf-quic-transport}} with a way to send
 unreliable data while leveraging the security and congestion-control properties
 of QUIC. However, QUIC DATAGRAM frames do not provide a means to demultiplex
-application contexts using them. This document defines how to use QUIC DATAGRAM
-frames when the application protocol running over QUIC is HTTP/3
-{{!I-D.ietf-quic-http}}, by adding an identifier at the start of the frame
-payload.
+application contexts. This document defines how to use QUIC DATAGRAM frames when
+the application protocol running over QUIC is HTTP/3 {{!I-D.ietf-quic-http}} by
+adding an identifier at the start of the frame payload.
 
 
 --- middle
@@ -38,10 +37,10 @@ payload.
 # Introduction {#intro}
 
 The QUIC DATAGRAM extension {{!I-D.pauly-quic-datagram}} provides application
-protocols running over QUIC {{!I-D.ietf-quic-transport}} with a way to send
-unreliable data while leveraging the security and congestion-control properties
-of QUIC. However, QUIC DATAGRAM frames do not provide a means to demultiplex
-application contexts using them. This document defines how to use QUIC DATAGRAM
+protocols running over QUIC {{!I-D.ietf-quic-transport}} with a mechansim to
+send unreliable data while leveraging the security and congestion-control
+properties of QUIC. However, QUIC DATAGRAM frames do not provide a means to
+demultiplex application contexts. This document defines how to use QUIC DATAGRAM
 frames when the application protocol running over QUIC is HTTP/3
 {{!I-D.ietf-quic-http}}, by adding an identifier at the start of the frame
 payload.
@@ -87,17 +86,17 @@ applications.
 
 ## Flow Identifiers {#flow-id}
 
-Flow identifiers represent bidirectional flows of datagrams within a single
-QUIC connection. These are effectively equivalent to UDP ports, that allow
-basic demultiplexing of application data. The primary role of slow identifiers
-is to provide a standard mechanism for demultiplexing application data flows,
-which may be destined for different processing threads in the application,
-akin to UDP sockets.
+Flow identifiers represent bidirectional flows of datagrams within a single QUIC
+connection. These are effectively equivalent to UDP ports and allow basic
+demultiplexing of application data. The primary role of flow identifiers is to
+provide a standard mechanism for demultiplexing application data flows, which
+may be destined for different processing threads in the application, akin to UDP
+sockets.
 
 Beyond this, a sender SHOULD ensure that DATAGRAM frames within a single flow
 are transmitted in order relative to one another. If multiple DATAGRAM frames
-can be packed into a single QUIC packet, the sender SHOULD group them by Flow
-Identifier to promote fate-sharing within a specific flow and improve the
+can be packed into a single QUIC packet, the sender SHOULD group them by flow
+identifier to promote fate-sharing within a specific flow and improve the
 ability to process batches of datagram messages efficiently on the receiver.
 
 
@@ -105,17 +104,16 @@ ability to process batches of datagram messages efficiently on the receiver.
 
 Implementations of HTTP/3 that support the DATAGRAM extension will provide a
 flow identifier allocation service. That service will allow applications
-co-located with HTTP/3 to request a unique Flow Identifier that they can
+co-located with HTTP/3 to request a unique flow identifier that they can
 subsequently use for their own purposes. The HTTP/3 implementation will then
-parse the Flow Identifier of incoming DATAGRAM frames and use it to deliver the
+parse the flow identifier of incoming DATAGRAM frames and use it to deliver the
 frame to the appropriate application.
 
 
 # Security Considerations {#security}
 
-This document currently does not have additional security considerations on top
-of the ones defined in {{!I-D.ietf-quic-transport}} and
-{{!I-D.pauly-quic-datagram}}.
+This document currently does not have additional security considerations beyond
+those defined in {{!I-D.ietf-quic-transport}} and {{!I-D.pauly-quic-datagram}}.
 
 
 # IANA Considerations {#iana}
