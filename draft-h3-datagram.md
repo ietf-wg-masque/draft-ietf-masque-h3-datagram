@@ -37,7 +37,7 @@ adding an identifier at the start of the frame payload.
 # Introduction {#intro}
 
 The QUIC DATAGRAM extension {{!I-D.pauly-quic-datagram}} provides application
-protocols running over QUIC {{!I-D.ietf-quic-transport}} with a mechansim to
+protocols running over QUIC {{!I-D.ietf-quic-transport}} with a mechanism to
 send unreliable data while leveraging the security and congestion-control
 properties of QUIC. However, QUIC DATAGRAM frames do not provide a means to
 demultiplex application contexts. This document defines how to use QUIC DATAGRAM
