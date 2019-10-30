@@ -94,7 +94,7 @@ applications.
 ## Flow Identifiers {#flow-id}
 
 Flow identifiers represent bidirectional flows of datagrams within a single QUIC
-connection. These are effectively equivalent to UDP ports and allow basic
+connection. These are conceptually similar to UDP ports and allow basic
 demultiplexing of application data. The primary role of flow identifiers is to
 provide a standard mechanism for demultiplexing application data flows, which
 may be destined for different processing threads in the application, akin to UDP
