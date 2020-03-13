@@ -1,7 +1,7 @@
 ---
 title: Using QUIC Datagrams with HTTP/3
 abbrev: HTTP/3 Datagrams
-docname: draft-schinazi-quic-h3-datagram
+docname: draft-schinazi-quic-h3-datagram-latest
 category: exp
 
 ipr: trust200902
