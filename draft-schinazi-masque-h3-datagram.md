@@ -67,16 +67,14 @@ when, and only when, they appear in all capitals, as shown here.
 # HTTP/3 DATAGRAM Frame Format {#format}
 
 When used with HTTP/3, the Datagram Data field of QUIC DATAGRAM frames uses the
-following format:
+following format (using the notation from the "Notational Conventions" section
+of {{QUIC}}):
 
 ~~~
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                     Flow Identifier (i)                     ...
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                 HTTP/3 Datagram Payload (*)                 ...
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+HTTP/3 DATAGRAM Frame {
+  Flow Identifier (i),
+  HTTP/3 Datagram Payload (..),
+}
 ~~~
 {: #h3-datagram-format title="HTTP/3 DATAGRAM Frame Format"}
 
@@ -91,11 +89,11 @@ HTTP/3 Datagram Payload:
 applications.
 
 
-## Flow Identifiers {#flow-id}
+# Flow Identifiers {#flow-id}
 
 Flow identifiers represent bidirectional flows of datagrams within a single QUIC
 connection. These are conceptually similar to streams in the sense that they
-allow multiplexing of application data.  Of course flows lack any of the ordering
+allow multiplexing of application data.  Flows lack any of the ordering
 or reliability guarantees of streams.
 
 Beyond this, a sender SHOULD ensure that DATAGRAM frames within a single flow
@@ -175,7 +173,7 @@ This document will request IANA to register the following entry in the
 # Acknowledgments {#acks}
 {:numbered="false"}
 
-The DATAGRAM frame identifier was previously part of the DATAGRAM frame
+The DATAGRAM flow identifier was previously part of the DATAGRAM frame
 definition itself, the author would like to acknowledge the authors of
 that document and the members of the IETF QUIC working group for their
 suggestions. Additionally, the author would like to thank Martin Thomson
