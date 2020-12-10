@@ -1,8 +1,8 @@
 ---
 title: Using QUIC Datagrams with HTTP/3
 abbrev: HTTP/3 Datagrams
-docname: draft-schinazi-quic-h3-datagram-latest
-category: exp
+docname: draft-schinazi-masque-h3-datagram-latest
+category: std
 
 ipr: trust200902
 keyword: Internet-Draft
@@ -30,8 +30,8 @@ provide a means to demultiplex application contexts. This document defines how
 to use QUIC DATAGRAM frames when the application protocol running over QUIC is
 HTTP/3 by adding an identifier at the start of the frame payload.
 
-Discussion of this work is encouraged to happen on the QUIC IETF mailing list
-([quic@ietf.org](mailto:quic@ietf.org)) or on the GitHub repository which
+Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
+([masque@ietf.org](mailto:masque@ietf.org)) or on the GitHub repository which
 contains the draft: [](https://github.com/DavidSchinazi/draft-h3-datagram).
 
 
@@ -51,8 +51,8 @@ frame payload.
 This design mimics the use of Stream Types in HTTP/3, which provide a
 demultiplexing identifier at the start of each unidirectional stream.
 
-Discussion of this work is encouraged to happen on the QUIC IETF mailing list
-([quic@ietf.org](mailto:quic@ietf.org)) or on the GitHub repository which
+Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
+([masque@ietf.org](mailto:masque@ietf.org)) or on the GitHub repository which
 contains the draft: [](https://github.com/DavidSchinazi/draft-h3-datagram).
 
 
