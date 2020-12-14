@@ -2,8 +2,8 @@
 
 This is the working area for the individual Internet-Draft, "Using QUIC Datagrams with HTTP/3".
 
-* [Editor's Copy](https://davidschinazi.github.io/draft-h3-datagram/draft-schinazi-quic-h3-datagram.html)
-* [Individual Draft](https://tools.ietf.org/html/draft-schinazi-quic-h3-datagram)
+* [Editor's Copy](https://davidschinazi.github.io/draft-h3-datagram/draft-schinazi-masque-h3-datagram.html)
+* [Individual Draft](https://tools.ietf.org/html/draft-schinazi-masque-h3-datagram)
 
 ## Building the Draft
 
