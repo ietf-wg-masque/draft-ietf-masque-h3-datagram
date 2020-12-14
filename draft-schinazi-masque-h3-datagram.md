@@ -91,12 +91,13 @@ subsequently use for their own purposes. The HTTP/3 implementation will then
 parse the flow identifier of incoming DATAGRAM frames and use it to deliver the
 frame to the appropriate application.
 
-Even flow identifiers are client-initiated, while odd flow identifiers are
-server-initiated. This means that an HTTP/3 client implementation of the
-flow identifier allocation service MUST only provide even identifiers, while
-a server implementation MUST only provide odd identifiers. Note that, once
-allocated, any flow identifier can be used by both client and server - only
-allocation carries separate namespaces to avoid requiring synchronization.
+Even-numbered flow identifiers are client-initiated, while odd-numbered flow
+identifiers are server-initiated. This means that an HTTP/3 client
+implementation of the flow identifier allocation service MUST only provide
+even-numbered identifiers, while a server implementation MUST only provide
+odd-numbered identifiers. Note that, once allocated, any flow identifier can be
+used by both client and server - only allocation carries separate namespaces to
+avoid requiring synchronization.
 
 
 # HTTP/3 DATAGRAM Frame Format {#format}
@@ -136,7 +137,7 @@ of 0 indicates that this mechanism is not supported. An endpoint that receives
 the H3_DATAGRAM SETTINGS parameter with a value that is neither 0 or 1 MUST
 terminate the connection with error H3_SETTINGS_ERROR.
 
-And endpoint that sends the H3_DATAGRAM SETTINGS parameter with a value of 1
+An endpoint that sends the H3_DATAGRAM SETTINGS parameter with a value of 1
 MUST send the max_datagram_frame_size QUIC Transport Parameter {{DGRAM}}.
 An endpoint that receives the H3_DATAGRAM SETTINGS parameter with a value of 1
 on a QUIC connection that did not also receive the max_datagram_frame_size
@@ -155,30 +156,30 @@ or equal to the stored value; if not, the client MUST terminate the connection
 with error H3_SETTINGS_ERROR.
 
 
-# Datagram-Flow-Id Header Definition {#header}
+# Datagram-Flow-Id Header Field Definition {#header}
 
 "Datagram-Flow-Id" is a Item Structured
-Header {{!STRUCT-HDR=I-D.ietf-httpbis-header-structure}}. Its value MUST be an
+Field {{!STRUCT-FIELD=I-D.ietf-httpbis-header-structure}}. Its value MUST be an
 Integer. Its ABNF is:
 
 ~~~
-  Datagram-Flow-Id = sh-integer
+  Datagram-Flow-Id = sf-integer
 ~~~
 
-The "Datagram-Flow-Id" header is used to associate a datagram flow identifier
-with an HTTP message. For example, the definition of an HTTP method could
-instruct the client to use its flow identifier allocation service to allocate
-a new flow identifier, and then the client will add the "Datagram-Flow-Id"
-header to its request to communicate that value to the server. For example, the
-resulting header could look like:
+The "Datagram-Flow-Id" header field is used to associate a datagram flow
+identifier with an HTTP message. For example, the definition of an HTTP method
+could instruct the client to use its flow identifier allocation service to
+allocate a new flow identifier, and then the client will add the
+"Datagram-Flow-Id" header field to its request to communicate that value to the
+server. For example, the resulting header field could look like:
 
 ~~~
   Datagram-Flow-Id = 2
 ~~~
 
-Definitions of HTTP features that use the "Datagram-Flow-Id" header MAY define
-their own parameters (parameters are defined in Section 3.1.2 of
-{{STRUCT-HDR}}). For example, an HTTP method that wishes to use two datagram
+Definitions of HTTP features that use the "Datagram-Flow-Id" header field MAY
+define their own parameters (parameters are defined in Section 3.1.2 of
+{{STRUCT-FIELD}}). For example, an HTTP method that wishes to use two datagram
 flow identifiers for the lifetime of its request stream could encode the second
 flow identifier as a parameter, which could look like this:
 
@@ -186,23 +187,23 @@ flow identifier as a parameter, which could look like this:
   Datagram-Flow-Id = 42; alternate=44
 ~~~
 
-The "Datagram-Flow-Id" header MUST NOT be present more than once on a given
+The "Datagram-Flow-Id" header field MUST NOT be present more than once on a given
 HTTP message; any HTTP message containing more than one "Datagram-Flow-Id"
-header is malformed.
+header field is malformed.
 
-Since the QUIC STREAM frame that contains the "Datagram-Flow-Id" header could
+Since the QUIC STREAM frame that contains the "Datagram-Flow-Id" header field could
 be lost or reordered, it is possible that an endpoint will receive an HTTP/3
 datagram with a flow identifier that it does not know as it has not yet
-received the corresponding "Datagram-Flow-Id" header. Endpoints MUST NOT treat
+received the corresponding "Datagram-Flow-Id" header field. Endpoints MUST NOT treat
 that as an error; they MUST either silently discard the datagram or buffer it
-until they receive the "Datagram-Flow-Id" header.
+until they receive the "Datagram-Flow-Id" header field.
 
 Note that integer structured fields can only encode values up to 10^15-1,
-therefore the maximum possible value of the "Datagram-Flow-Id" header is lower
-then the theoretical maximum value of a flow identifier which is 2^62-1 due to
-the QUIC variable length integer encoding. If the flow identifier allocation
-service of an endpoint runs out of values lower than 10^15-1, the endpoint
-MUST treat is as a connection error of type H3_ID_ERROR.
+therefore the maximum possible value of the "Datagram-Flow-Id" header field is
+lower then the theoretical maximum value of a flow identifier which is 2^62-1
+due to the QUIC variable length integer encoding. If the flow identifier
+allocation service of an endpoint runs out of values lower than 10^15-1, the
+endpoint MUST treat is as a connection error of type H3_ID_ERROR.
 
 
 # HTTP Intermediaries {#intermediaries}
@@ -212,21 +213,21 @@ However, in some cases, an HTTP request may travel across multiple HTTP
 connections if there are HTTP intermediaries involved; see Section 2.3 of
 {{!RFC7230}}.
 
-If an intermediary has sent the H3_DATAGRAM SETTINGS parameter with a value of
-1 on its client-facing connection, it MUST inspect all HTTP requests from that
-connection and check for the presence of the "Datagram-Flow-Id" header. If the
-HTTP method of the request is not supported by the intermediary, it MUST remove
-the "Datagram-Flow-Id" header before forwarding the request. If the intermediary
-supports the method, it MUST either remove the header or adhere to the
-requirements leveraged by that method on intermediaries.
+If an intermediary has sent the H3_DATAGRAM SETTINGS parameter with a value of 1
+on its client-facing connection, it MUST inspect all HTTP requests from that
+connection and check for the presence of the "Datagram-Flow-Id" header field. If
+the HTTP method of the request is not supported by the intermediary, it MUST
+remove the "Datagram-Flow-Id" header field before forwarding the request. If the
+intermediary supports the method, it MUST either remove the header field or
+adhere to the requirements leveraged by that method on intermediaries.
 
-If an intermediary has sent the H3_DATAGRAM SETTINGS parameter with a value of
-1 on its server-facing connection, it MUST inspect all HTTP responses from that
-connection and check for the presence of the "Datagram-Flow-Id" header. If the
-HTTP method of the request is not supported by the intermediary, it MUST remove
-the "Datagram-Flow-Id" header before forwarding the response. If the
-intermediary supports the method, it MUST either remove the header or adhere to
-the requirements leveraged by that method on intermediaries.
+If an intermediary has sent the H3_DATAGRAM SETTINGS parameter with a value of 1
+on its server-facing connection, it MUST inspect all HTTP responses from that
+connection and check for the presence of the "Datagram-Flow-Id" header field. If
+the HTTP method of the request is not supported by the intermediary, it MUST
+remove the "Datagram-Flow-Id" header field before forwarding the response. If
+the intermediary supports the method, it MUST either remove the header field or
+adhere to the requirements leveraged by that method on intermediaries.
 
 
 # Security Considerations {#security}
@@ -251,10 +252,10 @@ This document will request IANA to register the following entry in the
 ~~~
 
 
-## HTTP Header {#iana-header}
+## HTTP Header Field {#iana-header}
 
 This document will request IANA to register the "Datagram-Flow-Id"
-header in the "Permanent Message Header Field Names"
+header field in the "Permanent Message Header Field Names"
 registry maintained at
 <[](https://www.iana.org/assignments/message-headers)>.
 
