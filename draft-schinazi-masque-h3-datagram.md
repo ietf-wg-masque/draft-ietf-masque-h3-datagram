@@ -20,6 +20,12 @@ author:
     country: "United States of America"
     email: dschinazi.ietf@gmail.com
 
+ -
+    ins: "L. Pardue"
+    name: "Lucas Pardue"
+    organization: "Cloudflare"
+    email: lucaspardue.24.7@gmail.com
+
 
 --- abstract
 
@@ -276,5 +282,4 @@ The DATAGRAM flow identifier was previously part of the DATAGRAM frame
 definition itself, the author would like to acknowledge the authors of
 that document and the members of the IETF QUIC working group for their
 suggestions. Additionally, the author would like to thank Martin Thomson
-for suggesting the use of an HTTP/3 SETTINGS parameter. Thanks to Lucas Pardue
-for their inputs on this document.
+for suggesting the use of an HTTP/3 SETTINGS parameter.
