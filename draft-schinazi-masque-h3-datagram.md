@@ -165,51 +165,61 @@ with error H3_SETTINGS_ERROR.
 # Datagram-Flow-Id Header Field Definition {#header}
 
 "Datagram-Flow-Id" is a Item Structured
-Field {{!STRUCT-FIELD=I-D.ietf-httpbis-header-structure}}. Its value MUST be an
-Integer. Its ABNF is:
+Field {{!STRUCT-FIELD=I-D.ietf-httpbis-header-structure}}. Its value MUST be a
+List of Integers. Its ABNF is:
 
 ~~~
-  Datagram-Flow-Id = sf-integer
+  Datagram-Flow-Id = sf-list
 ~~~
 
-The "Datagram-Flow-Id" header field is used to associate a datagram flow
-identifier with an HTTP message. For example, the definition of an HTTP method
-could instruct the client to use its flow identifier allocation service to
-allocate a new flow identifier, and then the client will add the
-"Datagram-Flow-Id" header field to its request to communicate that value to the
-server. For example, the resulting header field could look like:
+The "Datagram-Flow-Id" header field is used to associate one or more datagram
+flow identifiers with an HTTP message. As a simple example using a single
+identifier, the definition of an HTTP method could instruct the client to use
+its flow identifier allocation service to allocate a new flow identifier, and
+then the client will add the "Datagram-Flow-Id" header field to its request to
+communicate that value to the server. In this example, the resulting header
+field could look like:
 
 ~~~
   Datagram-Flow-Id = 2
 ~~~
 
-Definitions of HTTP features that use the "Datagram-Flow-Id" header field MAY
-define their own parameters (parameters are defined in Section 3.1.2 of
-{{STRUCT-FIELD}}). For example, an HTTP method that wishes to use two datagram
-flow identifiers for the lifetime of its request stream could encode the second
-flow identifier as a parameter, which could look like this:
+One element in the list is allowed to be unnamed, but all but one elements
+MUST carry a name. The name is conveyed using a true boolean parameter
+(parameters are defined in Section 3.1.2 of {{STRUCT-FIELD}}) which MUST
+bew the first parameter of that element. The ordering of the list does not
+carry any semantics. For example, an HTTP method that wishes to use four
+datagram flow identifiers for the lifetime of its request stream could look
+like this:
 
 ~~~
-  Datagram-Flow-Id = 42; alternate=44
+  Datagram-Flow-Id = 42, 44; ecn-ect0, 48; ecn-ce, 46; ecn-ect1
 ~~~
 
-The "Datagram-Flow-Id" header field MUST NOT be present more than once on a given
-HTTP message; any HTTP message containing more than one "Datagram-Flow-Id"
-header field is malformed.
+In this example, 42 is the unnamed flow identifier, 44 represents "ecn-ect0",
+46 represents "ecn-ect1" and 48 represents "ecn-ce".
 
-Since the QUIC STREAM frame that contains the "Datagram-Flow-Id" header field could
-be lost or reordered, it is possible that an endpoint will receive an HTTP/3
-datagram with a flow identifier that it does not know as it has not yet
-received the corresponding "Datagram-Flow-Id" header field. Endpoints MUST NOT treat
-that as an error; they MUST either silently discard the datagram or buffer it
-until they receive the "Datagram-Flow-Id" header field.
+Even if a sender attempts to communicate the meaning of a flow identifier
+before it uses it in an HTTP/3 datagram, it is possible that its peer will
+receive an HTTP/3 datagram with a flow identifier that it does not know as it
+has not yet received the corresponding "Datagram-Flow-Id" header field. (For
+example, this could happen if the QUIC STREAM frame that contains the
+"Datagram-Flow-Id" header field is reordered and arrives afer the DATAGRAM
+frame.) Endpoints MUST NOT treat that scenario as an error; they MUST either
+silently discard the datagram or buffer it until they receive the
+"Datagram-Flow-Id" header field.
+
+Distinct HTTP requests MAY refer to the same flow identifier in their
+respective "Datagram-Flow-Id" header fields.
 
 Note that integer structured fields can only encode values up to 10^15-1,
 therefore the maximum possible value of the "Datagram-Flow-Id" header field is
 lower then the theoretical maximum value of a flow identifier which is 2^62-1
 due to the QUIC variable length integer encoding. If the flow identifier
 allocation service of an endpoint runs out of values lower than 10^15-1, the
-endpoint MUST treat is as a connection error of type H3_ID_ERROR.
+endpoint MUST fail the flow identifier allocation. An HTTP message that
+carries a "Datagram-Flow-Id" header field with a flow identifier value above
+10^15-1 is malformed.
 
 
 # HTTP Intermediaries {#intermediaries}
@@ -234,6 +244,10 @@ the HTTP method of the request is not supported by the intermediary, it MUST
 remove the "Datagram-Flow-Id" header field before forwarding the response. If
 the intermediary supports the method, it MUST either remove the header field or
 adhere to the requirements leveraged by that method on intermediaries.
+
+If an intermediary processes distinct HTTP requests that refer to the same flow
+identifier in their respective "Datagram-Flow-Id" header fields, it MUST ensure
+that those requests are routed to the same backend.
 
 
 # Security Considerations {#security}
