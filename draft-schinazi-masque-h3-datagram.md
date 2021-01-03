@@ -166,7 +166,8 @@ with error H3_SETTINGS_ERROR.
 
 "Datagram-Flow-Id" is a Item Structured
 Field {{!STRUCT-FIELD=I-D.ietf-httpbis-header-structure}}. Its value MUST be a
-List of Integers. Its ABNF is:
+List Structured Field, whose members MUST all be Items of type Integer. Its
+ABNF is:
 
 ~~~
   Datagram-Flow-Id = sf-list
@@ -185,19 +186,28 @@ field could look like:
 ~~~
 
 One element in the list is allowed to be unnamed, but all but one elements
-MUST carry a name. The name is conveyed using a true boolean parameter
-(parameters are defined in Section 3.1.2 of {{STRUCT-FIELD}}) which MUST
-be the first parameter of that element. The ordering of the list does not
-carry any semantics. For example, an HTTP method that wishes to use four
-datagram flow identifiers for the lifetime of its request stream could look
-like this:
+MUST carry a name. The name of an element is encoded in the key of the first
+parameter of that element (parameters are defined in Section 3.1.2 of
+{{STRUCT-FIELD}}). Each name MUST NOT appear more than once in the list. The
+value of the first parameter of each named element (whose corresponding key
+conveys the element name) MUST be of type Boolean and equal to true. The value
+of the first parameter of the unnamed element MUST NOT be of type Boolean. The
+ordering of the list does not carry any semantics. For example, an HTTP method
+that wishes to use four datagram flow identifiers for the lifetime of its
+request stream could look like this:
 
 ~~~
-  Datagram-Flow-Id = 42, 44; ecn-ect0, 48; ecn-ce, 46; ecn-ect1
+  Datagram-Flow-Id = 42, 44; ecn-ect0, 46; ecn-ect1, 48; ecn-ce
 ~~~
 
-In this example, 42 is the unnamed flow identifier, 44 represents "ecn-ect0",
-46 represents "ecn-ect1" and 48 represents "ecn-ce".
+In this example, 42 is the unnamed flow identifier, 44 represents the name
+"ecn-ect0", 46 represents "ecn-ect1", and 48 represents "ecn-ce". Note that,
+since the list ordering does not carry semantics, this example can be
+equivalently encoded as:
+
+~~~
+  Datagram-Flow-Id = 44; ecn-ect0, 42, 48; ecn-ce, 46; ecn-ect1
+~~~
 
 Even if a sender attempts to communicate the meaning of a flow identifier
 before it uses it in an HTTP/3 datagram, it is possible that its peer will
@@ -213,13 +223,13 @@ Distinct HTTP requests MAY refer to the same flow identifier in their
 respective "Datagram-Flow-Id" header fields.
 
 Note that integer structured fields can only encode values up to 10^15-1,
-therefore the maximum possible value of the "Datagram-Flow-Id" header field is
-lower then the theoretical maximum value of a flow identifier which is 2^62-1
-due to the QUIC variable length integer encoding. If the flow identifier
-allocation service of an endpoint runs out of values lower than 10^15-1, the
-endpoint MUST fail the flow identifier allocation. An HTTP message that
-carries a "Datagram-Flow-Id" header field with a flow identifier value above
-10^15-1 is malformed.
+therefore the maximum possible value of an element of the "Datagram-Flow-Id"
+header field is lower then the theoretical maximum value of a flow identifier
+which is 2^62-1 due to the QUIC variable length integer encoding. If the flow
+identifier allocation service of an endpoint runs out of values lower than
+10^15-1, the endpoint MUST fail the flow identifier allocation. An HTTP
+message that carries a "Datagram-Flow-Id" header field with a flow identifier
+value above 10^15-1 is malformed (see Section 8.1.2.6 of {{!H2=RFC7540}}).
 
 
 # HTTP Intermediaries {#intermediaries}
