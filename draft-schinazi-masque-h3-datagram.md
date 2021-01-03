@@ -187,7 +187,7 @@ field could look like:
 One element in the list is allowed to be unnamed, but all but one elements
 MUST carry a name. The name is conveyed using a true boolean parameter
 (parameters are defined in Section 3.1.2 of {{STRUCT-FIELD}}) which MUST
-bew the first parameter of that element. The ordering of the list does not
+be the first parameter of that element. The ordering of the list does not
 carry any semantics. For example, an HTTP method that wishes to use four
 datagram flow identifiers for the lifetime of its request stream could look
 like this:
