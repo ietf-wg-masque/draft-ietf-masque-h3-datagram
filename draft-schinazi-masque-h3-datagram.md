@@ -131,7 +131,8 @@ HTTP/3 Datagram Payload:
 applications. Note that this field can be empty.
 
 Endpoints MUST treat receipt of a DATAGRAM frame whose payload is too short to
-parse the flow identifier as a connection error of type PROTOCOL_VIOLATION.
+parse the flow identifier as an HTTP/3 connection error of type
+H3_GENERAL_PROTOCOL_ERROR.
 
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
