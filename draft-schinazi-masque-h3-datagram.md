@@ -185,6 +185,7 @@ field could look like:
   Datagram-Flow-Id = 2
 ~~~
 
+List members are flow identifier elements, which can be named or unnamed.
 One element in the list is allowed to be unnamed, but all but one elements
 MUST carry a name. The name of an element is encoded in the key of the first
 parameter of that element (parameters are defined in Section 3.1.2 of
