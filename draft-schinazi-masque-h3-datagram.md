@@ -334,6 +334,11 @@ Is Name:
 parameter is the name of a named element (see {{header}}). No indicates that it
 is a parameter that is not a name.
 
+Reference:
+
+: An optional reference to a specification for the parameter. This field MAY be
+empty.
+
 Registrations follow the "First Come First Served" policy (see Section 4.4 of
 {{!IANA-POLICY=RFC8126}}) where two registrations MUST NOT have the same Key.
 This registry is initially empty.
