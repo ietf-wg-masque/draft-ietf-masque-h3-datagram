@@ -311,6 +311,39 @@ registry maintained at
 ~~~
 
 
+## Flow Identifier Parameters {#iana-params}
+
+This document will request IANA to create an "HTTP Datagram Flow Identifier
+Parameters" registry. Registrations in this registry MUST
+include the following fields:
+
+Key:
+
+: The key of a parameter that is associated with a datagram flow identifier
+list member (see {{header}}). Keys MUST be valid structured field parameter
+keys (see Section 3.1.2 of {{STRUCT-FIELD}}).
+
+Description:
+
+: A brief description of the parameter semantics, which MAY be a summary if a
+specification reference is provided.
+
+Is Name:
+
+: This field MUST be either Yes or No. Yes indicates that this
+parameter is the name of a named element (see {{header}}). No indicates that it
+is a parameter that is not a name.
+
+Reference:
+
+: An optional reference to a specification for the parameter. This field MAY be
+empty.
+
+Registrations follow the "First Come First Served" policy (see Section 4.4 of
+{{!IANA-POLICY=RFC8126}}) where two registrations MUST NOT have the same Key.
+This registry is initially empty.
+
+
 --- back
 
 # Acknowledgments {#acks}
