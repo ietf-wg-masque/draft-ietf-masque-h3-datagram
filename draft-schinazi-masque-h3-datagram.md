@@ -311,6 +311,27 @@ registry maintained at
 ~~~
 
 
+## Flow Identifier Element Names {#iana-element-names}
+
+This document will request IANA to create an "HTTP Datagram Flow Identifier
+Element Names" registry. Registrations in this registry MUST
+include the following fields:
+
+Name:
+
+: The element name that will be transmitted (see {{header}}). Names MUST be
+valid structured field parameter keys (see Section 3.1.2 of {{STRUCT-FIELD}}).
+
+Description:
+
+: A brief description of the name semantics, which MAY be a summary if a
+specification reference is provided.
+
+Registrations follow the "First Come First Served" policy (see Section 4.4 of
+{{!IANA-POLICY=RFC8126}}) where two registrations MUST NOT have the same Name.
+This registry is initially empty.
+
+
 --- back
 
 # Acknowledgments {#acks}
