@@ -318,6 +318,6 @@ registry maintained at
 
 The DATAGRAM flow identifier was previously part of the DATAGRAM frame
 definition itself, the author would like to acknowledge the authors of
-that document and the members of the IETF QUIC working group for their
+that document and the members of the IETF MASQUE working group for their
 suggestions. Additionally, the author would like to thank Martin Thomson
 for suggesting the use of an HTTP/3 SETTINGS parameter.
