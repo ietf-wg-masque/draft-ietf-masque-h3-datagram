@@ -105,6 +105,17 @@ odd-numbered identifiers. Note that, once allocated, any flow identifier can be
 used by both client and server - only allocation carries separate namespaces to
 avoid requiring synchronization.
 
+The flow allocation service SHOULD also provide a mechanism for applications
+to indicate they have completed their usage of a flow identifier and will no
+longer be using that flow identifier, this process is called "retiring" a flow
+identifier. Applications MUST NOT retire a flow identifier until after they
+have received confirmation that the peer has also stopped using that flow
+identifier. The flow identifier allocation service MAY reuse previously
+retired flow identifiers once they have ascertained that there are no packets
+with DATAGRAM frames using that flow identifier still in flight. Reusing flow
+identifiers can improve performance by transmitting the flow identifier using
+a shorter variable length integer encoding.
+
 
 # HTTP/3 DATAGRAM Frame Format {#format}
 
