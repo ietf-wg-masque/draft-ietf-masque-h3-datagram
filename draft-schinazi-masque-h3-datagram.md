@@ -164,10 +164,9 @@ with error H3_SETTINGS_ERROR.
 
 # Datagram-Flow-Id Header Field Definition {#header}
 
-"Datagram-Flow-Id" is a Item Structured
-Field {{!STRUCT-FIELD=I-D.ietf-httpbis-header-structure}}. Its value MUST be a
-List Structured Field, whose members MUST all be Items of type Integer. Its
-ABNF is:
+"Datagram-Flow-Id" is a List Structured
+Field {{!STRUCT-FIELD=I-D.ietf-httpbis-header-structure}}, whose members MUST
+all be Items of type Integer. Its ABNF is:
 
 ~~~
   Datagram-Flow-Id = sf-list
