@@ -114,7 +114,7 @@ identifier. The flow identifier allocation service MAY reuse previously
 retired flow identifiers once they have ascertained that there are no packets
 with DATAGRAM frames using that flow identifier still in flight. Reusing flow
 identifiers can improve performance by transmitting the flow identifier using
-a shorter variable length integer encoding.
+a shorter variable-length integer encoding.
 
 
 # HTTP/3 DATAGRAM Frame Format {#format}
