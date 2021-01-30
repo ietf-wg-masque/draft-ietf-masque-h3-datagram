@@ -1,9 +1,9 @@
 # Using QUIC Datagrams with HTTP/3
 
-This is the working area for the individual Internet-Draft, "Using QUIC Datagrams with HTTP/3".
+This is the working area for the MASQUE Working Group Internet-Draft, "Using QUIC Datagrams with HTTP/3".
 
-* [Editor's Copy](https://davidschinazi.github.io/draft-h3-datagram/draft-schinazi-masque-h3-datagram.html)
-* [Individual Draft](https://tools.ietf.org/html/draft-schinazi-masque-h3-datagram)
+* [Editor's Copy](https://github.com/ietf-wg-masque/draft-ietf-masque-h3-datagram/draft-ietf-masque-h3-datagram.html)
+* [Working Group Draft](https://tools.ietf.org/html/draft-ietf-masque-h3-datagram)
 
 ## Building the Draft
 
@@ -20,4 +20,4 @@ This requires that you have the necessary software installed.  See
 ## Contributing
 
 See the
-[guidelines for contributions](https://github.com/DavidSchinazi/draft-h3-datagram/blob/master/CONTRIBUTING.md).
+[guidelines for contributions](https://github.com/ietf-wg-masque/draft-ietf-masque-h3-datagram/blob/master/CONTRIBUTING.md).
