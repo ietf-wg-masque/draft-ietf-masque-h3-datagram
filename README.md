@@ -2,7 +2,7 @@
 
 This is the working area for the MASQUE Working Group Internet-Draft, "Using QUIC Datagrams with HTTP/3".
 
-* [Editor's Copy](https://github.com/ietf-wg-masque/draft-ietf-masque-h3-datagram/draft-ietf-masque-h3-datagram.html)
+* [Editor's Copy](https://ietf-wg-masque.github.io/draft-ietf-masque-h3-datagram/draft-ietf-masque-h3-datagram.html)
 * [Working Group Draft](https://tools.ietf.org/html/draft-ietf-masque-h3-datagram)
 
 ## Building the Draft
