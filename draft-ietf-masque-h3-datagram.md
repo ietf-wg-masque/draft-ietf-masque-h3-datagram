@@ -1,7 +1,7 @@
 ---
 title: Using QUIC Datagrams with HTTP/3
 abbrev: HTTP/3 Datagrams
-docname: draft-schinazi-masque-h3-datagram-latest
+docname: draft-ietf-masque-h3-datagram-latest
 category: std
 
 ipr: trust200902
@@ -40,7 +40,8 @@ ensuring those frames are properly associated with an HTTP message.
 
 Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
 ([masque@ietf.org](mailto:masque@ietf.org)) or on the GitHub repository which
-contains the draft: [](https://github.com/DavidSchinazi/draft-h3-datagram).
+contains the draft:
+[](https://github.com/ietf-wg-masque/draft-ietf-masque-h3-datagram).
 
 
 --- middle
@@ -63,7 +64,8 @@ demultiplexing identifier at the start of each unidirectional stream.
 
 Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
 ([masque@ietf.org](mailto:masque@ietf.org)) or on the GitHub repository which
-contains the draft: [](https://github.com/DavidSchinazi/draft-h3-datagram).
+contains the draft:
+[](https://github.com/ietf-wg-masque/draft-ietf-masque-h3-datagram).
 
 
 ## Conventions and Definitions {#defs}
