@@ -32,11 +32,12 @@ author:
 The QUIC DATAGRAM extension provides application protocols running over QUIC
 with a mechanism to send unreliable data while leveraging the security and
 congestion-control properties of QUIC. However, QUIC DATAGRAM frames do not
-provide a means to demultiplex application contexts. This document defines how
+provide a means to demultiplex application contexts. This document describes how
 to use QUIC DATAGRAM frames when the application protocol running over QUIC is
-HTTP/3 by adding an identifier at the start of the frame payload. This allows
-HTTP messages to convey related information using unreliable DATAGRAM frames,
-ensuring those frames are properly associated with an HTTP message.
+HTTP/3. It defines logical flows identified by a non-negative integer that are
+present at the start of the DATAGRAM frame payload. Flows are associated with
+HTTP messages using the Datagram-Flow-Id header field, allowing endpoints to
+match unreliable DATAGRAMS frames to the HTTP messages that they are related to.
 
 Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
 ([masque@ietf.org](mailto:masque@ietf.org)) or on the GitHub repository which
@@ -49,15 +50,16 @@ contains the draft:
 # Introduction {#intro}
 
 The QUIC DATAGRAM extension {{!DGRAM=I-D.ietf-quic-datagram}} provides
-application protocols running over QUIC {{!QUIC=I-D.ietf-quic-transport}} with
-a mechanism to send unreliable data while leveraging the security and
+application protocols running over QUIC {{!QUIC=I-D.ietf-quic-transport}} with a
+mechanism to send unreliable data while leveraging the security and
 congestion-control properties of QUIC. However, QUIC DATAGRAM frames do not
-provide a means to demultiplex application contexts. This document defines how
+provide a means to demultiplex application contexts. This document describes how
 to use QUIC DATAGRAM frames when the application protocol running over QUIC is
-HTTP/3 {{!H3=I-D.ietf-quic-http}} by adding an identifier at the start of the
-frame payload. This allows HTTP messages to convey related information using
-unreliable DATAGRAM frames, ensuring those frames are properly associated with
-an HTTP message.
+HTTP/3 {{!H3=I-D.ietf-quic-http}}. It defines logical flows identified by a
+non-negative integer that are present at the start of the DATAGRAM frame
+payload. Flows are associated with HTTP messages using the Datagram-Flow-Id
+header field, allowing endpoints to match unreliable DATAGRAMS frames to the
+HTTP messages that they are related to.
 
 This design mimics the use of Stream Types in HTTP/3, which provide a
 demultiplexing identifier at the start of each unidirectional stream.
@@ -76,46 +78,48 @@ document are to be interpreted as described in BCP 14 {{!RFC2119}} {{!RFC8174}}
 when, and only when, they appear in all capitals, as shown here.
 
 
-# Flow Identifiers {#flow-id}
+# Flows
 
-Flow identifiers represent bidirectional flows of datagrams within a single QUIC
-connection. These are conceptually similar to streams in the sense that they
-allow multiplexing of application data.  Flows lack any of the ordering
-or reliability guarantees of streams.
+Flows are bidirectional exchanges of datagrams within a single QUIC connection.
+These are conceptually similar to streams in the sense that they allow
+multiplexing of application data. Flows are identified within a connection by a
+numeric value, referred to as the flow ID.  A flow ID is a 62-bit integer (0
+to 2^62-1).
 
-Beyond this, a sender SHOULD ensure that DATAGRAM frames within a single flow
-are transmitted in order relative to one another. If multiple DATAGRAM frames
-can be packed into a single QUIC packet, the sender SHOULD group them by flow
-identifier to promote fate-sharing within a specific flow and improve the
-ability to process batches of datagram messages efficiently on the receiver.
+Flows lack any of the ordering or reliability guarantees of streams. Beyond
+this, a sender SHOULD ensure that DATAGRAM frames within a single flow are
+transmitted in order relative to one another. If multiple DATAGRAM frames can be
+packed into a single QUIC packet, the sender SHOULD group them by flow to
+promote fate-sharing within a specific flow and improve the ability to process
+batches of datagram messages efficiently on the receiver.
 
 
-# Flow Identifier Allocation {#flow-id-alloc}
+# Flow Allocation {#flow-id-alloc}
 
 Implementations of HTTP/3 that support the DATAGRAM extension MUST provide a
-flow identifier allocation service. That service will allow applications
-co-located with HTTP/3 to request a unique flow identifier that they can
+flow allocation service. That service will allow applications
+co-located with HTTP/3 to request a unique flow ID that they can
 subsequently use for their own purposes. The HTTP/3 implementation will then
-parse the flow identifier of incoming DATAGRAM frames and use it to deliver the
-frame to the appropriate application.
+parse the flow ID of incoming DATAGRAM frames and use it to deliver the
+frame to the appropriate application context.
 
-Even-numbered flow identifiers are client-initiated, while odd-numbered flow
-identifiers are server-initiated. This means that an HTTP/3 client
-implementation of the flow identifier allocation service MUST only provide
-even-numbered identifiers, while a server implementation MUST only provide
-odd-numbered identifiers. Note that, once allocated, any flow identifier can be
+Even-numbered flow IDs are client-initiated, while odd-numbered flow
+IDs are server-initiated. This means that an HTTP/3 client
+implementation of the flow allocation service MUST only provide
+even-numbered IDs, while a server implementation MUST only provide
+odd-numbered IDs. Note that, once allocated, any flow ID can be
 used by both client and server - only allocation carries separate namespaces to
 avoid requiring synchronization.
 
 The flow allocation service SHOULD also provide a mechanism for applications
-to indicate they have completed their usage of a flow identifier and will no
-longer be using that flow identifier, this process is called "retiring" a flow
-identifier. Applications MUST NOT retire a flow identifier until after they
+to indicate they have completed their usage of a flow ID and will no
+longer be using that flow ID, this process is called "retiring" a flow
+ID. Applications MUST NOT retire a flow ID until after they
 have received confirmation that the peer has also stopped using that flow
-identifier. The flow identifier allocation service MAY reuse previously
-retired flow identifiers once they have ascertained that there are no packets
-with DATAGRAM frames using that flow identifier still in flight. Reusing flow
-identifiers can improve performance by transmitting the flow identifier using
+ID. The flow allocation service MAY reuse previously
+retired flow ID once they have ascertained that there are no packets
+with DATAGRAM frames using that flow ID still in flight. Reusing flow
+IDs can improve performance by transmitting the flow ID using
 a shorter variable-length integer encoding.
 
 
@@ -127,16 +131,16 @@ of {{QUIC}}):
 
 ~~~
 HTTP/3 DATAGRAM Frame {
-  Flow Identifier (i),
+  Flow ID (i),
   HTTP/3 Datagram Payload (..),
 }
 ~~~
 {: #h3-datagram-format title="HTTP/3 DATAGRAM Frame Format"}
 
-Flow Identifier:
+Flow ID:
 
-: A variable-length integer indicating the Flow Identifier of the datagram (see
-{{flow-id}}).
+: A variable-length integer indicating the Flow ID of the datagram (see
+{{flows}}).
 
 HTTP/3 Datagram Payload:
 
@@ -144,7 +148,7 @@ HTTP/3 Datagram Payload:
 applications. Note that this field can be empty.
 
 Endpoints MUST treat receipt of a DATAGRAM frame whose payload is too short to
-parse the flow identifier as an HTTP/3 connection error of type
+parse the flow ID as an HTTP/3 connection error of type
 H3_GENERAL_PROTOCOL_ERROR.
 
 
@@ -181,16 +185,16 @@ all cases, the maximum permitted value of the H3_DATAGRAM SETTINGS parameter is
 
 "Datagram-Flow-Id" is a List Structured
 Field {{!STRUCT-FIELD=I-D.ietf-httpbis-header-structure}}, whose members MUST
-all be Items of type Integer. Its ABNF is:
+all be Items of type Integer. Integers MUST be non-negative. Its ABNF is:
 
 ~~~
   Datagram-Flow-Id = sf-list
 ~~~
 
 The "Datagram-Flow-Id" header field is used to associate one or more datagram
-flow identifiers with an HTTP message. As a simple example using a single
-identifier, the definition of an HTTP method could instruct the client to use
-its flow identifier allocation service to allocate a new flow identifier, and
+flows with an HTTP message. As a simple example using a single
+flow, the definition of an HTTP method could instruct the client to use
+its flow allocation service to allocate a new flow ID, and
 then the client will add the "Datagram-Flow-Id" header field to its request to
 communicate that value to the server. In this example, the resulting header
 field could look like:
@@ -199,7 +203,7 @@ field could look like:
   Datagram-Flow-Id = 2
 ~~~
 
-List members are flow identifier elements, which can be named or unnamed.
+List members are flow ID elements, which can be named or unnamed.
 One element in the list is allowed to be unnamed, but all but one elements
 MUST carry a name. The name of an element is encoded in the key of the first
 parameter of that element (parameters are defined in Section 3.1.2 of
@@ -208,14 +212,14 @@ value of the first parameter of each named element (whose corresponding key
 conveys the element name) MUST be of type Boolean and equal to true. The value
 of the first parameter of the unnamed element MUST NOT be of type Boolean. The
 ordering of the list does not carry any semantics. For example, an HTTP method
-that wishes to use four datagram flow identifiers for the lifetime of its
+that wishes to use four datagram flows for the lifetime of its
 request stream could look like this:
 
 ~~~
   Datagram-Flow-Id = 42, 44; ecn-ect0, 46; ecn-ect1, 48; ecn-ce
 ~~~
 
-In this example, 42 is the unnamed flow identifier, 44 represents the name
+In this example, 42 is the unnamed flow, 44 represents the name
 "ecn-ect0", 46 represents "ecn-ect1", and 48 represents "ecn-ce". Note that,
 since the list ordering does not carry semantics, this example can be
 equivalently encoded as:
@@ -224,9 +228,9 @@ equivalently encoded as:
   Datagram-Flow-Id = 44; ecn-ect0, 42, 48; ecn-ce, 46; ecn-ect1
 ~~~
 
-Even if a sender attempts to communicate the meaning of a flow identifier
+Even if a sender attempts to communicate the meaning of a flow
 before it uses it in an HTTP/3 datagram, it is possible that its peer will
-receive an HTTP/3 datagram with a flow identifier that it does not know as it
+receive an HTTP/3 datagram with a flow ID that it does not know as it
 has not yet received the corresponding "Datagram-Flow-Id" header field. (For
 example, this could happen if the QUIC STREAM frame that contains the
 "Datagram-Flow-Id" header field is reordered and arrives afer the DATAGRAM
@@ -234,22 +238,22 @@ frame.) Endpoints MUST NOT treat that scenario as an error; they MUST either
 silently discard the datagram or buffer it until they receive the
 "Datagram-Flow-Id" header field.
 
-Distinct HTTP requests MAY refer to the same flow identifier in their
+Distinct HTTP requests MAY refer to the same flow in their
 respective "Datagram-Flow-Id" header fields.
 
 Note that integer structured fields can only encode values up to 10^15-1,
 therefore the maximum possible value of an element of the "Datagram-Flow-Id"
-header field is lower then the theoretical maximum value of a flow identifier
+header field is lower then the theoretical maximum value of a flow ID
 which is 2^62-1 due to the QUIC variable length integer encoding. If the flow
-identifier allocation service of an endpoint runs out of values lower than
-10^15-1, the endpoint MUST fail the flow identifier allocation. An HTTP
-message that carries a "Datagram-Flow-Id" header field with a flow identifier
+allocation service of an endpoint runs out of flow ID values lower than
+10^15-1, the endpoint MUST fail the flow allocation. An HTTP
+message that carries a "Datagram-Flow-Id" header field with a flow ID
 value above 10^15-1 is malformed (see Section 8.1.2.6 of {{!H2=RFC7540}}).
 
 
 # HTTP Intermediaries {#intermediaries}
 
-HTTP/3 DATAGRAM flow identifiers are specific to a given HTTP/3 connection.
+HTTP/3 DATAGRAM flows are specific to a given HTTP/3 connection.
 However, in some cases, an HTTP request may travel across multiple HTTP
 connections if there are HTTP intermediaries involved; see Section 2.3 of
 {{!RFC7230}}.
@@ -271,7 +275,7 @@ the intermediary supports the method, it MUST either remove the header field or
 adhere to the requirements leveraged by that method on intermediaries.
 
 If an intermediary processes distinct HTTP requests that refer to the same flow
-identifier in their respective "Datagram-Flow-Id" header fields, it MUST ensure
+ID in their respective "Datagram-Flow-Id" header fields, it MUST ensure
 that those requests are routed to the same backend.
 
 
@@ -313,15 +317,15 @@ registry maintained at
 ~~~
 
 
-## Flow Identifier Parameters {#iana-params}
+## Flow Parameters {#iana-params}
 
-This document will request IANA to create an "HTTP Datagram Flow Identifier
+This document will request IANA to create an "HTTP Datagram Flow
 Parameters" registry. Registrations in this registry MUST
 include the following fields:
 
 Key:
 
-: The key of a parameter that is associated with a datagram flow identifier
+: The key of a parameter that is associated with a datagram flow
 list member (see {{header}}). Keys MUST be valid structured field parameter
 keys (see Section 3.1.2 of {{STRUCT-FIELD}}).
 
