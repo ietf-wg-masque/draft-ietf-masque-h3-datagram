@@ -78,7 +78,7 @@ document are to be interpreted as described in BCP 14 {{!RFC2119}} {{!RFC8174}}
 when, and only when, they appear in all capitals, as shown here.
 
 
-# Flows
+# Datagram Flows
 
 Flows are bidirectional exchanges of datagrams within a single QUIC connection.
 These are conceptually similar to streams in the sense that they allow
@@ -94,10 +94,10 @@ promote fate-sharing within a specific flow and improve the ability to process
 batches of datagram messages efficiently on the receiver.
 
 
-# Flow Allocation {#flow-id-alloc}
+# Flow ID Allocation {#flow-id-alloc}
 
 Implementations of HTTP/3 that support the DATAGRAM extension MUST provide a
-flow allocation service. That service will allow applications
+flow ID allocation service. That service will allow applications
 co-located with HTTP/3 to request a unique flow ID that they can
 subsequently use for their own purposes. The HTTP/3 implementation will then
 parse the flow ID of incoming DATAGRAM frames and use it to deliver the
@@ -105,18 +105,18 @@ frame to the appropriate application context.
 
 Even-numbered flow IDs are client-initiated, while odd-numbered flow
 IDs are server-initiated. This means that an HTTP/3 client
-implementation of the flow allocation service MUST only provide
+implementation of the flow ID allocation service MUST only provide
 even-numbered IDs, while a server implementation MUST only provide
 odd-numbered IDs. Note that, once allocated, any flow ID can be
 used by both client and server - only allocation carries separate namespaces to
 avoid requiring synchronization.
 
-The flow allocation service SHOULD also provide a mechanism for applications
+The flow ID allocation service SHOULD also provide a mechanism for applications
 to indicate they have completed their usage of a flow ID and will no
 longer be using that flow ID, this process is called "retiring" a flow
 ID. Applications MUST NOT retire a flow ID until after they
 have received confirmation that the peer has also stopped using that flow
-ID. The flow allocation service MAY reuse previously
+ID. The flow ID allocation service MAY reuse previously
 retired flow ID once they have ascertained that there are no packets
 with DATAGRAM frames using that flow ID still in flight. Reusing flow
 IDs can improve performance by transmitting the flow ID using
@@ -140,7 +140,7 @@ HTTP/3 DATAGRAM Frame {
 Flow ID:
 
 : A variable-length integer indicating the Flow ID of the datagram (see
-{{flows}}).
+{{datagram-flows}}).
 
 HTTP/3 Datagram Payload:
 
@@ -194,7 +194,7 @@ all be Items of type Integer. Integers MUST be non-negative. Its ABNF is:
 The "Datagram-Flow-Id" header field is used to associate one or more datagram
 flows with an HTTP message. As a simple example using a single
 flow, the definition of an HTTP method could instruct the client to use
-its flow allocation service to allocate a new flow ID, and
+its flow ID allocation service to allocate a new flow ID, and
 then the client will add the "Datagram-Flow-Id" header field to its request to
 communicate that value to the server. In this example, the resulting header
 field could look like:
@@ -246,7 +246,7 @@ therefore the maximum possible value of an element of the "Datagram-Flow-Id"
 header field is lower then the theoretical maximum value of a flow ID
 which is 2^62-1 due to the QUIC variable length integer encoding. If the flow
 allocation service of an endpoint runs out of flow ID values lower than
-10^15-1, the endpoint MUST fail the flow allocation. An HTTP
+10^15-1, the endpoint MUST fail the flow ID allocation. An HTTP
 message that carries a "Datagram-Flow-Id" header field with a flow ID
 value above 10^15-1 is malformed (see Section 8.1.2.6 of {{!H2=RFC7540}}).
 
