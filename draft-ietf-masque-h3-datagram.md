@@ -195,7 +195,7 @@ REGISTER_DATAGRAM_FLOW_ID Frame {
   Type (i) = TBD,
   Length (i),
   Flow ID (i),
-  Encoded Field Section (..),
+  Extension String (..),
 }
 ~~~
 {: #register-frame-format title="REGISTER_DATAGRAM_FLOW_ID HTTP/3 Frame Format"}
@@ -207,10 +207,19 @@ Flow ID:
 
 : The flow ID to associate with the QUIC stream that carried this frame.
 
-Encoded Field Section:
+Extension String:
 
-: QPACK-encoded fields. This allows extensions to optionally attach headers to
-their flow IDs.
+: A string of comma-separated key-value pairs to enable extensibility.
+
+The ABNF for the Extension String field is as follows (using syntax from
+{{Section 3.2.6 of RFC7230}}):
+
+~~~
+  extension-string = [ ext-member *( "," ext-member ) ]
+  ext-member       = ext-member-key "=" ext-member-value
+  ext-member-key   = token
+  ext-member-value = token
+~~~
 
 Note that these registrations are unilateral and unidirectional: the sender of
 the frame unilateraly defines the semantics it will apply to the datagrams it
@@ -294,6 +303,32 @@ This document will request IANA to register the following entry in the
   | H3_DATAGRAM  | 0x276 | This Document |    0    |
   +--------------+-------+---------------+---------+
 ~~~
+
+
+## Flow Extension Keys {#iana-keys}
+
+This document will request IANA to create an "HTTP Datagram Flow
+Extension Keys" registry. Registrations in this registry MUST
+include the following fields:
+
+Key:
+
+: The key (see {{register-frame}}). Keys MUST be valid tokens as defined in
+{{Section 3.2.6 of RFC7230}}.
+
+Description:
+
+: A brief description of the key semantics, which MAY be a summary if a
+specification reference is provided.
+
+Reference:
+
+: An optional reference to a specification for the parameter. This field MAY be
+empty.
+
+Registrations follow the "First Come First Served" policy (see Section 4.4 of
+{{!IANA-POLICY=RFC8126}}) where two registrations MUST NOT have the same Key.
+This registry is initially empty.
 
 
 --- back
