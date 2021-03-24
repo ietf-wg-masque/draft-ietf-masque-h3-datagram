@@ -36,7 +36,7 @@ provide a means to demultiplex application contexts. This document describes how
 to use QUIC DATAGRAM frames when the application protocol running over QUIC is
 HTTP/3. It defines logical flows identified by a non-negative integer that are
 present at the start of the DATAGRAM frame payload. Flows are associated with
-HTTP messages using the Datagram-Flow-Id header field, allowing endpoints to
+QUIC streams using the REGISTER_DATAGRAM_FLOW_ID HTTP/3 frame, allowing endpoints to
 match unreliable DATAGRAMS frames to the HTTP messages that they are related to.
 
 Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
@@ -57,8 +57,8 @@ provide a means to demultiplex application contexts. This document describes how
 to use QUIC DATAGRAM frames when the application protocol running over QUIC is
 HTTP/3 {{!H3=I-D.ietf-quic-http}}. It defines logical flows identified by a
 non-negative integer that are present at the start of the DATAGRAM frame
-payload. Flows are associated with HTTP messages using the Datagram-Flow-Id
-header field, allowing endpoints to match unreliable DATAGRAMS frames to the
+payload. Flows are associated with QUIC streams using the REGISTER_DATAGRAM_FLOW_ID
+HTTP/3 frame, allowing endpoints to match unreliable DATAGRAMS frames to the
 HTTP messages that they are related to.
 
 This design mimics the use of Stream Types in HTTP/3, which provide a
@@ -181,74 +181,82 @@ all cases, the maximum permitted value of the H3_DATAGRAM SETTINGS parameter is
 1.
 
 
-# Datagram-Flow-Id Header Field Definition {#header}
+# REGISTER_DATAGRAM_FLOW_ID HTTP/3 Frame Definition {#register-frame}
 
-"Datagram-Flow-Id" is a List Structured
-Field {{!STRUCT-FIELD=I-D.ietf-httpbis-header-structure}}, whose members MUST
-all be Items of type Integer. Integers MUST be non-negative. Its ABNF is:
-
-~~~
-  Datagram-Flow-Id = sf-list
-~~~
-
-The "Datagram-Flow-Id" header field is used to associate one or more datagram
-flows with an HTTP message. As a simple example using a single
-flow, the definition of an HTTP method could instruct the client to use
-its flow ID allocation service to allocate a new flow ID, and
-then the client will add the "Datagram-Flow-Id" header field to its request to
-communicate that value to the server. In this example, the resulting header
-field could look like:
+The REGISTER_DATAGRAM_FLOW_ID frame (type=TBD) is used to register a flow ID
+with the QUIC stream that it is sent on. By sending this frame, the sender
+indicates that it will process any received datagram with the corresponding
+flow ID using semantics specific to this frame. For example, if this is sent on
+a client-initiated bidirectional stream that has carried an HTTP request, this
+flow ID will now be interpreted as governed by the method of that request.
 
 ~~~
-  Datagram-Flow-Id = 2
+REGISTER_DATAGRAM_FLOW_ID Frame {
+  Type (i) = TBD,
+  Length (i),
+  Flow ID (i),
+  Encoded Field Section (..),
+}
 ~~~
+{: #register-frame-format title="REGISTER_DATAGRAM_FLOW_ID HTTP/3 Frame Format"}
 
-List members are flow ID elements, which can be named or unnamed.
-One element in the list is allowed to be unnamed, but all but one elements
-MUST carry a name. The name of an element is encoded in the key of the first
-parameter of that element (parameters are defined in Section 3.1.2 of
-{{STRUCT-FIELD}}). Each name MUST NOT appear more than once in the list. The
-value of the first parameter of each named element (whose corresponding key
-conveys the element name) MUST be of type Boolean and equal to true. The value
-of the first parameter of the unnamed element MUST NOT be of type Boolean. The
-ordering of the list does not carry any semantics. For example, an HTTP method
-that wishes to use four datagram flows for the lifetime of its
-request stream could look like this:
+The Type and Length fields follows the definition of HTTP/3 frames from {{H3}}.
+The payload consists of:
+
+Flow ID:
+
+: The flow ID to associate with the QUIC stream that carried this frame.
+
+Encoded Field Section:
+
+: QPACK-encoded fields. This allows extensions to optionally attach headers to
+their flow IDs.
+
+Note that these registrations are unilateral and unidirectional: the sender of
+the frame unilateraly defines the semantics it will apply to the datagrams it
+receives. If a mechanism using this feature wants to send datagrams of a given
+flow ID in both directions, this frame will need to be exchanged in both
+directions.
+
+
+# RELIABLE_DATAGRAM HTTP/3 Frame Definition {#reliable-datagram-frame}
+
+The RELIABLE_DATAGRAM frame (type=TBD) is used to send datagrams over QUIC
+streams when QUIC datagrams are unavailable or undesirable. Datagrams
+transmitted over streams using this frame have the same semantics as datgrams
+sent over the QUIC DATAGRAM frame.
 
 ~~~
-  Datagram-Flow-Id = 42, 44; ecn-ect0, 46; ecn-ect1, 48; ecn-ce
+RELIABLE_DATAGRAM Frame {
+  Type (i) = TBD,
+  Length (i),
+  Flow ID (i),
+  HTTP/3 Datagram Payload (..),
+}
 ~~~
+{: #reliable-datagram-frame-format title="RELIABLE_DATAGRAM HTTP/3 Frame Format"}
 
-In this example, 42 is the unnamed flow, 44 represents the name
-"ecn-ect0", 46 represents "ecn-ect1", and 48 represents "ecn-ce". Note that,
-since the list ordering does not carry semantics, this example can be
-equivalently encoded as:
+The Type and Length fields follows the definition of HTTP/3 frames from {{H3}}.
+The payload consists of:
 
-~~~
-  Datagram-Flow-Id = 44; ecn-ect0, 42, 48; ecn-ce, 46; ecn-ect1
-~~~
+Flow ID:
 
-Even if a sender attempts to communicate the meaning of a flow
-before it uses it in an HTTP/3 datagram, it is possible that its peer will
-receive an HTTP/3 datagram with a flow ID that it does not know as it
-has not yet received the corresponding "Datagram-Flow-Id" header field. (For
-example, this could happen if the QUIC STREAM frame that contains the
-"Datagram-Flow-Id" header field is reordered and arrives afer the DATAGRAM
-frame.) Endpoints MUST NOT treat that scenario as an error; they MUST either
-silently discard the datagram or buffer it until they receive the
-"Datagram-Flow-Id" header field.
+: A variable-length integer indicating the Flow ID of the datagram (see
+{{datagram-flows}}).
 
-Distinct HTTP requests MAY refer to the same flow in their
-respective "Datagram-Flow-Id" header fields.
+HTTP/3 Datagram Payload:
 
-Note that integer structured fields can only encode values up to 10^15-1,
-therefore the maximum possible value of an element of the "Datagram-Flow-Id"
-header field is lower then the theoretical maximum value of a flow ID
-which is 2^62-1 due to the QUIC variable length integer encoding. If the flow
-allocation service of an endpoint runs out of flow ID values lower than
-10^15-1, the endpoint MUST fail the flow ID allocation. An HTTP
-message that carries a "Datagram-Flow-Id" header field with a flow ID
-value above 10^15-1 is malformed (see Section 8.1.2.6 of {{!H2=RFC7540}}).
+: The payload of the datagram, whose semantics are defined by individual
+applications. Note that this field can be empty.
+
+
+# HTTP/2 Support
+
+We can provide DATAGRAM support in HTTP/2 by defining the
+REGISTER_DATAGRAM_FLOW_ID and RELIABLE_DATAGRAM frames in HTTP/2.
+
+TODO: Refactor this document into "HTTP Datagrams" with definitions for
+HTTP/2 and HTTP/3.
 
 
 # HTTP Intermediaries {#intermediaries}
@@ -258,25 +266,12 @@ However, in some cases, an HTTP request may travel across multiple HTTP
 connections if there are HTTP intermediaries involved; see Section 2.3 of
 {{!RFC7230}}.
 
-If an intermediary has sent the H3_DATAGRAM SETTINGS parameter with a value of 1
-on its client-facing connection, it MUST inspect all HTTP requests from that
-connection and check for the presence of the "Datagram-Flow-Id" header field. If
-the HTTP method of the request is not supported by the intermediary, it MUST
-remove the "Datagram-Flow-Id" header field before forwarding the request. If the
-intermediary supports the method, it MUST either remove the header field or
-adhere to the requirements leveraged by that method on intermediaries.
-
-If an intermediary has sent the H3_DATAGRAM SETTINGS parameter with a value of 1
-on its server-facing connection, it MUST inspect all HTTP responses from that
-connection and check for the presence of the "Datagram-Flow-Id" header field. If
-the HTTP method of the request is not supported by the intermediary, it MUST
-remove the "Datagram-Flow-Id" header field before forwarding the response. If
-the intermediary supports the method, it MUST either remove the header field or
-adhere to the requirements leveraged by that method on intermediaries.
-
-If an intermediary processes distinct HTTP requests that refer to the same flow
-ID in their respective "Datagram-Flow-Id" header fields, it MUST ensure
-that those requests are routed to the same backend.
+If an intermediary has sent the H3_DATAGRAM SETTINGS parameter with a value of
+1 it MUST NOT blindly forward HTTP/3 frames. The intermediary MUST parse
+received REGISTER_DATAGRAM_FLOW_ID and RELIABLE_DATAGRAM frames and act on
+them. If the intermediary wishes to forward datagrams from one connection to
+another, it MUST generate flow IDs on the outbound connection using its flow ID
+allocation service.
 
 
 # Security Considerations {#security}
@@ -299,55 +294,6 @@ This document will request IANA to register the following entry in the
   | H3_DATAGRAM  | 0x276 | This Document |    0    |
   +--------------+-------+---------------+---------+
 ~~~
-
-
-## HTTP Header Field {#iana-header}
-
-This document will request IANA to register the "Datagram-Flow-Id"
-header field in the "Permanent Message Header Field Names"
-registry maintained at
-<[](https://www.iana.org/assignments/message-headers)>.
-
-~~~
-  +-------------------+----------+--------+---------------+
-  | Header Field Name | Protocol | Status |   Reference   |
-  +-------------------+----------+--------+---------------+
-  | Datagram-Flow-Id  |   http   |  std   | This document |
-  +-------------------+----------+--------+---------------+
-~~~
-
-
-## Flow Parameters {#iana-params}
-
-This document will request IANA to create an "HTTP Datagram Flow
-Parameters" registry. Registrations in this registry MUST
-include the following fields:
-
-Key:
-
-: The key of a parameter that is associated with a datagram flow
-list member (see {{header}}). Keys MUST be valid structured field parameter
-keys (see Section 3.1.2 of {{STRUCT-FIELD}}).
-
-Description:
-
-: A brief description of the parameter semantics, which MAY be a summary if a
-specification reference is provided.
-
-Is Name:
-
-: This field MUST be either Yes or No. Yes indicates that this
-parameter is the name of a named element (see {{header}}). No indicates that it
-is a parameter that is not a name.
-
-Reference:
-
-: An optional reference to a specification for the parameter. This field MAY be
-empty.
-
-Registrations follow the "First Come First Served" policy (see Section 4.4 of
-{{!IANA-POLICY=RFC8126}}) where two registrations MUST NOT have the same Key.
-This registry is initially empty.
 
 
 --- back
