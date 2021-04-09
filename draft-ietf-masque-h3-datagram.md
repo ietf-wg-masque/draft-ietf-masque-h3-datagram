@@ -3,6 +3,7 @@ title: Using QUIC Datagrams with HTTP/3
 abbrev: HTTP/3 Datagrams
 docname: draft-ietf-masque-h3-datagram-latest
 category: std
+wg: MASQUE
 
 ipr: trust200902
 keyword: Internet-Draft
