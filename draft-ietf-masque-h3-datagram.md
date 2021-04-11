@@ -35,10 +35,8 @@ with a mechanism to send unreliable data while leveraging the security and
 congestion-control properties of QUIC. However, QUIC DATAGRAM frames do not
 provide a means to demultiplex application contexts. This document describes how
 to use QUIC DATAGRAM frames when the application protocol running over QUIC is
-HTTP/3. It defines logical flows identified by a non-negative integer that are
-present at the start of the DATAGRAM frame payload. Flows are associated with
-HTTP messages using the Datagram-Flow-Id header field, allowing endpoints to
-match unreliable DATAGRAMS frames to the HTTP messages that they are related to.
+HTTP/3. It associates datagrams with client-initiated bidirectional streams
+and defines an optional additional demultiplexing layer.
 
 Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
 ([masque@ietf.org](mailto:masque@ietf.org)) or on the GitHub repository which
@@ -56,11 +54,8 @@ mechanism to send unreliable data while leveraging the security and
 congestion-control properties of QUIC. However, QUIC DATAGRAM frames do not
 provide a means to demultiplex application contexts. This document describes how
 to use QUIC DATAGRAM frames when the application protocol running over QUIC is
-HTTP/3 {{!H3=I-D.ietf-quic-http}}. It defines logical flows identified by a
-non-negative integer that are present at the start of the DATAGRAM frame
-payload. Flows are associated with HTTP messages using the Datagram-Flow-Id
-header field, allowing endpoints to match unreliable DATAGRAMS frames to the
-HTTP messages that they are related to.
+HTTP/3 {{!H3=I-D.ietf-quic-http}}. It associates datagrams with client-initiated
+bidirectional streams and defines an optional additional demultiplexing layer.
 
 This design mimics the use of Stream Types in HTTP/3, which provide a
 demultiplexing identifier at the start of each unidirectional stream.
@@ -79,49 +74,41 @@ document are to be interpreted as described in BCP 14 {{!RFC2119}} {{!RFC8174}}
 when, and only when, they appear in all capitals, as shown here.
 
 
-# Datagram Flows
+# Multiplexing
 
-Flows are bidirectional exchanges of datagrams within a single QUIC connection.
-These are conceptually similar to streams in the sense that they allow
-multiplexing of application data. Flows are identified within a connection by a
-numeric value, referred to as the flow ID.  A flow ID is a 62-bit integer (0
-to 2^62-1).
-
-Flows lack any of the ordering or reliability guarantees of streams. Beyond
-this, a sender SHOULD ensure that DATAGRAM frames within a single flow are
-transmitted in order relative to one another. If multiple DATAGRAM frames can be
-packed into a single QUIC packet, the sender SHOULD group them by flow to
-promote fate-sharing within a specific flow and improve the ability to process
-batches of datagram messages efficiently on the receiver.
+In order to allow multiple datagram types and contexts to coexist on a given
+QUIC connection, HTTP datagrams contain two layers of multiplexing. First, the
+QUIC DATAGRAM frame payload starts with a custom-encoded stream identifier that
+associates the datagram with a given QUIC stream. Second, datagrams carry a
+flow ID that allows multiplexing multiple datagram flows related to a given
+HTTP request. Conceptually, the first layer of multiplexing is per-hop, while
+the second is end-to-end (see {{datagram-flows}}).
 
 
-# Flow ID Allocation {#flow-id-alloc}
+# Datagram Flows {#datagram-flows}
+
+Flows are unirectional exchanges of datagrams associated with a given HTTP
+request. Flows are identified within a request context by a numeric value,
+referred to as the flow ID. A flow ID is a 62-bit integer (0 to 2^62-1). Note
+that the flow ID value of zero is reserved for registration purposes (see
+{{register}}).
+
+While stream IDs are a per-hop concept, flow IDs are an end-to-end concept. In
+other words, if a datagram travels through multiple intermediaries on its way
+from client to server, the stream ID will most likely change from hop to hop,
+but the flow ID will remain the same. Flow IDs are opaque to intermediaries.
+
+
+## Flow ID Allocation {#flow-id-alloc}
 
 Implementations of HTTP/3 that support the DATAGRAM extension MUST provide a
 flow ID allocation service. That service will allow applications
 co-located with HTTP/3 to request a unique flow ID that they can
 subsequently use for their own purposes. The HTTP/3 implementation will then
 parse the flow ID of incoming DATAGRAM frames and use it to deliver the
-frame to the appropriate application context.
-
-Even-numbered flow IDs are client-initiated, while odd-numbered flow
-IDs are server-initiated. This means that an HTTP/3 client
-implementation of the flow ID allocation service MUST only provide
-even-numbered IDs, while a server implementation MUST only provide
-odd-numbered IDs. Note that, once allocated, any flow ID can be
-used by both client and server - only allocation carries separate namespaces to
-avoid requiring synchronization.
-
-The flow ID allocation service SHOULD also provide a mechanism for applications
-to indicate they have completed their usage of a flow ID and will no
-longer be using that flow ID, this process is called "retiring" a flow
-ID. Applications MUST NOT retire a flow ID until after they
-have received confirmation that the peer has also stopped using that flow
-ID. The flow ID allocation service MAY reuse previously
-retired flow ID once they have ascertained that there are no packets
-with DATAGRAM frames using that flow ID still in flight. Reusing flow
-IDs can improve performance by transmitting the flow ID using
-a shorter variable-length integer encoding.
+frame to the appropriate application context. Note that the flow ID namespace is
+tied to a given HTTP request: it is possible for the same numeral flow ID to be
+used simultaneously in distinct requests.
 
 
 # HTTP/3 DATAGRAM Frame Format {#format}
@@ -132,11 +119,20 @@ of {{QUIC}}):
 
 ~~~
 HTTP/3 DATAGRAM Frame {
+  Quarter Stream ID (i),
   Flow ID (i),
   HTTP/3 Datagram Payload (..),
 }
 ~~~
 {: #h3-datagram-format title="HTTP/3 DATAGRAM Frame Format"}
+
+Quarter Stream ID:
+
+: A variable-length integer that contains the value of the client-initiated
+bidirectional stream that this datagram is associated with, divided by four.
+(The division by four stems from the fact that HTTP requests are sent on
+client-initiated bidirectional streams, and those have stream IDs equal to zero
+modulo four.)
 
 Flow ID:
 
@@ -149,8 +145,52 @@ HTTP/3 Datagram Payload:
 applications. Note that this field can be empty.
 
 Endpoints MUST treat receipt of a DATAGRAM frame whose payload is too short to
-parse the flow ID as an HTTP/3 connection error of type
+parse the Quarter Stream ID or Flow ID as an HTTP/3 connection error of type
 H3_GENERAL_PROTOCOL_ERROR.
+
+
+# Registering Flow IDs {#register}
+
+On all streams, flow ID zero is reserved for registration of other flow IDs.
+This allows the endpoint to inform its peer of the encoding and semantics of
+upcoming datagrams. Datagrams with flow ID set to zero contain the following
+HTTP/3 Datagram Payload:
+
+~~~
+Flow ID Registration {
+  Registered Flow ID (i),
+  Extension String (..),
+}
+~~~
+{: #h3-register-format title="Flow ID Registration Format"}
+
+Registered Flow ID:
+
+: The flow ID to register and associate with the corresponding extension string.
+
+Extension String:
+
+: A string of comma-separated key-value pairs to enable extensibility.
+
+The ABNF for the Extension String field is as follows (using syntax from
+{{Section 3.2.6 of RFC7230}}):
+
+~~~
+  extension-string = [ ext-member *( "," ext-member ) ]
+  ext-member       = ext-member-key "=" ext-member-value
+  ext-member-key   = token
+  ext-member-value = token
+~~~
+
+Note that these registrations are unilateral and unidirectional: the sender of
+the frame unilateraly defines the semantics it will apply to the datagrams it
+sends. If a mechanism using this feature wants to send datagrams of a given
+flow ID in both directions, this frame will need to be exchanged in both
+directions.
+
+Note that while this registration MAY be sent using QUIC DATAGRAM frames,
+endpoints SHOULD instead send it using the RELIABLE_DATAGRAM HTTP/3 frame to
+ensure it is retransmitted if lost.
 
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
@@ -182,74 +222,49 @@ all cases, the maximum permitted value of the H3_DATAGRAM SETTINGS parameter is
 1.
 
 
-# Datagram-Flow-Id Header Field Definition {#header}
+# RELIABLE_DATAGRAM HTTP/3 Frame Definition {#reliable-datagram-frame}
 
-"Datagram-Flow-Id" is a List Structured
-Field {{!STRUCT-FIELD=I-D.ietf-httpbis-header-structure}}, whose members MUST
-all be Items of type Integer. Integers MUST be non-negative. Its ABNF is:
-
-~~~
-  Datagram-Flow-Id = sf-list
-~~~
-
-The "Datagram-Flow-Id" header field is used to associate one or more datagram
-flows with an HTTP message. As a simple example using a single
-flow, the definition of an HTTP method could instruct the client to use
-its flow ID allocation service to allocate a new flow ID, and
-then the client will add the "Datagram-Flow-Id" header field to its request to
-communicate that value to the server. In this example, the resulting header
-field could look like:
+The RELIABLE_DATAGRAM frame (type=TBD) is used to send datagrams over QUIC
+streams when QUIC datagrams are unavailable or undesirable. Datagrams
+transmitted over streams using this frame have the same semantics as datagrams
+sent over the QUIC DATAGRAM frame. The RELIABLE_DATAGRAM frame does not carry
+the Quarter Stream ID field because the Stream ID can be infered from the QUIC
+STREAM frames that carry this HTTP/3 frame.
 
 ~~~
-  Datagram-Flow-Id = 2
+RELIABLE_DATAGRAM Frame {
+  Type (i) = TBD,
+  Length (i),
+  Flow ID (i),
+  HTTP/3 Datagram Payload (..),
+}
 ~~~
+{: #reliable-datagram-frame-format title="RELIABLE_DATAGRAM HTTP/3 Frame Format"}
 
-List members are flow ID elements, which can be named or unnamed.
-One element in the list is allowed to be unnamed, but all but one elements
-MUST carry a name. The name of an element is encoded in the key of the first
-parameter of that element (parameters are defined in Section 3.1.2 of
-{{STRUCT-FIELD}}). Each name MUST NOT appear more than once in the list. The
-value of the first parameter of each named element (whose corresponding key
-conveys the element name) MUST be of type Boolean and equal to true. The value
-of the first parameter of the unnamed element MUST NOT be of type Boolean. The
-ordering of the list does not carry any semantics. For example, an HTTP method
-that wishes to use four datagram flows for the lifetime of its
-request stream could look like this:
+The Type and Length fields follows the definition of HTTP/3 frames from {{H3}}.
+The payload consists of:
 
-~~~
-  Datagram-Flow-Id = 42, 44; ecn-ect0, 46; ecn-ect1, 48; ecn-ce
-~~~
+Flow ID:
 
-In this example, 42 is the unnamed flow, 44 represents the name
-"ecn-ect0", 46 represents "ecn-ect1", and 48 represents "ecn-ce". Note that,
-since the list ordering does not carry semantics, this example can be
-equivalently encoded as:
+: A variable-length integer indicating the Flow ID of the datagram (see
+{{datagram-flows}}).
 
-~~~
-  Datagram-Flow-Id = 44; ecn-ect0, 42, 48; ecn-ce, 46; ecn-ect1
-~~~
+HTTP/3 Datagram Payload:
 
-Even if a sender attempts to communicate the meaning of a flow
-before it uses it in an HTTP/3 datagram, it is possible that its peer will
-receive an HTTP/3 datagram with a flow ID that it does not know as it
-has not yet received the corresponding "Datagram-Flow-Id" header field. (For
-example, this could happen if the QUIC STREAM frame that contains the
-"Datagram-Flow-Id" header field is reordered and arrives afer the DATAGRAM
-frame.) Endpoints MUST NOT treat that scenario as an error; they MUST either
-silently discard the datagram or buffer it until they receive the
-"Datagram-Flow-Id" header field.
+: The payload of the datagram, whose semantics are defined by individual
+applications. Note that this field can be empty.
 
-Distinct HTTP requests MAY refer to the same flow in their
-respective "Datagram-Flow-Id" header fields.
 
-Note that integer structured fields can only encode values up to 10^15-1,
-therefore the maximum possible value of an element of the "Datagram-Flow-Id"
-header field is lower then the theoretical maximum value of a flow ID
-which is 2^62-1 due to the QUIC variable length integer encoding. If the flow
-allocation service of an endpoint runs out of flow ID values lower than
-10^15-1, the endpoint MUST fail the flow ID allocation. An HTTP
-message that carries a "Datagram-Flow-Id" header field with a flow ID
-value above 10^15-1 is malformed (see Section 8.1.2.6 of {{!H2=RFC7540}}).
+# HTTP/1.x and HTTP/2 Support
+
+We can provide DATAGRAM support in HTTP/2 by defining the RELIABLE_DATAGRAM
+frame in HTTP/2.
+
+We can provide DATAGRAM support in HTTP/1.x by defining its data stream format
+to a sequence of length-value datagrams.
+
+TODO: Refactor this document into "HTTP Datagrams" with definitions for
+HTTP/1.x, HTTP/2, and HTTP/3.
 
 
 # HTTP Intermediaries {#intermediaries}
@@ -302,44 +317,21 @@ This document will request IANA to register the following entry in the
 ~~~
 
 
-## HTTP Header Field {#iana-header}
-
-This document will request IANA to register the "Datagram-Flow-Id"
-header field in the "Permanent Message Header Field Names"
-registry maintained at
-<[](https://www.iana.org/assignments/message-headers)>.
-
-~~~
-  +-------------------+----------+--------+---------------+
-  | Header Field Name | Protocol | Status |   Reference   |
-  +-------------------+----------+--------+---------------+
-  | Datagram-Flow-Id  |   http   |  std   | This document |
-  +-------------------+----------+--------+---------------+
-~~~
-
-
-## Flow Parameters {#iana-params}
+## Flow Extension Keys {#iana-keys}
 
 This document will request IANA to create an "HTTP Datagram Flow
-Parameters" registry. Registrations in this registry MUST
+Extension Keys" registry. Registrations in this registry MUST
 include the following fields:
 
 Key:
 
-: The key of a parameter that is associated with a datagram flow
-list member (see {{header}}). Keys MUST be valid structured field parameter
-keys (see Section 3.1.2 of {{STRUCT-FIELD}}).
+: The key (see {{register}}). Keys MUST be valid tokens as defined in {{Section
+3.2.6 of RFC7230}}.
 
 Description:
 
-: A brief description of the parameter semantics, which MAY be a summary if a
+: A brief description of the key semantics, which MAY be a summary if a
 specification reference is provided.
-
-Is Name:
-
-: This field MUST be either Yes or No. Yes indicates that this
-parameter is the name of a named element (see {{header}}). No indicates that it
-is a parameter that is not a name.
 
 Reference:
 
@@ -353,11 +345,184 @@ This registry is initially empty.
 
 --- back
 
+# Examples
+
+## CONNECT-UDP
+
+~~~
+Client                                             Server
+
+STREAM(44): DATA{HEADERS}      -------->
+  :method = CONNECT-UDP
+  :scheme = https
+  :path = /
+  :authority = target.example.org:443
+
+STREAM(44): RELIABLE_DATAGRAM  -------->
+  Flow ID = 0 (registration)
+  Registered Flow ID = 1
+  Extension String = ""
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Flow ID = 1
+  Payload = Encapsulated UDP Payload
+
+           <--------  STREAM(44): DATA{HEADERS}
+                        :status = 200
+
+           <--------  STREAM(44): RELIABLE_DATAGRAM
+                        Flow ID = 0 (registration)
+                        Registered Flow ID = 1
+                        Extension String = ""
+
+/* Wait for target server to respond to UDP packet. */
+
+           <--------  DATAGRAM
+                        Quarter Stream ID = 11
+                        Flow ID = 1
+                        Payload = Encapsulated UDP Payload
+~~~
+
+
+## CONNECT-UDP with ECN
+
+~~~
+Client                                             Server
+
+STREAM(44): DATA{HEADERS}      -------->
+  :method = CONNECT-UDP
+  :scheme = https
+  :path = /
+  :authority = target.example.org:443
+
+STREAM(44): RELIABLE_DATAGRAM  -------->
+  Flow ID = 0 (registration)
+  Registered Flow ID = 1
+  Extension String = ""
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Flow ID = 1
+  Payload = Encapsulated UDP Payload
+
+           <--------  STREAM(44): DATA{HEADERS}
+                        :status = 200
+
+           <--------  STREAM(44): RELIABLE_DATAGRAM
+                        Flow ID = 0 (registration)
+                        Registered Flow ID = 1
+                        Extension String = ""
+
+/* Wait for target server to respond to UDP packet. */
+
+           <--------  DATAGRAM
+                        Quarter Stream ID = 11
+                        Flow ID = 1
+                        Payload = Encapsulated UDP Payload
+
+STREAM(44): RELIABLE_DATAGRAM  -------->
+  Flow ID = 0 (registration)
+  Registered Flow ID = 2
+  Extension String = "ecn=ect0"
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Flow ID = 2
+  Payload = Encapsulated UDP Payload
+~~~
+
+
+## CONNECT-IP with IP compression
+
+~~~
+Client                                             Server
+
+STREAM(44): DATA{HEADERS}      -------->
+  :method = CONNECT-IP
+  :scheme = https
+  :path = /
+  :authority = proxy.example.org:443
+
+           <--------  STREAM(44): DATA{HEADERS}
+                        :status = 200
+
+/* Exchange CONNECT-IP configuration information. */
+
+STREAM(44): RELIABLE_DATAGRAM  -------->
+  Flow ID = 0 (registration)
+  Registered Flow ID = 1
+  Extension String = ""
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Flow ID = 1
+  Payload = Encapsulated IP Packet
+
+           <--------  STREAM(44): RELIABLE_DATAGRAM
+                        Flow ID = 0 (registration)
+                        Registered Flow ID = 1
+                        Extension String = ""
+
+/* Endpoint happily exchange encapsulated IP packets. */
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Flow ID = 1
+  Payload = Encapsulated IP Packet
+
+/* After performing some analysis on traffic patterns, */
+/* the client decides it wants to compress a 5-tuple. */
+
+STREAM(44): RELIABLE_DATAGRAM  -------->
+  Flow ID = 0 (registration)
+  Registered Flow ID = 2
+  Extension String = "ip=192.0.2.42,port=443"
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Flow ID = 2
+  Payload = Compressed IP Packet
+~~~
+
+
+## WebTransport
+
+~~~
+Client                                             Server
+
+STREAM(44): DATA{HEADERS}      -------->
+  :method = CONNECT
+  :scheme = https
+  :method = webtransport
+  :path = /hello
+  :authority = webtransport.example.org:443
+  Origin = https://www.example.org:443
+
+STREAM(44): RELIABLE_DATAGRAM  -------->
+  Flow ID = 0 (control flow)
+  Registered Flow ID = 1
+  Extension String = ""
+
+           <--------  STREAM(44): DATA{HEADERS}
+                        :status = 200
+
+           <--------  STREAM(44): RELIABLE_DATAGRAM
+                        Flow ID = 0 (registration)
+                        Registered Flow ID = 1
+                        Extension String = ""
+
+/* Both endpoints can now send WebTransport datagrams. */
+~~~
+
+
 # Acknowledgments {#acks}
 {:numbered="false"}
 
 The DATAGRAM flow identifier was previously part of the DATAGRAM frame
-definition itself, the author would like to acknowledge the authors of
-that document and the members of the IETF MASQUE working group for their
-suggestions. Additionally, the author would like to thank Martin Thomson
-for suggesting the use of an HTTP/3 SETTINGS parameter.
+definition itself, the author would like to acknowledge the authors of that
+document and the members of the IETF MASQUE working group for their
+suggestions. Additionally, the author would like to thank Martin Thomson for
+suggesting the use of an HTTP/3 SETTINGS parameter. Furthermore, the authors
+would like to thank Ben Schwartz for writing the first proposal that used two
+layers of indirection.
