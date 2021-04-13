@@ -89,9 +89,7 @@ the second is end-to-end (see {{datagram-flows}}).
 
 Flows are unirectional exchanges of datagrams associated with a given HTTP
 request. Flows are identified within a request context by a numeric value,
-referred to as the flow ID. A flow ID is a 62-bit integer (0 to 2^62-1). Note
-that the flow ID value of zero is reserved for registration purposes (see
-{{register}}).
+referred to as the flow ID. A flow ID is a 62-bit integer (0 to 2^62-1).
 
 While stream IDs are a per-hop concept, flow IDs are an end-to-end concept. In
 other words, if a datagram travels through multiple intermediaries on its way
@@ -149,24 +147,28 @@ parse the Quarter Stream ID or Flow ID as an HTTP/3 connection error of type
 H3_GENERAL_PROTOCOL_ERROR.
 
 
-# Registering Flow IDs {#register}
+# REGISTER_DATAGRAM_FLOW_ID HTTP/3 Frame Definition {#register-frame}
 
-On all streams, flow ID zero is reserved for registration of other flow IDs.
-This allows the endpoint to inform its peer of the encoding and semantics of
-upcoming datagrams. Datagrams with flow ID set to zero contain the following
-HTTP/3 Datagram Payload:
+The REGISTER_DATAGRAM_FLOW_ID frame (type=TBD) allows an endpoint to inform its
+peer of the encoding and semantics of upcoming datagrams associated with this
+stream.
 
 ~~~
-Flow ID Registration {
-  Registered Flow ID (i),
+REGISTER_DATAGRAM_FLOW_ID Frame {
+  Type (i) = TBD,
+  Length (i),
+  Flow ID (i),
   Extension String (..),
 }
 ~~~
-{: #h3-register-format title="Flow ID Registration Format"}
+{: #register-frame-format title="REGISTER_DATAGRAM_FLOW_ID HTTP/3 Frame Format"}
 
-Registered Flow ID:
+The Type and Length fields follows the definition of HTTP/3 frames from {{H3}}.
+The payload consists of:
 
-: The flow ID to register and associate with the corresponding extension string.
+Flow ID:
+
+: The flow ID to associate with the QUIC stream that carried this frame.
 
 Extension String:
 
@@ -187,10 +189,6 @@ the frame unilateraly defines the semantics it will apply to the datagrams it
 sends. If a mechanism using this feature wants to send datagrams of a given
 flow ID in both directions, this frame will need to be exchanged in both
 directions.
-
-Note that while this registration MAY be sent using QUIC DATAGRAM frames,
-endpoints SHOULD instead send it using the RELIABLE_DATAGRAM HTTP/3 frame to
-ensure it is retransmitted if lost.
 
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
@@ -257,42 +255,14 @@ applications. Note that this field can be empty.
 
 # HTTP/1.x and HTTP/2 Support
 
-We can provide DATAGRAM support in HTTP/2 by defining the RELIABLE_DATAGRAM
-frame in HTTP/2.
+We can provide DATAGRAM support in HTTP/2 by defining the
+REGISTER_DATAGRAM_FLOW_ID and RELIABLE_DATAGRAM frames frame in HTTP/2.
 
 We can provide DATAGRAM support in HTTP/1.x by defining its data stream format
 to a sequence of length-value datagrams.
 
 TODO: Refactor this document into "HTTP Datagrams" with definitions for
 HTTP/1.x, HTTP/2, and HTTP/3.
-
-
-# HTTP Intermediaries {#intermediaries}
-
-HTTP/3 DATAGRAM flows are specific to a given HTTP/3 connection.
-However, in some cases, an HTTP request may travel across multiple HTTP
-connections if there are HTTP intermediaries involved; see Section 2.3 of
-{{!RFC7230}}.
-
-If an intermediary has sent the H3_DATAGRAM SETTINGS parameter with a value of 1
-on its client-facing connection, it MUST inspect all HTTP requests from that
-connection and check for the presence of the "Datagram-Flow-Id" header field. If
-the HTTP method of the request is not supported by the intermediary, it MUST
-remove the "Datagram-Flow-Id" header field before forwarding the request. If the
-intermediary supports the method, it MUST either remove the header field or
-adhere to the requirements leveraged by that method on intermediaries.
-
-If an intermediary has sent the H3_DATAGRAM SETTINGS parameter with a value of 1
-on its server-facing connection, it MUST inspect all HTTP responses from that
-connection and check for the presence of the "Datagram-Flow-Id" header field. If
-the HTTP method of the request is not supported by the intermediary, it MUST
-remove the "Datagram-Flow-Id" header field before forwarding the response. If
-the intermediary supports the method, it MUST either remove the header field or
-adhere to the requirements leveraged by that method on intermediaries.
-
-If an intermediary processes distinct HTTP requests that refer to the same flow
-ID in their respective "Datagram-Flow-Id" header fields, it MUST ensure
-that those requests are routed to the same backend.
 
 
 # Security Considerations {#security}
@@ -325,8 +295,8 @@ include the following fields:
 
 Key:
 
-: The key (see {{register}}). Keys MUST be valid tokens as defined in {{Section
-3.2.6 of RFC7230}}.
+: The key (see {{register-frame}}). Keys MUST be valid tokens as defined in
+Section 3.2.6 of {{!RFC7230}}.
 
 Description:
 
@@ -358,9 +328,8 @@ STREAM(44): DATA{HEADERS}      -------->
   :path = /
   :authority = target.example.org:443
 
-STREAM(44): RELIABLE_DATAGRAM  -------->
-  Flow ID = 0 (registration)
-  Registered Flow ID = 1
+STREAM(44): REGISTER_DATAGRAM_FLOW_ID  -------->
+  Flow ID = 1
   Extension String = ""
 
 DATAGRAM                       -------->
@@ -371,9 +340,8 @@ DATAGRAM                       -------->
            <--------  STREAM(44): DATA{HEADERS}
                         :status = 200
 
-           <--------  STREAM(44): RELIABLE_DATAGRAM
-                        Flow ID = 0 (registration)
-                        Registered Flow ID = 1
+           <--------  STREAM(44): REGISTER_DATAGRAM_FLOW_ID
+                        Flow ID = 1
                         Extension String = ""
 
 /* Wait for target server to respond to UDP packet. */
@@ -396,9 +364,8 @@ STREAM(44): DATA{HEADERS}      -------->
   :path = /
   :authority = target.example.org:443
 
-STREAM(44): RELIABLE_DATAGRAM  -------->
-  Flow ID = 0 (registration)
-  Registered Flow ID = 1
+STREAM(44): REGISTER_DATAGRAM_FLOW_ID  -------->
+  Flow ID = 1
   Extension String = ""
 
 DATAGRAM                       -------->
@@ -409,9 +376,8 @@ DATAGRAM                       -------->
            <--------  STREAM(44): DATA{HEADERS}
                         :status = 200
 
-           <--------  STREAM(44): RELIABLE_DATAGRAM
-                        Flow ID = 0 (registration)
-                        Registered Flow ID = 1
+           <--------  STREAM(44): REGISTER_DATAGRAM_FLOW_ID
+                        Flow ID = 1
                         Extension String = ""
 
 /* Wait for target server to respond to UDP packet. */
@@ -421,9 +387,8 @@ DATAGRAM                       -------->
                         Flow ID = 1
                         Payload = Encapsulated UDP Payload
 
-STREAM(44): RELIABLE_DATAGRAM  -------->
-  Flow ID = 0 (registration)
-  Registered Flow ID = 2
+STREAM(44): REGISTER_DATAGRAM_FLOW_ID  -------->
+  Flow ID = 2
   Extension String = "ecn=ect0"
 
 DATAGRAM                       -------->
@@ -449,9 +414,8 @@ STREAM(44): DATA{HEADERS}      -------->
 
 /* Exchange CONNECT-IP configuration information. */
 
-STREAM(44): RELIABLE_DATAGRAM  -------->
-  Flow ID = 0 (registration)
-  Registered Flow ID = 1
+STREAM(44): REGISTER_DATAGRAM_FLOW_ID  -------->
+  Flow ID = 1
   Extension String = ""
 
 DATAGRAM                       -------->
@@ -459,9 +423,8 @@ DATAGRAM                       -------->
   Flow ID = 1
   Payload = Encapsulated IP Packet
 
-           <--------  STREAM(44): RELIABLE_DATAGRAM
-                        Flow ID = 0 (registration)
-                        Registered Flow ID = 1
+           <--------  STREAM(44): REGISTER_DATAGRAM_FLOW_ID
+                        Flow ID = 1
                         Extension String = ""
 
 /* Endpoint happily exchange encapsulated IP packets. */
@@ -474,9 +437,8 @@ DATAGRAM                       -------->
 /* After performing some analysis on traffic patterns, */
 /* the client decides it wants to compress a 5-tuple. */
 
-STREAM(44): RELIABLE_DATAGRAM  -------->
-  Flow ID = 0 (registration)
-  Registered Flow ID = 2
+STREAM(44): REGISTER_DATAGRAM_FLOW_ID  -------->
+  Flow ID = 2
   Extension String = "ip=192.0.2.42,port=443"
 
 DATAGRAM                       -------->
@@ -499,17 +461,15 @@ STREAM(44): DATA{HEADERS}      -------->
   :authority = webtransport.example.org:443
   Origin = https://www.example.org:443
 
-STREAM(44): RELIABLE_DATAGRAM  -------->
-  Flow ID = 0 (control flow)
-  Registered Flow ID = 1
+STREAM(44): REGISTER_DATAGRAM_FLOW_ID  -------->
+  Flow ID = 1
   Extension String = ""
 
            <--------  STREAM(44): DATA{HEADERS}
                         :status = 200
 
-           <--------  STREAM(44): RELIABLE_DATAGRAM
-                        Flow ID = 0 (registration)
-                        Registered Flow ID = 1
+           <--------  STREAM(44): REGISTER_DATAGRAM_FLOW_ID
+                        Flow ID = 1
                         Extension String = ""
 
 /* Both endpoints can now send WebTransport datagrams. */
