@@ -267,8 +267,11 @@ that those requests are routed to the same backend.
 
 # Security Considerations {#security}
 
-This document does not have additional security considerations beyond those
-defined in {{QUIC}} and {{DGRAM}}.
+Since this feature requires sending an HTTP/3 Settings parameter, it "sticks
+out". In other words, probing clients can learn whether a server supports this
+feature. Implementations that support this feature SHOULD always send this
+Settings parameter to avoid leaking the fact that there are applications using
+HTTP/3 datagrams enabled on this endpoint.
 
 
 # IANA Considerations {#iana}
