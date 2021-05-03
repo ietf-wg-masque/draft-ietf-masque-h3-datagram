@@ -112,17 +112,6 @@ odd-numbered IDs. Note that, once allocated, any flow ID can be
 used by both client and server - only allocation carries separate namespaces to
 avoid requiring synchronization.
 
-The flow ID allocation service SHOULD also provide a mechanism for applications
-to indicate they have completed their usage of a flow ID and will no
-longer be using that flow ID, this process is called "retiring" a flow
-ID. Applications MUST NOT retire a flow ID until after they
-have received confirmation that the peer has also stopped using that flow
-ID. The flow ID allocation service MAY reuse previously
-retired flow ID once they have ascertained that there are no packets
-with DATAGRAM frames using that flow ID still in flight. Reusing flow
-IDs can improve performance by transmitting the flow ID using
-a shorter variable-length integer encoding.
-
 
 # HTTP/3 DATAGRAM Frame Format {#format}
 
