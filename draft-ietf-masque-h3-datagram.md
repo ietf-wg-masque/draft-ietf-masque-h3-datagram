@@ -89,10 +89,7 @@ to 2^62-1).
 
 Flows lack any of the ordering or reliability guarantees of streams. Beyond
 this, a sender SHOULD ensure that DATAGRAM frames within a single flow are
-transmitted in order relative to one another. If multiple DATAGRAM frames can be
-packed into a single QUIC packet, the sender SHOULD group them by flow to
-promote fate-sharing within a specific flow and improve the ability to process
-batches of datagram messages efficiently on the receiver.
+transmitted in order relative to one another.
 
 
 # Flow ID Allocation {#flow-id-alloc}
