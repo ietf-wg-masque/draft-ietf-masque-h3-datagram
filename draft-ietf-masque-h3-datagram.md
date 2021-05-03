@@ -203,16 +203,15 @@ that wishes to use four datagram flows for the lifetime of its
 request stream could look like this:
 
 ~~~
-  Datagram-Flow-Id = 42, 44; ecn-ect0, 46; ecn-ect1, 48; ecn-ce
+  Datagram-Flow-Id = 42, 44; foo, 46; bar, 48; baz
 ~~~
 
 In this example, 42 is the unnamed flow, 44 represents the name
-"ecn-ect0", 46 represents "ecn-ect1", and 48 represents "ecn-ce". Note that,
-since the list ordering does not carry semantics, this example can be
-equivalently encoded as:
+"foo", 46 represents "bar", and 48 represents "baz". Note that, since the list
+ordering does not carry semantics, this example can be equivalently encoded as:
 
 ~~~
-  Datagram-Flow-Id = 44; ecn-ect0, 42, 48; ecn-ce, 46; ecn-ect1
+  Datagram-Flow-Id = 44; foo, 42, 48; baz, 46; bar
 ~~~
 
 Even if a sender attempts to communicate the meaning of a flow
