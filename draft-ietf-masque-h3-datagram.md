@@ -457,6 +457,160 @@ This registry is initially empty.
 
 --- back
 
+# Examples
+
+## CONNECT-UDP
+
+~~~
+Client                                             Server
+
+STREAM(44): HEADERS             -------->
+  :method = CONNECT-UDP
+  :scheme = https
+  :path = /
+  :authority = target.example.org:443
+
+STREAM(44): CAPSULE             -------->
+  Capsule Type = REGISTER_DATAGRAM_CONTEXT
+  Context ID = 0
+  Extension String = ""
+
+DATAGRAM                        -------->
+  Quarter Stream ID = 11
+  Context ID = 0
+  Payload = Encapsulated UDP Payload
+
+           <--------  STREAM(44): HEADERS
+                        :status = 200
+
+/* Wait for target server to respond to UDP packet. */
+
+           <--------  DATAGRAM
+                        Quarter Stream ID = 11
+                        Context ID = 0
+                        Payload = Encapsulated UDP Payload
+~~~
+
+
+## CONNECT-UDP with Timestamp Extension
+
+~~~
+Client                                             Server
+
+STREAM(44): HEADERS            -------->
+  :method = CONNECT-UDP
+  :scheme = https
+  :path = /
+  :authority = target.example.org:443
+
+STREAM(44): CAPSULE            -------->
+  Capsule Type = REGISTER_DATAGRAM_CONTEXT
+  Context ID = 0
+  Extension String = ""
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Context ID = 0
+  Payload = Encapsulated UDP Payload
+
+           <--------  STREAM(44): HEADERS
+                        :status = 200
+
+/* Wait for target server to respond to UDP packet. */
+
+           <--------  DATAGRAM
+                        Quarter Stream ID = 11
+                        Context ID = 0
+                        Payload = Encapsulated UDP Payload
+
+
+STREAM(44): CAPSULE            -------->
+  Capsule Type = REGISTER_DATAGRAM_CONTEXT
+  Context ID = 2
+  Extension String = "timestamp"
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Context ID = 2
+  Payload = Encapsulated UDP Payload With TImeStamp
+~~~
+
+
+## CONNECT-IP with IP compression
+
+~~~
+Client                                             Server
+
+STREAM(44): HEADERS            -------->
+  :method = CONNECT-IP
+  :scheme = https
+  :path = /
+  :authority = proxy.example.org:443
+
+           <--------  STREAM(44): HEADERS
+                        :status = 200
+
+/* Exchange CONNECT-IP configuration information. */
+
+STREAM(44): CAPSULE             -------->
+  Capsule Type = REGISTER_DATAGRAM_CONTEXT
+  Context ID = 0
+  Extension String = ""
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Context ID = 0
+  Payload = Encapsulated IP Packet
+
+/* Endpoint happily exchange encapsulated IP packets */
+/* using Quarter Stream ID 11 and Context ID 0.      */
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Context ID = 0
+  Payload = Encapsulated IP Packet
+
+/* After performing some analysis on traffic patterns, */
+/* the client decides it wants to compress a 5-tuple.  */
+
+
+STREAM(44): CAPSULE             -------->
+  Capsule Type = REGISTER_DATAGRAM_CONTEXT
+  Context ID = 2
+  Extension String = "ip=192.0.2.42,port=443"
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Context ID = 2
+  Payload = Compressed IP Packet
+~~~
+
+
+## WebTransport
+
+~~~
+Client                                             Server
+
+STREAM(44): HEADERS            -------->
+  :method = CONNECT
+  :scheme = https
+  :method = webtransport
+  :path = /hello
+  :authority = webtransport.example.org:443
+  Origin = https://www.example.org:443
+
+STREAM(44): CAPSULE             -------->
+  Capsule Type = REGISTER_DATAGRAM_CONTEXT
+  Context ID = 0
+  Extension String = ""
+
+           <--------  STREAM(44): HEADERS
+                        :status = 200
+
+/* Both endpoints can now send WebTransport datagrams. */
+~~~
+
+
 # Acknowledgments {#acks}
 {:numbered="false"}
 
