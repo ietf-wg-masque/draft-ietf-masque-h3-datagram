@@ -149,9 +149,22 @@ HTTP/3 Datagram Payload:
 : The payload of the datagram, whose semantics are defined by individual
 applications. Note that this field can be empty.
 
-Endpoints MUST treat receipt of a DATAGRAM frame whose payload is too short to
-parse the Quarter Stream ID or Context ID as an HTTP/3 connection error of type
-H3_GENERAL_PROTOCOL_ERROR.
+Intermediaries parse the Quarter Stream ID field in order to associate the QUIC
+DATAGRAM frame with a stream. If an intermediary receives a QUIC DATAGRAM frame
+whose payload is too short to allow parsing the Quarter Stream ID field, the
+intermediary MUST treat it as an HTTP/3 connection error of type
+H3_GENERAL_PROTOCOL_ERROR. Intermediaries MUST ignore any HTTP/3 Datagram
+fields after the Quarter Stream ID.
+
+Endpoints parse both the Quarter Stream ID field and the Context ID field in
+order to associate the QUIC DATAGRAM frame with a stream and context within
+that stream. If an endpoint receives a QUIC DATAGRAM frame whose payload is too
+short to allow parsing the Quarter Stream ID field, the endpoint MUST treat it
+as an HTTP/3 connection error of type H3_GENERAL_PROTOCOL_ERROR. If an endpoint
+receives a QUIC DATAGRAM frame whose payload is long enough to allow parsing
+the Quarter Stream ID field but too short to allow parsing the Context ID
+field, the endpoint MUST abruptly terminate the corresponding stream with a
+stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 
 # CAPSULE HTTP/3 Frame Definition {#capsule-frame}
