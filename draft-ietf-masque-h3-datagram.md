@@ -123,7 +123,7 @@ following format (using the notation from the "Notational Conventions" section
 of {{QUIC}}):
 
 ~~~
-HTTP/3 DATAGRAM Frame {
+HTTP/3 Datagram {
   Quarter Stream ID (i),
   Context ID (i),
   HTTP/3 Datagram Payload (..),
