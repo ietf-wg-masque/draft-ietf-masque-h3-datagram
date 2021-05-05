@@ -73,24 +73,29 @@ when, and only when, they appear in all capitals, as shown here.
 
 # Multiplexing
 
-In order to allow multiple datagram types and contexts to coexist on a given
-QUIC connection, HTTP datagrams contain two layers of multiplexing. First, the
-QUIC DATAGRAM frame payload starts with a custom-encoded stream identifier that
-associates the datagram with a given QUIC stream. Second, datagrams carry a
-context ID that allows multiplexing multiple datagram contexts related to a
-given HTTP request. Conceptually, the first layer of multiplexing is per-hop,
-while the second is end-to-end.
+In order to allow multiple exchanges of datagrams to coexist on a given QUIC
+connection, HTTP datagrams contain two layers of multiplexing. First, the QUIC
+DATAGRAM frame payload starts with an encoded stream identifier that associates
+the datagram with a given QUIC stream. Second, datagrams carry a context
+identifier (see {{datagram-contexts}}) that allows multiplexing multiple
+datagram contexts related to a given HTTP request. Conceptually, the first
+layer of multiplexing is per-hop, while the second is end-to-end.
 
 
 ## Datagram Contexts {#datagram-contexts}
 
-Contexts refer to bidirectional exchanges of datagrams associated with a single
-HTTP request. Contexts are identified within the scope of a given request by a
-numeric value, referred to as the context ID. A context ID is a 62-bit integer
-(0 to 2^62-1).
+Within the scope of a given HTTP request, contexts provide an additional
+demultiplexing layer. Contexts determine the encoding of datagrams, and can be
+used to implicitly convey metadata. For example, contexts can be used for
+compression to elide some parts of the datagram: the context identifier then
+maps to a compression context that the receiver can use to reconstruct the
+elided data.
+
+Contexts are identified within the scope of a given request by a numeric value,
+referred to as the context ID. A context ID is a 62-bit integer (0 to 2^62-1).
 
 While stream IDs are a per-hop concept, context IDs are an end-to-end concept.
-In other words, if a datagram travels through multiple intermediaries on its
+In other words, if a datagram travels through one or more intermediaries on its
 way from client to server, the stream ID will most likely change from hop to
 hop, but the context ID will remain the same. Context IDs are opaque to
 intermediaries.
@@ -166,6 +171,12 @@ the Quarter Stream ID field but too short to allow parsing the Context ID
 field, the endpoint MUST abruptly terminate the corresponding stream with a
 stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
+If a DATAGRAM frame is received and its Quarter Stream ID maps to a stream that
+has already been closed, the receiver MUST silently drop that frame. If a
+DATAGRAM frame is received and its Quarter Stream ID maps to a stream that has
+not yet been created, the receiver SHALL either drop that frame silently or
+buffer it temporarily while awaiting the creation of the corresponding stream.
+
 
 # CAPSULE HTTP/3 Frame Definition {#capsule-frame}
 
@@ -174,7 +185,7 @@ the presence of HTTP intermediaries.
 
 CAPSULE is an HTTP/3 Frame (as opposed to a QUIC frame) which SHALL only be sent
 in client-initiated bidirectional streams. Intermediaries MUST forward all
-received CAPSULE frame in their unmodified entirety on the same stream where it
+received CAPSULE frames in their unmodified entirety on the same stream where it
 would forward DATA frames.
 
 This specification of CAPSULE currently uses HTTP/3 frame type 0xffcab5. If this
@@ -209,8 +220,8 @@ know the Capsule Type or cannot parse the Capsule Data.
 ## The REGISTER_DATAGRAM_CONTEXT Capsule {#register-capsule}
 
 The REGISTER_DATAGRAM_CONTEXT capsule (type=0x00) allows an endpoint to inform
-its peer of the encoding and semantics of upcoming datagrams associated with
-a given context ID. Its Capsule Data field consists of:
+its peer of the encoding and semantics of datagrams associated with a given
+context ID. Its Capsule Data field consists of:
 
 ~~~
 REGISTER_DATAGRAM_CONTEXT Capsule {
@@ -226,7 +237,8 @@ Context ID:
 
 Extension String:
 
-: A string of comma-separated key-value pairs to enable extensibility.
+: A string of comma-separated key-value pairs to enable extensibility. Keys are
+registered with IANA, see {{iana-keys}}.
 
 The ABNF for the Extension String field is as follows (using syntax from
 {{Section 3.2.6 of RFC7230}}):
@@ -247,8 +259,16 @@ Endpoints MUST NOT send DATAGRAM frames using a Context ID until they have
 either sent or received a REGISTER_DATAGRAM_CONTEXT Capsule with the same
 Context ID. However, due to reordering, an endpoint that receives a DATAGRAM
 frame with an unknown Context ID MUST NOT treat it as an error, it SHALL
-instead drop the DATAGRAM frame silently, or buffer it for a short while in
-hopes of receiving the corresponding REGISTER_DATAGRAM_CONTEXT Capsule.
+instead drop the DATAGRAM frame silently, or buffer it temporarily while
+awaiting the corresponding REGISTER_DATAGRAM_CONTEXT Capsule.
+
+Endpoints MUST NOT register the same Context ID twice on the same stream. This
+also applies to Context IDs that have been closed using a
+CLOSE_DATAGRAM_CONTEXT capsule. Clients MUST NOT register server-initiated
+Context IDs and servers MUST NOT register client-initiated Context IDs. If an
+endpoint receives a REGISTER_DATAGRAM_CONTEXT capsule that violates one or more
+of these requirements, the endpoint MUST abruptly terminate the corresponding
+stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 
 ## The CLOSE_DATAGRAM_CONTEXT Capsule {#close-capsule}
@@ -281,6 +301,12 @@ it MUST NOT send any DATAGRAM frames with that Context ID. However, due to
 reordering, an endpoint that receives a DATAGRAM frame with a closed Context ID
 MUST NOT treat it as an error, it SHALL instead drop the DATAGRAM frame
 silently.
+
+Endpoints MUST NOT close a Context ID that was not previously registered.
+Endpoints MUST NOT close a Context ID that has already been closed. If an
+endpoint receives a CLOSE_DATAGRAM_CONTEXT capsule that violates one or more of
+these requirements, the endpoint MUST abruptly terminate the corresponding
+stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 
 ## The DATAGRAM Capsule {#datagram-capsule}
@@ -431,8 +457,9 @@ This registry initially contains the following entries:
 
 ## Context Extension Keys {#iana-keys}
 
-This document will request IANA to create an "HTTP Datagram Context
-Extension Keys" registry. Registrations in this registry MUST
+REGISTER_DATAGRAM_CONTEXT capsules carry key-value pairs, see
+{{register-capsule}}. This document will request IANA to create an "HTTP
+Datagram Context Extension Keys" registry. Registrations in this registry MUST
 include the following fields:
 
 Key:
@@ -532,7 +559,7 @@ STREAM(44): CAPSULE            -------->
 DATAGRAM                       -------->
   Quarter Stream ID = 11
   Context ID = 2
-  Payload = Encapsulated UDP Payload With TImeStamp
+  Payload = Encapsulated UDP Payload With Timestamp
 ~~~
 
 
