@@ -79,13 +79,13 @@ QUIC DATAGRAM frame payload starts with a custom-encoded stream identifier that
 associates the datagram with a given QUIC stream. Second, datagrams carry a
 context ID that allows multiplexing multiple datagram contexts related to a
 given HTTP request. Conceptually, the first layer of multiplexing is per-hop,
-while the second is end-to-end (see {{datagram-contexts}}).
+while the second is end-to-end.
 
 
-# Datagram Contexts {#datagram-contexts}
+## Datagram Contexts {#datagram-contexts}
 
-Contexts are birectional exchanges of datagrams associated with a given HTTP
-request. Contexts are identified within the scope of a given request by a
+Contexts refer to bidirectional exchanges of datagrams associated with a single
+HTTP request. Contexts are identified within the scope of a given request by a
 numeric value, referred to as the context ID. A context ID is a 62-bit integer
 (0 to 2^62-1).
 
@@ -136,8 +136,8 @@ Quarter Stream ID:
 : A variable-length integer that contains the value of the client-initiated
 bidirectional stream that this datagram is associated with, divided by four.
 (The division by four stems from the fact that HTTP requests are sent on
-client-initiated bidirectional streams, and those have stream IDs equal to zero
-modulo four.)
+client-initiated bidirectional streams, and those have stream IDs that are
+divisible by four.)
 
 Context ID:
 
@@ -239,7 +239,7 @@ The ABNF for the Extension String field is as follows (using syntax from
 ~~~
 
 Note that these registrations are unilateral and bidirectional: the sender of
-the frame unilateraly defines the semantics it will apply to the datagrams it
+the frame unilaterally defines the semantics it will apply to the datagrams it
 sends and receives using this context ID. Once a context ID is registered, it
 can be used in both directions.
 
@@ -269,9 +269,9 @@ Context ID:
 : The context ID to close.
 
 Note that this close is unilateral and bidirectional: the sender of the frame
-unilateraly informs its peer of the closure. Endpoints can use
+unilaterally informs its peer of the closure. Endpoints can use
 CLOSE_DATAGRAM_CONTEXT capsules to close a context that was initially
-registered by either themself, or by their peer. Endpoints MAY use the
+registered by either themselves, or by their peer. Endpoints MAY use the
 CLOSE_DATAGRAM_CONTEXT capsule to immediately reject a context that was just
 registered using a REGISTER_DATAGRAM_CONTEXT capsule if they find its Extension
 String to be unacceptable.
