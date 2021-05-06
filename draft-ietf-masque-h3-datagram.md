@@ -186,7 +186,8 @@ the presence of HTTP intermediaries.
 CAPSULE is an HTTP/3 Frame (as opposed to a QUIC frame) which SHALL only be sent
 in client-initiated bidirectional streams. Intermediaries MUST forward all
 received CAPSULE frames in their unmodified entirety on the same stream where it
-would forward DATA frames.
+would forward DATA frames. Intermediaries MUST NOT send any CAPSULE frames other
+than the ones it is forwarding.
 
 This specification of CAPSULE currently uses HTTP/3 frame type 0xffcab5. If this
 document is approved, a lower number will be requested from IANA.
