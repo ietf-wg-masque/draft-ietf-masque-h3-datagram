@@ -281,6 +281,7 @@ a given context ID. Its Capsule Data field consists of:
 ~~~
 CLOSE_DATAGRAM_CONTEXT Capsule {
   Context ID (i),
+  Extension String (..),
 }
 ~~~
 {: #close-capsule-format title="CLOSE_DATAGRAM_CONTEXT Capsule Format"}
@@ -288,6 +289,11 @@ CLOSE_DATAGRAM_CONTEXT Capsule {
 Context ID:
 
 : The context ID to close.
+
+Extension String:
+
+: A string of comma-separated key-value pairs to enable extensibility, see
+the definition of the same field in {{register-capsule}} for details.
 
 Note that this close is unilateral and bidirectional: the sender of the frame
 unilaterally informs its peer of the closure. Endpoints can use
