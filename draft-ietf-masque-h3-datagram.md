@@ -271,6 +271,22 @@ endpoint receives a REGISTER_DATAGRAM_CONTEXT capsule that violates one or more
 of these requirements, the endpoint MUST abruptly terminate the corresponding
 stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
+Endpoints MUST NOT send a REGISTER_DATAGRAM_CONTEXT capsule on a stream before
+they have sent at least one HEADERS frame on that stream. This removes the need
+to buffer REGISTER_DATAGRAM_CONTEXT capsules when the endpoint needs
+information from headers to determine how to react to the capsule. If an
+endpoint receives a REGISTER_DATAGRAM_CONTEXT capsule on a stream that hasn't
+yet received a HEADERS frame, the endpoint MUST abruptly terminate the
+corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
+
+Servers MUST NOT send a REGISTER_DATAGRAM_CONTEXT capsule on a stream before
+they have received at least one REGISTER_DATAGRAM_CONTEXT capsule from the
+client on that stream. This ensures that clients control whether datagrams are
+allowed for a given request. If a client receives a REGISTER_DATAGRAM_CONTEXT
+capsule on a stream where the client has not yet sent a
+REGISTER_DATAGRAM_CONTEXT capsule, the client MUST abruptly terminate the
+corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
+
 
 ## The CLOSE_DATAGRAM_CONTEXT Capsule {#close-capsule}
 
