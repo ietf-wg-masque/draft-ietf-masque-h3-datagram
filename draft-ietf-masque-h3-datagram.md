@@ -472,6 +472,13 @@ all cases, the maximum permitted value of the H3_DATAGRAM SETTINGS parameter is
 1.
 
 
+# Prioritization
+
+Prioritization of HTTP/3 datagrams is not defined in this document. Future
+extensions MAY define how to prioritize datagrams, and MAY define signaling to
+allow endpoints to communicate their prioritization preferences.
+
+
 # HTTP/1.x and HTTP/2 Support
 
 We can provide DATAGRAM support in HTTP/2 by defining the CAPSULE frame in
