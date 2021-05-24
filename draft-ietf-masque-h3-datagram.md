@@ -124,7 +124,7 @@ request: it is possible for the same numeral context ID to be used
 simultaneously in distinct requests.
 
 
-# HTTP/3 DATAGRAM Frame Format {#format}
+# HTTP/3 DATAGRAM Format {#format}
 
 When used with HTTP/3, the Datagram Data field of QUIC DATAGRAM frames uses the
 following format (using the notation from the "Notational Conventions" section
@@ -137,7 +137,7 @@ HTTP/3 Datagram {
   HTTP/3 Datagram Payload (..),
 }
 ~~~
-{: #h3-datagram-format title="HTTP/3 DATAGRAM Frame Format"}
+{: #h3-datagram-format title="HTTP/3 DATAGRAM Format"}
 
 Quarter Stream ID:
 
