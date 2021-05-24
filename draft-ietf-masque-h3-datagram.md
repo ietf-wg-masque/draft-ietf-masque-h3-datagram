@@ -182,11 +182,13 @@ the Quarter Stream ID field but too short to allow parsing the Context ID
 field, the endpoint MUST abruptly terminate the corresponding stream with a
 stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
-If a DATAGRAM frame is received and its Quarter Stream ID maps to a stream that
-has already been closed, the receiver MUST silently drop that frame. If a
-DATAGRAM frame is received and its Quarter Stream ID maps to a stream that has
-not yet been created, the receiver SHALL either drop that frame silently or
-buffer it temporarily while awaiting the creation of the corresponding stream.
+Endpoints MUST NOT send HTTP/3 datagrams unless the corresponding stream is
+open. If an HTTP/3 datagram is received and its Quarter Stream ID maps to a
+stream that has already been closed, the receiver MUST silently drop that
+datagram. If an HTTP/3 datagram is received and its Quarter Stream ID maps to a
+stream that has not yet been created, the receiver SHALL either drop that
+datagram silently or buffer it temporarily while awaiting the creation of the
+corresponding stream.
 
 
 # CAPSULE HTTP/3 Frame Definition {#capsule-frame}
@@ -440,7 +442,10 @@ HTTP/3 Datagram Payload:
 applications. Note that this field can be empty.
 
 Datagrams sent using the DATAGRAM Capsule have the exact same semantics as
-datagrams sent in QUIC DATAGRAM frames.
+datagrams sent in QUIC DATAGRAM frames. In particular, the restrictions on when
+it is allowed to send an HTTP/3 datagram and how to process them from
+{{format}} also apply to HTTP/3 datagrams sent and received using the DATAGRAM
+capsule.
 
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
