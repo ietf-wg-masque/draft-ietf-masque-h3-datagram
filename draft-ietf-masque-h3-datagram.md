@@ -169,8 +169,12 @@ Intermediaries parse the Quarter Stream ID field in order to associate the QUIC
 DATAGRAM frame with a stream. If an intermediary receives a QUIC DATAGRAM frame
 whose payload is too short to allow parsing the Quarter Stream ID field, the
 intermediary MUST treat it as an HTTP/3 connection error of type
-H3_GENERAL_PROTOCOL_ERROR. Intermediaries MUST ignore any HTTP/3 Datagram
-fields after the Quarter Stream ID.
+H3_GENERAL_PROTOCOL_ERROR. Since the Context ID is optional and its use is
+negotiated end-to-end (and extensions MAY change this negotiation in a way
+which is opaque to intermediaries), intermediaries have no way of definitely
+knowing whether the Context ID field is present or absent. Because of this,
+intermediaries MUST ignore any HTTP/3 Datagram fields after the Quarter Stream
+ID.
 
 Endpoints parse both the Quarter Stream ID field and the Context ID field in
 order to associate the QUIC DATAGRAM frame with a stream and context within
