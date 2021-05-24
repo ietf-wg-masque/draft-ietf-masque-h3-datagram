@@ -76,10 +76,10 @@ when, and only when, they appear in all capitals, as shown here.
 In order to allow multiple exchanges of datagrams to coexist on a given QUIC
 connection, HTTP datagrams contain two layers of multiplexing. First, the QUIC
 DATAGRAM frame payload starts with an encoded stream identifier that associates
-the datagram with a given QUIC stream. Second, datagrams carry a context
-identifier (see {{datagram-contexts}}) that allows multiplexing multiple
-datagram contexts related to a given HTTP request. Conceptually, the first
-layer of multiplexing is per-hop, while the second is end-to-end.
+the datagram with a given QUIC stream. Second, datagrams optionally carry a
+context identifier (see {{datagram-contexts}}) that allows multiplexing
+multiple datagram contexts related to a given HTTP request. Conceptually, the
+first layer of multiplexing is per-hop, while the second is end-to-end.
 
 
 ## Datagram Contexts {#datagram-contexts}
@@ -91,8 +91,11 @@ compression to elide some parts of the datagram: the context identifier then
 maps to a compression context that the receiver can use to reconstruct the
 elided data.
 
-Contexts are identified within the scope of a given request by a numeric value,
-referred to as the context ID. A context ID is a 62-bit integer (0 to 2^62-1).
+Contexts are optional, their use is negotiated on each request stream using
+registration capsules, see {{register-capsule}} and
+{{register-no-context-capsule}}. When contexts are used, they are identified
+within the scope of a given request by a numeric value, referred to as the
+context ID. A context ID is a 62-bit integer (0 to 2^62-1).
 
 While stream IDs are a per-hop concept, context IDs are an end-to-end concept.
 In other words, if a datagram travels through one or more intermediaries on its
@@ -130,7 +133,7 @@ of {{QUIC}}):
 ~~~
 HTTP/3 Datagram {
   Quarter Stream ID (i),
-  Context ID (i),
+  [Context ID (i)],
   HTTP/3 Datagram Payload (..),
 }
 ~~~
@@ -147,7 +150,15 @@ divisible by four.)
 Context ID:
 
 : A variable-length integer indicating the context ID of the datagram (see
-{{datagram-contexts}}).
+{{datagram-contexts}}). Whether or not this field is present depends on which
+registration capsules were exchanged on the associated stream: if a
+REGISTER_DATAGRAM_CONTEXT capsule (see {{register-capsule}}) has been sent or
+received on this stream, then the field is present; if a
+REGISTER_DATAGRAM_NO_CONTEXT capsule (see {{register-no-context-capsule}}) has
+been sent or received, then this field is absent; if neither has been sent or
+received, then it is not yet possible to parse this datagram and the receiver
+MUST either drop that datagram silently or buffer it temporarily while awaiting
+the registration capsule.
 
 HTTP/3 Datagram Payload:
 
@@ -280,11 +291,75 @@ yet received a HEADERS frame, the endpoint MUST abruptly terminate the
 corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 Servers MUST NOT send a REGISTER_DATAGRAM_CONTEXT capsule on a stream before
-they have received at least one REGISTER_DATAGRAM_CONTEXT capsule from the
-client on that stream. This ensures that clients control whether datagrams are
-allowed for a given request. If a client receives a REGISTER_DATAGRAM_CONTEXT
-capsule on a stream where the client has not yet sent a
-REGISTER_DATAGRAM_CONTEXT capsule, the client MUST abruptly terminate the
+they have received at least one REGISTER_DATAGRAM_CONTEXT capsule or one
+REGISTER_DATAGRAM_NO_CONTEXT capsule from the client on that stream. This
+ensures that clients control whether datagrams are allowed for a given request.
+If a client receives a REGISTER_DATAGRAM_CONTEXT capsule on a stream where the
+client has not yet sent a REGISTER_DATAGRAM_CONTEXT capsule, the client MUST
+abruptly terminate the corresponding stream with a stream error of type
+H3_GENERAL_PROTOCOL_ERROR.
+
+Servers MUST NOT send a REGISTER_DATAGRAM_CONTEXT capsule on a stream where it
+has received a REGISTER_DATAGRAM_NO_CONTEXT capsule. If a client receives a
+REGISTER_DATAGRAM_CONTEXT capsule on a stream where the client has sent a
+REGISTER_DATAGRAM_NO_CONTEXT capsule, the client MUST abruptly terminate the
+corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
+
+
+## The REGISTER_DATAGRAM_NO_CONTEXT Capsule {#register-no-context-capsule}
+
+The REGISTER_DATAGRAM_NO_CONTEXT capsule (type=0x03) allows a client to inform
+the server that datagram contexts will not be used with this stream. It also
+informs the server of the encoding and semantics of datagrams associated with
+this stream. Its Capsule Data field consists of:
+
+~~~
+REGISTER_DATAGRAM_NO_CONTEXT Capsule {
+  Extension String (..),
+}
+~~~
+{: #register-no-context-capsule-format title="REGISTER_DATAGRAM_NO_CONTEXT Capsule Format"}
+
+Extension String:
+
+: A string of comma-separated key-value pairs to enable extensibility, see
+the definition of the same field in {{register-capsule}} for details.
+
+Note that this registration is unilateral and bidirectional: the client
+unilaterally defines the semantics it will apply to the datagrams it sends and
+receives with this stream.
+
+Endpoints MUST NOT send DATAGRAM frames without a Context ID until they have
+either sent or received a REGISTER_DATAGRAM_NO_CONTEXT Capsule. However, due to
+reordering, an endpoint that receives a DATAGRAM frame before receiving either
+a REGISTER_DATAGRAM_CONTEXT capsule or a REGISTER_DATAGRAM_NO_CONTEXT capsule
+MUST NOT treat it as an error, it SHALL instead drop the DATAGRAM frame
+silently, or buffer it temporarily while awaiting a
+REGISTER_DATAGRAM_NO_CONTEXT capsule or the corresponding
+REGISTER_DATAGRAM_CONTEXT capsule.
+
+Servers MUST NOT send the REGISTER_DATAGRAM_NO_CONTEXT capsule. If a client
+receives a REGISTER_DATAGRAM_NO_CONTEXT capsule, the client MUST abruptly
+terminate the corresponding stream with a stream error of type
+H3_GENERAL_PROTOCOL_ERROR.
+
+Clients MUST NOT send more than one REGISTER_DATAGRAM_NO_CONTEXT capsule on a
+stream. If a server receives a second REGISTER_DATAGRAM_NO_CONTEXT capsule on
+the same stream, the server MUST abruptly terminate the corresponding stream
+with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
+
+Clients MUST NOT send a REGISTER_DATAGRAM_NO_CONTEXT capsule on a stream before
+they have sent at least one HEADERS frame on that stream. This removes the need
+to buffer REGISTER_DATAGRAM_CONTEXT capsules when the server needs
+information from headers to determine how to react to the capsule. If a
+server receives a REGISTER_DATAGRAM_NO_CONTEXT capsule on a stream that hasn't
+yet received a HEADERS frame, the server MUST abruptly terminate the
+corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
+
+Clients MUST NOT send both REGISTER_DATAGRAM_CONTEXT capsules and
+REGISTER_DATAGRAM_NO_CONTEXT capsules on the same stream. If a server receives
+both a REGISTER_DATAGRAM_CONTEXT capsule and a REGISTER_DATAGRAM_NO_CONTEXT
+capsule on the same stream, the server MUST abruptly terminate the
 corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 
@@ -340,7 +415,7 @@ that does not support QUIC DATAGRAM frames. Its Capsule Data field consists of:
 
 ~~~
 DATAGRAM Capsule {
-  Context ID (i),
+  [Context ID (i)],
   HTTP/3 Datagram Payload (..),
 }
 ~~~
@@ -349,7 +424,15 @@ DATAGRAM Capsule {
 Context ID:
 
 : A variable-length integer indicating the context ID of the datagram (see
-{{datagram-contexts}}).
+{{datagram-contexts}}). Whether or not this field is present depends on which
+registration capsules were exchanged on the associated stream: if a
+REGISTER_DATAGRAM_CONTEXT capsule (see {{register-capsule}}) has been sent or
+received on this stream, then the field is present; if a
+REGISTER_DATAGRAM_NO_CONTEXT capsule (see {{register-no-context-capsule}}) has
+been sent or received, then this field is absent; if neither has been sent or
+received, then it is not yet possible to parse this datagram and the receiver
+MUST either drop that datagram silently or buffer it temporarily while awaiting
+the registration capsule.
 
 HTTP/3 Datagram Payload:
 
@@ -466,15 +549,17 @@ Registrations follow the "First Come First Served" policy (see Section 4.4 of
 This registry initially contains the following entries:
 
 ~~~
-+---------------------------+-------+---------------+
-| Capsule Type              | Value | Specification |
-+---------------------------+-------+---------------+
-| REGISTER_DATAGRAM_CONTEXT | 0x00  | This Document |
-+---------------------------+-------+---------------+
-| CLOSE_DATAGRAM_CONTEXT    | 0x01  | This Document |
-+---------------------------+-------+---------------+
-| DATAGRAM                  | 0x02  | This Document |
-+---------------------------+-------+---------------+
++------------------------------+-------+---------------+
+| Capsule Type                 | Value | Specification |
++------------------------------+-------+---------------+
+| REGISTER_DATAGRAM_CONTEXT    | 0x00  | This Document |
++------------------------------+-------+---------------+
+| CLOSE_DATAGRAM_CONTEXT       | 0x01  | This Document |
++------------------------------+-------+---------------+
+| DATAGRAM                     | 0x02  | This Document |
++------------------------------+-------+---------------+
+| REGISTER_DATAGRAM_NO_CONTEXT | 0x03  | This Document |
++------------------------------+-------+---------------+
 ~~~
 
 
@@ -650,8 +735,7 @@ STREAM(44): HEADERS            -------->
   Origin = https://www.example.org:443
 
 STREAM(44): CAPSULE             -------->
-  Capsule Type = REGISTER_DATAGRAM_CONTEXT
-  Context ID = 0
+  Capsule Type = REGISTER_DATAGRAM_NO_CONTEXT
   Extension String = ""
 
            <--------  STREAM(44): HEADERS
