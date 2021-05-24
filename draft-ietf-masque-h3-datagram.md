@@ -199,12 +199,9 @@ CAPSULE allows reliably sending request-related information end-to-end, even in
 the presence of HTTP intermediaries.
 
 CAPSULE is an HTTP/3 Frame (as opposed to a QUIC frame) which SHALL only be
-sent in client-initiated bidirectional streams. Intermediaries MUST forward all
-received CAPSULE frames in their unmodified entirety on the same stream where
-it would forward DATA frames. Intermediaries MUST NOT send any CAPSULE frames
-other than the ones it is forwarding. Intermediaries respect the order of
-CAPSULE frames: if an intermediary receives two CAPSULE frames in a given
-order, it MUST forward them in the same order.
+sent in client-initiated bidirectional streams. Intermediaries forward received
+CAPSULE frames in their unmodified entirety on the same stream where it would
+forward DATA frames.
 
 This specification of CAPSULE currently uses HTTP/3 frame type 0xffcab5. If this
 document is approved, a lower number will be requested from IANA.
@@ -230,9 +227,20 @@ Capsule Data:
 
 : Data whose semantics depends on the Capsule Type.
 
+Unless otherwise specified, all Capsule Types are defined as opaque to
+intermediaries. Intermediaries MUST forward all received opaque CAPSULE frames
+in their unmodified entirety. Intermediaries MUST NOT send any opaque CAPSULE
+frames other than the ones it is forwarding. All Capsule Types defined in this
+document are opaque, with the exception of the DATAGRAM Capsule, see
+{{datagram-capsule}}. Definitions of new Capsule Types MAY specify that the
+newly introduced type is not opaque. Intermediaries MUST treat unknown Capsule
+Types as opaque.
+
+Intermediaries respect the order of CAPSULE frames: if an intermediary receives
+two CAPSULE frames in a given order, it MUST forward them in the same order.
+
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
-drop that Capsule. Intermediaries MUST forward Capsules, even if they do not
-know the Capsule Type or cannot parse the Capsule Data.
+drop that Capsule.
 
 
 ## The REGISTER_DATAGRAM_CONTEXT Capsule {#register-capsule}
@@ -453,6 +461,12 @@ datagrams sent in QUIC DATAGRAM frames. In particular, the restrictions on when
 it is allowed to send an HTTP/3 datagram and how to process them from
 {{format}} also apply to HTTP/3 datagrams sent and received using the DATAGRAM
 capsule.
+
+The DATAGRAM Capsule is not opaque, meaning that intermediaries MAY parse it
+and send DATAGRAM Capsules that they did not receive. This allows an
+intermediary to reencode HTTP/3 Datagrams as it forwards them: in other words,
+an intermediary MAY send a DATAGRAM Capsule to forward an HTTP/3 Datagram which
+was received in a QUIC DATAGRAM frame, and vice versa.
 
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
