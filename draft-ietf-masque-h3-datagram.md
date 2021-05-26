@@ -839,7 +839,7 @@ DATAGRAM                       -------->
 STREAM(44): CAPSULE             -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 2
-  Context Extension = {IP_COMPRESSION=192.0.2.42:443}
+  Context Extension = {IP_COMPRESSION=tcp,192.0.2.6:9876,192.0.2.7:443}
 
 DATAGRAM                       -------->
   Quarter Stream ID = 11
