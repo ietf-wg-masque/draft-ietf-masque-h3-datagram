@@ -402,6 +402,12 @@ endpoint receives a CLOSE_DATAGRAM_CONTEXT capsule that violates one or more of
 these requirements, the endpoint MUST abruptly terminate the corresponding
 stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
+All CLOSE_DATAGRAM_CONTEXT capsules MUST contain a CLOSE_CODE context
+extension, see {{close-code}}. If an endpoint receives a CLOSE_DATAGRAM_CONTEXT
+capsule without a CLOSE_CODE context extension, the endpoint MUST abruptly
+terminate the corresponding stream with a stream error of type
+H3_GENERAL_PROTOCOL_ERROR.
+
 
 ## The DATAGRAM Capsule {#datagram-capsule}
 
@@ -496,10 +502,8 @@ RESOURCE_LIMIT (code=0x02):
 : This indicates that the context was closed to save resources. The recipient
 SHOULD limit its future registration of resource-incentive contexts.
 
-If CLOSE_CODE is not present in a CLOSE_DATAGRAM_CONTEXT capsule, the recipient
-SHALL treat it as if the NO_ERROR code was present. Close codes are registered
-with IANA, see {{iana-close-codes}}. Receipt of an unknown close code MUST be
-treated as if the NO_ERROR code was present.
+Receipt of an unknown close code MUST be treated as if the NO_ERROR code was
+present. Close codes are registered with IANA, see {{iana-close-codes}}.
 
 
 ## The DETAILS Context Extension Type
