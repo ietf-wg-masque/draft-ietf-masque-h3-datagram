@@ -245,6 +245,10 @@ the same order.
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
 drop that Capsule.
 
+Receipt of a CAPSULE HTTP/3 Frame on a stream that is not a client-initiated
+bidirectional stream MUST be treated as a connection error of type
+H3_FRAME_UNEXPECTED.
+
 
 ## The REGISTER_DATAGRAM_CONTEXT Capsule {#register-capsule}
 
