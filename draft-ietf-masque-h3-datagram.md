@@ -491,7 +491,7 @@ its local policy. The endpoint that had originally registered this context MUST
 NOT try to register another context with the same context extensions on this
 stream.
 
-RESSOURCE_LIMIT (code=0x02):
+RESOURCE_LIMIT (code=0x02):
 
 : This indicates that the context was closed to save resources. The recipient
 SHOULD limit its future registration of resource-incentive contexts.
@@ -708,7 +708,7 @@ This registry initially contains the following entries:
 +------------------------------+-------+---------------+
 | DENIED                       | 0x01  | This Document |
 +------------------------------+-------+---------------+
-| RESSOURCE_LIMIT              | 0x02  | This Document |
+| RESOURCE_LIMIT              | 0x02  | This Document |
 +------------------------------+-------+---------------+
 ~~~
 
