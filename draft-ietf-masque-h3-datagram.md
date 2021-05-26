@@ -472,6 +472,12 @@ forwards them: in other words, an intermediary MAY send a DATAGRAM Capsule to
 forward an HTTP/3 Datagram which was received in a QUIC DATAGRAM frame, and
 vice versa.
 
+Note that while DATAGRAM capsules are sent on a stream, intermediaries can
+reencode HTTP/3 datagrams into QUIC DATAGRAM frames over the next hop, and
+those could be dropped. Because of this, applications have to always consider
+HTTP/3 datagrams to be unreliable, even if they were initially sent in a
+capsule.
+
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
 
