@@ -185,12 +185,16 @@ field, the endpoint MUST abruptly terminate the corresponding stream with a
 stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 Endpoints MUST NOT send HTTP/3 datagrams unless the corresponding stream's send
-side is open. If an HTTP/3 datagram is received and its Quarter Stream ID maps
-to a stream whose receive side has already been closed, the receiver MUST
-silently drop that datagram. If an HTTP/3 datagram is received and its Quarter
-Stream ID maps to a stream that has not yet been created, the receiver SHALL
-either drop that datagram silently or buffer it temporarily while awaiting the
-creation of the corresponding stream.
+side is open. On a given endpoint, once the receive side of a stream is closed,
+incoming datagrams for this stream are no longer expected so the endpoint can
+release related state. Endpoints MAY keep state for a short time to account for
+reordering. Once the state is released, the endpoint MUST silently drop
+received associated datagrams.
+
+If an HTTP/3 datagram is received and its Quarter Stream ID maps to a stream
+that has not yet been created, the receiver SHALL either drop that datagram
+silently or buffer it temporarily while awaiting the creation of the
+corresponding stream.
 
 
 # CAPSULE HTTP/3 Frame Definition {#capsule-frame}
