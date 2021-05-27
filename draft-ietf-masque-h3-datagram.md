@@ -672,6 +672,12 @@ This registry initially contains the following entries:
 +------------------------------+-------+---------------+
 ~~~
 
+Capsule types with a value of the form 41 * N + 23 for integer values of N are
+reserved to exercise the requirement that unknown capsule types be ignored.
+These capsules have no semantics and can carry arbitrary values. These values
+MUST NOT be assigned by IANA and MUST NOT appear in the listing of assigned
+values.
+
 
 ## Context Extension Types {#iana-ext-types}
 
@@ -709,6 +715,12 @@ This registry initially contains the following entries:
 +------------------------------+-------+---------------+
 ~~~
 
+Context extension types with a value of the form 41 * N + 17 for integer values
+of N are reserved to exercise the requirement that unknown context extension
+types be ignored. These extensions have no semantics and can carry arbitrary
+values. These values MUST NOT be assigned by IANA and MUST NOT appear in the
+listing of assigned values.
+
 
 ## Context Close Codes {#iana-close-codes}
 
@@ -744,9 +756,14 @@ This registry initially contains the following entries:
 +------------------------------+-------+---------------+
 | DENIED                       | 0x01  | This Document |
 +------------------------------+-------+---------------+
-| RESOURCE_LIMIT              | 0x02  | This Document |
+| RESOURCE_LIMIT               | 0x02  | This Document |
 +------------------------------+-------+---------------+
 ~~~
+
+Context close codes with a value of the form 41 * N + 19 for integer values of
+N are reserved to exercise the requirement that unknown context close codes be
+treated as NO_ERROR. These values MUST NOT be assigned by IANA and MUST NOT
+appear in the listing of assigned values.
 
 
 --- back
