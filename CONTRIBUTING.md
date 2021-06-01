@@ -20,12 +20,12 @@ subject to a Simplified BSD License) in Contributions.
 ## Other Resources
 
 Discussion of this work occurs on the
-[datagram working group mailing list](https://mailarchive.ietf.org/arch/browse/datagram/)
-([subscribe](https://www.ietf.org/mailman/listinfo/datagram)).  In addition to
+[MASQUE working group mailing list](https://mailarchive.ietf.org/arch/browse/masque/)
+([subscribe](https://www.ietf.org/mailman/listinfo/masque)).  In addition to
 contributions in GitHub, you are encouraged to participate in discussions there.
 
 **Note**: Some working groups adopt a policy whereby substantive discussion of
 technical issues needs to occur on the mailing list.
 
 You might also like to familiarize yourself with other
-[working group documents](https://datatracker.ietf.org/wg/datagram/documents/).
+[working group documents](https://datatracker.ietf.org/wg/masque/documents/).
