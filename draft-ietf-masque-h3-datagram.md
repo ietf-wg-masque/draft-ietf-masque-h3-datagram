@@ -86,8 +86,9 @@ related to a given HTTP request. Conceptually, the first layer of multiplexing
 is per-hop, while the second is end-to-end.
 
 When running over HTTP/2, the first level of demultiplexing is provided by the
-HTTP/2 framing layer. When running over HTTP/1, requests are strictly serialized
-in the connection, therefore the first layer of demultiplexing is not needed.
+HTTP/2 framing layer. When running over HTTP/1, requests are strictly
+serialized in the connection, therefore the first layer of demultiplexing is
+not needed.
 
 
 ## Datagram Contexts {#datagram-contexts}
