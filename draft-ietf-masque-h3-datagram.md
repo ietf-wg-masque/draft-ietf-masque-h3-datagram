@@ -39,11 +39,6 @@ HTTP/3. It associates datagrams with client-initiated bidirectional streams
 and defines an optional additional demultiplexing layer. Additionally, this
 document defines how to convey datagrams over prior versions of HTTP.
 
-Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
-([masque@ietf.org](mailto:masque@ietf.org)) or on the GitHub repository which
-contains the draft:
-[](https://github.com/ietf-wg-masque/draft-ietf-masque-h3-datagram).
-
 
 --- middle
 
@@ -59,11 +54,6 @@ is HTTP/3 {{!H3=I-D.ietf-quic-http}}. It associates datagrams with
 client-initiated bidirectional streams and defines an optional additional
 demultiplexing layer. Additionally, this document defines how to convey
 datagrams over prior versions of HTTP.
-
-Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
-([masque@ietf.org](mailto:masque@ietf.org)) or on the GitHub repository which
-contains the draft:
-[](https://github.com/ietf-wg-masque/draft-ietf-masque-h3-datagram).
 
 
 ## Conventions and Definitions {#defs}
