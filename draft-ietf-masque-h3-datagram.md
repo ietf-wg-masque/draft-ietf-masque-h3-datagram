@@ -45,15 +45,15 @@ document defines how to convey datagrams over prior versions of HTTP.
 # Introduction {#intro}
 
 The QUIC DATAGRAM extension {{!DGRAM=I-D.ietf-quic-datagram}} provides
-application protocols running over QUIC {{!QUIC=I-D.ietf-quic-transport}} with
-a mechanism to send unreliable data while leveraging the security and
-congestion-control properties of QUIC. However, QUIC DATAGRAM frames do not
-provide a means to demultiplex application contexts. This document describes
-how to use QUIC DATAGRAM frames when the application protocol running over QUIC
-is HTTP/3 {{!H3=I-D.ietf-quic-http}}. It associates datagrams with
-client-initiated bidirectional streams and defines an optional additional
-demultiplexing layer. Additionally, this document defines how to convey
-datagrams over prior versions of HTTP.
+application protocols running over QUIC {{!QUIC=RFC9000}} with a mechanism to
+send unreliable data while leveraging the security and congestion-control
+properties of QUIC. However, QUIC DATAGRAM frames do not provide a means to
+demultiplex application contexts. This document describes how to use QUIC
+DATAGRAM frames when the application protocol running over QUIC is HTTP/3
+{{!H3=I-D.ietf-quic-http}}. It associates datagrams with client-initiated
+bidirectional streams and defines an optional additional demultiplexing layer.
+Additionally, this document defines how to convey datagrams over prior versions
+of HTTP.
 
 
 ## Conventions and Definitions {#defs}
