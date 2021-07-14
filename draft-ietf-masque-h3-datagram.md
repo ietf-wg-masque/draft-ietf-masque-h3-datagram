@@ -557,17 +557,21 @@ on a QUIC connection that did not also receive the max_datagram_frame_size
 QUIC Transport Parameter MUST terminate the connection with error
 H3_SETTINGS_ERROR.
 
+Endpoints MUST NOT send QUIC DATAGRAM frames nor HTTP/3 CAPSULE frames until
+they have both sent and received the H3_DATAGRAM SETTINGS parameter with a
+value of 1.
+
 When clients use 0-RTT, they MAY store the value of the server's H3_DATAGRAM
-SETTINGS parameter.  Doing so allows the client to use HTTP/3 datagrams in 0-RTT
-packets.  When servers decide to accept 0-RTT data, they MUST send a H3_DATAGRAM
-SETTINGS parameter greater than or equal to the value they sent to the client in
-the connection where they sent them the NewSessionTicket message.  If a client
-stores the value of the H3_DATAGRAM SETTINGS parameter with their 0-RTT state,
-they MUST validate that the new value of the H3_DATAGRAM SETTINGS parameter sent
-by the server in the handshake is greater than or equal to the stored value; if
-not, the client MUST terminate the connection with error H3_SETTINGS_ERROR.  In
-all cases, the maximum permitted value of the H3_DATAGRAM SETTINGS parameter is
-1.
+SETTINGS parameter. Doing so allows the client to send QUIC DATAGRAM frames and
+HTTP/3 CAPSULE frames in 0-RTT packets. When servers decide to accept 0-RTT
+data, they MUST send a H3_DATAGRAM SETTINGS parameter greater than or equal to
+the value they sent to the client in the connection where they sent them the
+NewSessionTicket message. If a client stores the value of the H3_DATAGRAM
+SETTINGS parameter with their 0-RTT state, they MUST validate that the new
+value of the H3_DATAGRAM SETTINGS parameter sent by the server in the handshake
+is greater than or equal to the stored value; if not, the client MUST terminate
+the connection with error H3_SETTINGS_ERROR. In all cases, the maximum
+permitted value of the H3_DATAGRAM SETTINGS parameter is 1.
 
 
 ## Note About Draft Versions
