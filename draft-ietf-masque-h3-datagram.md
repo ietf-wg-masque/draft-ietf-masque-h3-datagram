@@ -578,14 +578,15 @@ permitted value of the H3_DATAGRAM SETTINGS parameter is 1.
 
 \[\[RFC editor: please remove this section before publication.]]
 
-Some revisions of this draft specification use a different value for the
-H3_DATAGRAM Settings Parameter. This allows new draft revisions to make
-incompatible changes. Multiple draft versions MAY be supported by either
-endpoint in a connection. Such endpoints MUST send multiple values for
-H3_DATAGRAM. Once an endpoint has sent and received SETTINGS, it MUST compute
-the intersection of the values it has sent and received, and then it MUST
-select and use the most recent draft version from the intersection set. This
-ensures that both endpoints negotiate the same draft version.
+Some revisions of this draft specification use a different value (the
+Identifier field of a Setting in the HTTP/3 SETTINGS frame) for the H3_DATAGRAM
+Settings Parameter. This allows new draft revisions to make incompatible
+changes. Multiple draft versions MAY be supported by either endpoint in a
+connection. Such endpoints MUST send multiple values for H3_DATAGRAM. Once an
+endpoint has sent and received SETTINGS, it MUST compute the intersection of
+the values it has sent and received, and then it MUST select and use the most
+recent draft version from the intersection set. This ensures that both
+endpoints negotiate the same draft version.
 
 
 # Prioritization
