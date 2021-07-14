@@ -474,6 +474,12 @@ reencode HTTP Datagrams into QUIC DATAGRAM frames over the next hop, and those
 could be dropped. Because of this, applications have to always consider HTTP
 Datagrams to be unreliable, even if they were initially sent in a capsule.
 
+If an intermediary receives an HTTP Datagram in a QUIC DATAGRAM frame and is
+forwarding it on a connection that supports QUIC DATAGRAM frames, the
+intermediary SHOULD NOT convert that HTTP Datagram to a DATAGRAM capsule, as
+that would reduce the effectiveness of Datagram Packetization Layer Path MTU
+Discovery (DPLPMTUD) {{?RFC8899}}.
+
 
 # Context Extensibility {#context-ext}
 
