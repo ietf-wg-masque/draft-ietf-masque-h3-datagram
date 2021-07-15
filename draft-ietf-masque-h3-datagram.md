@@ -317,6 +317,13 @@ REGISTER_DATAGRAM_CONTEXT capsule on a stream where the client has sent a
 REGISTER_DATAGRAM_NO_CONTEXT capsule, the client MUST abruptly terminate the
 corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
+Endpoints MUST NOT register context IDs that have not been provided by their
+local context ID allocation service. If a client receives a
+REGISTER_DATAGRAM_CONTEXT capsule whose context ID is even, or if a server
+receives a REGISTER_DATAGRAM_CONTEXT capsule whose context ID is odd, the
+receiver MUST abruptly terminate the corresponding stream with a stream error
+of type H3_GENERAL_PROTOCOL_ERROR.
+
 
 ## The REGISTER_DATAGRAM_NO_CONTEXT Capsule {#register-no-context-capsule}
 
