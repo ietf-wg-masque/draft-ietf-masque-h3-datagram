@@ -474,6 +474,20 @@ reencode HTTP Datagrams into QUIC DATAGRAM frames over the next hop, and those
 could be dropped. Because of this, applications have to always consider HTTP
 Datagrams to be unreliable, even if they were initially sent in a capsule.
 
+If an intermediary receives an HTTP Datagram in a QUIC DATAGRAM frame and is
+forwarding it on a connection that supports QUIC DATAGRAM frames, the
+intermediary SHOULD NOT convert that HTTP Datagram to a DATAGRAM capsule. If
+the HTTP Datagram is too large to fit in a DATAGRAM frame (for example because
+the path MTU of that QUIC connection is too low or if the maximum UDP payload
+size advertised on that connection is too low), the intermediary SHOULD drop
+the HTTP Datagram instead of converting it to a DATAGRAM capsule. This
+preserves the end-to-end unreliability characteristic that methods such as
+Datagram Packetization Layer Path MTU Discovery (DPLPMTUD) depend on
+{{?RFC8899}}. An intermediary that converts QUIC DATAGRAM frames to DATAGRAM
+capsules allows HTTP Datagrams to be arbitrarily large without suffering any
+loss; this can misrepresent the true path properties, defeating methods such a
+DPLPMTUD.
+
 
 # Context Extensibility {#context-ext}
 
