@@ -251,6 +251,12 @@ Receipt of a CAPSULE HTTP/3 Frame on a stream that is not a client-initiated
 bidirectional stream MUST be treated as a connection error of type
 H3_FRAME_UNEXPECTED.
 
+CAPSULE frames MUST NOT be sent on a stream before at least one HEADERS frame
+has been sent on that stream. This removes the need to buffer capsules when the
+endpoint needs information from headers to determine how to react to the
+capsule. If a CAPSULE frame is received on a stream before a HEADERS frame, the
+receiver MUST treat this as a connection error of type H3_FRAME_UNEXPECTED.
+
 
 ## The REGISTER_DATAGRAM_CONTEXT Capsule {#register-capsule}
 
@@ -293,14 +299,6 @@ Context IDs and servers MUST NOT register client-initiated Context IDs. If an
 endpoint receives a REGISTER_DATAGRAM_CONTEXT capsule that violates one or more
 of these requirements, the endpoint MUST abruptly terminate the corresponding
 stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
-
-Endpoints MUST NOT send a REGISTER_DATAGRAM_CONTEXT capsule on a stream before
-they have sent at least one HEADERS frame on that stream. This removes the need
-to buffer REGISTER_DATAGRAM_CONTEXT capsules when the endpoint needs
-information from headers to determine how to react to the capsule. If an
-endpoint receives a REGISTER_DATAGRAM_CONTEXT capsule on a stream that hasn't
-yet received a HEADERS frame, the endpoint MUST abruptly terminate the
-corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 Servers MUST NOT send a REGISTER_DATAGRAM_CONTEXT capsule on a stream before
 they have received at least one REGISTER_DATAGRAM_CONTEXT capsule or one
@@ -358,14 +356,6 @@ Clients MUST NOT send more than one REGISTER_DATAGRAM_NO_CONTEXT capsule on a
 stream. If a server receives a second REGISTER_DATAGRAM_NO_CONTEXT capsule on
 the same stream, the server MUST abruptly terminate the corresponding stream
 with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
-
-Clients MUST NOT send a REGISTER_DATAGRAM_NO_CONTEXT capsule on a stream before
-they have sent at least one HEADERS frame on that stream. This removes the need
-to buffer REGISTER_DATAGRAM_CONTEXT capsules when the server needs
-information from headers to determine how to react to the capsule. If a
-server receives a REGISTER_DATAGRAM_NO_CONTEXT capsule on a stream that hasn't
-yet received a HEADERS frame, the server MUST abruptly terminate the
-corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 Clients MUST NOT send both REGISTER_DATAGRAM_CONTEXT capsules and
 REGISTER_DATAGRAM_NO_CONTEXT capsules on the same stream. If a server receives
