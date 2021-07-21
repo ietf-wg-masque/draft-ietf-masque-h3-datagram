@@ -281,10 +281,12 @@ can be used in both directions.
 
 Endpoints MUST NOT send DATAGRAM frames using a Context ID until they have
 either sent or received a REGISTER_DATAGRAM_CONTEXT Capsule with the same
-Context ID. However, due to reordering, an endpoint that receives a DATAGRAM
-frame with an unknown Context ID MUST NOT treat it as an error, it SHALL
-instead drop the DATAGRAM frame silently, or buffer it temporarily while
-awaiting the corresponding REGISTER_DATAGRAM_CONTEXT Capsule.
+Context ID. However, reordering can cause DATAGRAM frames to be received with an
+unknown Context ID. Receipt of such frames MUST NOT be treated as an error.
+Endpoints SHALL drop the DATAGRAM frame silently, or buffer it temporarily while
+awaiting the corresponding REGISTER_DATAGRAM_CONTEXT Capsule. Intermediaries
+SHALL drop the DATAGRAM frame silently, MAY buffer it, or forward it on
+immediately.
 
 Endpoints MUST NOT register the same Context ID twice on the same stream. This
 also applies to Context IDs that have been closed using a
