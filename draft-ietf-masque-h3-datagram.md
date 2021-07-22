@@ -533,7 +533,7 @@ stream.
 RESOURCE_LIMIT (code=0x02):
 
 : This indicates that the context was closed to save resources. The recipient
-SHOULD limit its future registration of resource-incentive contexts.
+SHOULD limit its future registration of resource-intensive contexts.
 
 Receipt of an unknown close code MUST be treated as if the NO_ERROR code was
 present. Close codes are registered with IANA, see {{iana-close-codes}}.
