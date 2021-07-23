@@ -418,15 +418,19 @@ terminate the corresponding stream with a stream error of type
 H3_GENERAL_PROTOCOL_ERROR.
 
 
-## The DATAGRAM Capsule {#datagram-capsule}
+## The DATAGRAM and DATAGRAM_NO_CONTEXT Capsules {#datagram-capsule}
 
-The DATAGRAM capsule (type=0x02) allows an endpoint to send a datagram frame
-over an HTTP stream. This is particularly useful when using a version of HTTP
-that does not support QUIC DATAGRAM frames. Its Capsule Data field consists of:
+The DATAGRAM capsule (type=0x02) and DATAGRAM_NO_CONTEXT capsule (type=0x04)
+allow an endpoint to send a datagram frame over an HTTP stream. This is
+particularly useful when using a version of HTTP that does not support QUIC
+DATAGRAM frames. The two capsules are functionality equivalent, the only
+difference being whether the frame carries a Context ID or not.
+
+The DATAGRAM capsule is structured as follows:
 
 ~~~
 DATAGRAM Capsule {
-  [Context ID (i)],
+  Context ID (i),
   HTTP Datagram Payload (..),
 }
 ~~~
@@ -435,36 +439,64 @@ DATAGRAM Capsule {
 Context ID:
 
 : A variable-length integer indicating the context ID of the datagram (see
-{{datagram-contexts}}). Whether or not this field is present depends on which
-registration capsules were exchanged on the associated stream: if a
-REGISTER_DATAGRAM_CONTEXT capsule (see {{register-capsule}}) has been sent or
-received on this stream, then the field is present; if a
-REGISTER_DATAGRAM_NO_CONTEXT capsule (see {{register-no-context-capsule}}) has
-been sent or received, then this field is absent; if neither has been sent or
-received, then it is not yet possible to parse this datagram and the receiver
-MUST either drop that datagram silently or buffer it temporarily while awaiting
-the registration capsule.
+{{datagram-contexts}}).
 
 HTTP Datagram Payload:
 
 : The payload of the datagram, whose semantics are defined by individual
 applications. Note that this field can be empty.
 
-Datagrams sent using the DATAGRAM Capsule have the exact same semantics as
-datagrams sent in QUIC DATAGRAM frames. In particular, the restrictions on when
-it is allowed to send an HTTP Datagram and how to process them from {{format}}
-also apply to HTTP Datagrams sent and received using the DATAGRAM capsule.
+The DATAGRAM_NO_CONTEXT capsule is structured as follows:
 
-The DATAGRAM Capsule is transparent to intermediaries, meaning that
-intermediaries MAY parse it and send DATAGRAM Capsules that they did not
-receive. This allows an intermediary to reencode HTTP Datagrams as it forwards
-them: in other words, an intermediary MAY send a DATAGRAM Capsule to forward an
-HTTP Datagram which was received in a QUIC DATAGRAM frame, and vice versa.
+~~~
+DATAGRAM_NO_CONTEXT Capsule {
+  HTTP Datagram Payload (..),
+}
+~~~
+{: #datagram-no-context-capsule-format title="DATAGRAM_NO_CONTEXT Capsule
+Format"}
 
-Note that while DATAGRAM capsules are sent on a stream, intermediaries can
-reencode HTTP Datagrams into QUIC DATAGRAM frames over the next hop, and those
-could be dropped. Because of this, applications have to always consider HTTP
-Datagrams to be unreliable, even if they were initially sent in a capsule.
+HTTP Datagram Payload:
+
+: The payload of the datagram, whose semantics are defined by individual
+applications. Note that this field can be empty.
+
+DATAGRAM capsules are intended to be used in conjunction with the
+REGISTER_DATAGRAM_CONTEXT capsule (see {{register-capsule}}). Endpoints MUST
+only send DATAGRAM capsules after a REGISTER_DATAGRAM_CONTEXT capsule. Endpoints
+that receive DATAGRAM capsules after a REGISTER_DATAGRAM_NO_CONTEXT capsule MUST
+treat it as a connection error of type H3_GENERAL_PROTOCOL_ERROR.
+
+DATAGRAM_NO_CONTEXT capsules are intended to be used in conjunction with the
+REGISTER_DATAGRAM_NO_CONTEXT capsule (see {{register-no-context-capsule}}).
+Endpoints MUST only send DATAGRAM_NO_CONTEXT capsules after a
+REGISTER_DATAGRAM_NO_CONTEXT capsule. Endpoints that receive DATAGRAM_NO_CONTEXT
+capsules after a REGISTER_DATAGRAM_CONTEXT capsule MUST treat it as a connection
+error of type H3_GENERAL_PROTOCOL_ERROR.
+
+An endpoint that receives a DATAGRAM or DATAGRAM_NO_CONTEXT capsule when neither
+a REGISTER_DATAGRAM_CONTEXT or REGISTER_DATAGRAM_NO_CONTEXT capsule has been
+sent or received MUST either drop the the datagram silently or buffer it
+temporarily while awaiting the registration capsule.
+
+Datagrams sent using the DATAGRAM/DATAGRAM_NO_CONTEXT capsule have the exact
+same semantics as datagrams sent in QUIC DATAGRAM frames. In particular, the
+restrictions on when it is allowed to send an HTTP Datagram and how to process
+them from {{format}} also apply to HTTP Datagrams sent and received using the
+DATAGRAM capsule.
+
+DATAGRAM/DATAGRAM_NO_CONTEXT capsules are transparent to intermediaries, meaning
+that intermediaries MAY parse them, and MAY send DATAGRAM/DATAGRAM_NO_CONTEXT
+capsules that they did not receive. This allows an intermediary to reencode HTTP
+Datagrams as it forwards them: in other words, an intermediary MAY send a
+DATAGRAM/DATAGRAM_NO_CONTEXT capsule in order to forward an HTTP Datagram which
+was received in a QUIC DATAGRAM frame, and vice versa.
+
+Note that while DATAGRAM/DATAGRAM_NO_CONTEXT capsules are sent on a stream,
+intermediaries can reencode HTTP Datagrams into QUIC DATAGRAM frames over the
+next hop, and those could be dropped. Because of this, applications have to
+always consider HTTP Datagrams to be unreliable, even if they were initially
+sent in a capsule.
 
 If an intermediary receives an HTTP Datagram in a QUIC DATAGRAM frame and is
 forwarding it on a connection that supports QUIC DATAGRAM frames, the
