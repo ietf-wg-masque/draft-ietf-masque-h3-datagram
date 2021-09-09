@@ -629,13 +629,10 @@ HTTP/3 datagrams enabled on this endpoint.
 This document will request IANA to register the following entry in the
 "HTTP/3 Frames" registry:
 
-~~~
-  +------------+----------+---------------+
-  | Frame Type |   Value  | Specification |
-  +============+==========+===============+
-  |  CAPSULE   | 0xffcab5 | This Document |
-  +------------+----------+---------------+
-~~~
+| Frame Type |   Value  | Specification |
+|:-----------|:---------|:--------------|
+|  CAPSULE   | 0xffcab5 | This Document |
+{: #iana-frame-table title="New HTTP/3 Frames"}
 
 
 ## HTTP/3 SETTINGS Parameter {#iana-setting}
@@ -643,13 +640,10 @@ This document will request IANA to register the following entry in the
 This document will request IANA to register the following entry in the
 "HTTP/3 Settings" registry:
 
-~~~
-  +--------------+----------+---------------+---------+
-  | Setting Name |   Value  | Specification | Default |
-  +==============+==========+===============+=========+
-  | H3_DATAGRAM  | 0xffd276 | This Document |    0    |
-  +--------------+----------+---------------+---------+
-~~~
+| Setting Name |   Value  | Specification | Default |
+|:-------------|:---------|:--------------|:--------|
+| H3_DATAGRAM  | 0xffd276 | This Document |    0    |
+{: #iana-setting-table title="New HTTP/3 Settings"}
 
 
 ## Capsule Types {#iana-types}
@@ -677,19 +671,13 @@ Registrations follow the "First Come First Served" policy (see Section 4.4 of
 
 This registry initially contains the following entries:
 
-~~~
-+------------------------------+-------+---------------+
 | Capsule Type                 | Value | Specification |
-+------------------------------+-------+---------------+
+|:-----------------------------|:------|:--------------|
 | REGISTER_DATAGRAM_CONTEXT    | 0x00  | This Document |
-+------------------------------+-------+---------------+
 | CLOSE_DATAGRAM_CONTEXT       | 0x01  | This Document |
-+------------------------------+-------+---------------+
 | DATAGRAM                     | 0x02  | This Document |
-+------------------------------+-------+---------------+
 | REGISTER_DATAGRAM_NO_CONTEXT | 0x03  | This Document |
-+------------------------------+-------+---------------+
-~~~
+{: #iana-types-table title="Initial Capsule Types Registry Entries"}
 
 Capsule types with a value of the form 41 * N + 23 for integer values of N are
 reserved to exercise the requirement that unknown capsule types be ignored.
@@ -724,15 +712,11 @@ nor Value.
 
 This registry initially contains the following entries:
 
-~~~
-+------------------------------+-------+---------------+
 | Context Extension Type       | Value | Specification |
-+------------------------------+-------+---------------+
+|:-----------------------------|:------|:--------------|
 | CLOSE_CODE                   | 0x00  | This Document |
-+------------------------------+-------+---------------+
 | DETAILS                      | 0x01  | This Document |
-+------------------------------+-------+---------------+
-~~~
+{: #iana-ext-table title="Initial Context Extension Types Registry Entries"}
 
 Context extension types with a value of the form 41 * N + 17 for integer values
 of N are reserved to exercise the requirement that unknown context extension
@@ -767,17 +751,12 @@ nor Value.
 
 This registry initially contains the following entries:
 
-~~~
-+------------------------------+-------+---------------+
 | Context Close Code           | Value | Specification |
-+------------------------------+-------+---------------+
+|:-----------------------------|:------|:--------------|
 | NO_ERROR                     | 0x00  | This Document |
-+------------------------------+-------+---------------+
 | DENIED                       | 0x01  | This Document |
-+------------------------------+-------+---------------+
 | RESOURCE_LIMIT               | 0x02  | This Document |
-+------------------------------+-------+---------------+
-~~~
+{: #iana-close-codes-table title="Initial Context Close Code Registry Entries"}
 
 Context close codes with a value of the form 41 * N + 19 for integer values of
 N are reserved to exercise the requirement that unknown context close codes be
