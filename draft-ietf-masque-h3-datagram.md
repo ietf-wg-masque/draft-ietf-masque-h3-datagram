@@ -635,7 +635,7 @@ This document will request IANA to register the following entry in the
 
 | Setting Name |   Value  | Specification | Default |
 |:-------------|:---------|:--------------|:--------|
-| H3_DATAGRAM  | 0xffd276 | This Document |    0    |
+| H3_DATAGRAM  | 0xffd277 | This Document |    0    |
 {: #iana-setting-table title="New HTTP/3 Settings"}
 
 
