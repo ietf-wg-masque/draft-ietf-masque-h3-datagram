@@ -549,27 +549,20 @@ UTF-8.
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
 
-Implementations of HTTP/3 that support this mechanism can indicate that to
+Implementations of HTTP/3 that support HTTP Datagrams can indicate that to
 their peer by sending the H3_DATAGRAM SETTINGS parameter with a value of 1.
 The value of the H3_DATAGRAM SETTINGS parameter MUST be either 0 or 1. A value
-of 0 indicates that this mechanism is not supported. An endpoint that receives
+of 0 indicates that HTTP Datagrams are not supported. An endpoint that receives
 the H3_DATAGRAM SETTINGS parameter with a value that is neither 0 or 1 MUST
 terminate the connection with error H3_SETTINGS_ERROR.
 
-An endpoint that sends the H3_DATAGRAM SETTINGS parameter with a value of 1
-MUST send the max_datagram_frame_size QUIC Transport Parameter {{DGRAM}}.
-An endpoint that receives the H3_DATAGRAM SETTINGS parameter with a value of 1
-on a QUIC connection that did not also receive the max_datagram_frame_size
-QUIC Transport Parameter MUST terminate the connection with error
-H3_SETTINGS_ERROR.
-
-Endpoints MUST NOT send QUIC DATAGRAM frames nor HTTP/3 CAPSULE frames until
+Endpoints MUST NOT send QUIC DATAGRAM frames nor DATAGRAM capsules until
 they have both sent and received the H3_DATAGRAM SETTINGS parameter with a
 value of 1.
 
 When clients use 0-RTT, they MAY store the value of the server's H3_DATAGRAM
 SETTINGS parameter. Doing so allows the client to send QUIC DATAGRAM frames and
-HTTP/3 CAPSULE frames in 0-RTT packets. When servers decide to accept 0-RTT
+Datagram capsules in 0-RTT packets. When servers decide to accept 0-RTT
 data, they MUST send a H3_DATAGRAM SETTINGS parameter greater than or equal to
 the value they sent to the client in the connection where they sent them the
 NewSessionTicket message. If a client stores the value of the H3_DATAGRAM
