@@ -103,6 +103,26 @@ hop, but the context ID will remain the same. Context IDs are opaque to
 intermediaries.
 
 
+## Datagram Formats {#datagram-formats}
+
+When an endpoint registers a datagram context (or the lack of contexts), it
+communicates the format (i.e., the semantics and encoding) of datagrams sent
+using this context. This is acccomplished by sending a Datagram Format Type as
+part of the registration capsule, see {{register-capsule}} and
+{{register-no-context-capsule}}. This type identifier is registered with IANA
+(see {{iana-format-types}}) and allows applications that use HTTP Datagrams to
+indicate what the content of datagrams are. Registration capsules carry a
+Datagram Format Data field which allows sending some additional information
+that would impact the format of datagrams.
+
+For example, a protocol which proxies IP packets can define a Datagram Format
+Type which represents an IP packet. The corresponding Datagram Format Data
+field would be empty. An extension to such a protocol that wishes to compress
+IP addresses could define a distinct Datagram Format Type and exchange two IP
+addresses via the Datagram Format Data field. Then any datagrams with that type
+would contain the IP packet with addresses elided.
+
+
 ## Context ID Allocation {#context-id-alloc}
 
 Implementations of HTTP Datagrams MUST provide a context ID allocation service.
@@ -320,7 +340,8 @@ field consists of:
 ~~~
 REGISTER_DATAGRAM_CONTEXT Capsule {
   Context ID (i),
-  Context Extensions (..),
+  Datagram Format Type (i),
+  Datagram Format Data (..),
 }
 ~~~
 {: #register-capsule-format title="REGISTER_DATAGRAM_CONTEXT Capsule Format"}
@@ -329,9 +350,16 @@ Context ID:
 
 : The context ID to register.
 
-Context Extensions:
+Datagram Format Type:
 
-: See {{context-ext}}.
+: A variable-length integer that defines the semantics and encoding of the HTTP
+Datagram Payload field of datagrams with this context ID, see
+{{datagram-formats}}.
+
+Datagram Format Data:
+
+: This field carries additional information that impact the format of datagrams
+with this context ID, see {{datagram-formats}}.
 
 Note that these registrations are unilateral and bidirectional: the sender of
 the frame unilaterally defines the semantics it will apply to the datagrams it
@@ -381,14 +409,21 @@ consists of:
 
 ~~~
 REGISTER_DATAGRAM_NO_CONTEXT Capsule {
-  Context Extensions (..),
+  Datagram Format Type (i),
+  Datagram Format Data (..),
 }
 ~~~
 {: #register-no-context-capsule-format title="REGISTER_DATAGRAM_NO_CONTEXT Capsule Format"}
 
-Context Extensions:
+Datagram Format Type:
 
-: See {{context-ext}}.
+: A variable-length integer that defines the semantics and encoding of the HTTP
+Datagram Payload field of datagrams, see {{datagram-formats}}.
+
+Datagram Format Data:
+
+: This field carries additional information that impact the format of
+datagrams, see {{datagram-formats}}.
 
 Note that this registration is unilateral and bidirectional: the client
 unilaterally defines the semantics it will apply to the datagrams it sends and
@@ -433,7 +468,8 @@ Data field consists of:
 ~~~
 CLOSE_DATAGRAM_CONTEXT Capsule {
   Context ID (i),
-  Context Extensions (..),
+  Close Code (i),
+  Close Details (..),
 }
 ~~~
 {: #close-capsule-format title="CLOSE_DATAGRAM_CONTEXT Capsule Format"}
@@ -442,17 +478,23 @@ Context ID:
 
 : The context ID to close.
 
-Context Extensions:
+Close Code:
 
-: See {{context-ext}}.
+: The close code allows an endpoint to provide additional information as to why
+a datagram context was closed. The codes are defined in {{close-codes}}.
+
+Close Details:
+
+: This is meant for debugging purposes. It consists of a human-readable string
+encoded in UTF-8.
 
 Note that this close is unilateral and bidirectional: the sender of the frame
 unilaterally informs its peer of the closure. Endpoints can use
 CLOSE_DATAGRAM_CONTEXT capsules to close a context that was initially
 registered by either themselves, or by their peer. Endpoints MAY use the
 CLOSE_DATAGRAM_CONTEXT capsule to immediately reject a context that was just
-registered using a REGISTER_DATAGRAM_CONTEXT capsule if they find its Context
-Extensions field to be unacceptable.
+registered using a REGISTER_DATAGRAM_CONTEXT capsule if they find its Datagram
+Format Type field to be unacceptable.
 
 After an endpoint has either sent or received a CLOSE_DATAGRAM_CONTEXT frame,
 it MUST NOT send any DATAGRAM frames with that Context ID. However, due to
@@ -466,11 +508,38 @@ endpoint receives a CLOSE_DATAGRAM_CONTEXT capsule that violates one or more of
 these requirements, the endpoint MUST abruptly terminate the corresponding
 stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
-All CLOSE_DATAGRAM_CONTEXT capsules MUST contain a CLOSE_CODE context
-extension, see {{close-code}}. If an endpoint receives a CLOSE_DATAGRAM_CONTEXT
-capsule without a CLOSE_CODE context extension, the endpoint MUST abruptly
-terminate the corresponding stream with a stream error of type
-H3_GENERAL_PROTOCOL_ERROR.
+
+#### Close Codes {#close-codes}
+
+This specification defines the close codes below. Their numeric values are in
+{{iana-close-codes}}.
+
+NO_ERROR:
+
+: This indicates that the registration was closed without any additional
+information.
+
+UNKNOWN_FORMAT:
+
+: This indicates that the sender does not know how to interpret the datagram
+format type associated with this context. The endpoint that had originally
+registered this context MUST NOT try to register another context with the same
+datagram format type on this stream.
+
+DENIED:
+
+: This indicates that the sender has rejected the context registration based on
+its local policy. The endpoint that had originally registered this context MUST
+NOT try to register another context with the same datagram format type and
+datagram format data on this stream.
+
+RESOURCE_LIMIT:
+
+: This indicates that the context was closed to save resources. The recipient
+SHOULD limit its future registration of resource-intensive contexts.
+
+Receipt of an unknown close code MUST be treated as if the NO_ERROR code was
+present. Close codes are registered with IANA, see {{iana-close-codes}}.
 
 
 ### The DATAGRAM Capsule {#datagram-capsule}
@@ -535,73 +604,6 @@ Datagram Packetization Layer Path MTU Discovery (DPLPMTUD) depend on
 capsules allows HTTP Datagrams to be arbitrarily large without suffering any
 loss; this can misrepresent the true path properties, defeating methods such a
 DPLPMTUD.
-
-
-# Context Extensibility {#context-ext}
-
-In order to facilitate extensibility of contexts, the
-REGISTER_DATAGRAM_CONTEXT, REGISTER_DATAGRAM_NO_CONTEXT, and the
-CLOSE_DATAGRAM_CONTEXT capsules carry a Context Extensions field. That
-field contains a sequence of context extensions:
-
-~~~
-  Context Extensions {
-    Context Extension (..) ...,
-  }
-~~~
-
-Each context extension is encoded as a (type, length, value) tuple:
-
-~~~
-  Context Extension {
-    Context Extension Type (i),
-    Context Extension Length (i),
-    Context Extension Value (..),
-  }
-~~~
-
-Context Extension Types are registered with IANA, see {{iana-ext-types}}. The
-Context Extension Length field contains the length of the Context Extension
-Value field in bytes. The semantics of the Context Extension Value field are
-defined by the corresponding Context Extension Type.
-
-
-## The CLOSE_CODE Context Extension Type {#close-code}
-
-The CLOSE_CODE context extension type (see {{iana-ext-types}} for the value of
-the context extension type) allows an endpoint to provide additional
-information as to why a datagram context was closed. This type SHALL only be
-sent in CLOSE_DATAGRAM_CONTEXT capsules. Its Context Extension Value field
-consists of a single variable-length integer which contains the close code. The
-following codes are defined:
-
-NO_ERROR:
-
-: This indicates that the registration was closed without any additional
-information.
-
-DENIED:
-
-: This indicates that the sender has rejected the context registration based on
-its local policy. The endpoint that had originally registered this context MUST
-NOT try to register another context with the same context extensions on this
-stream.
-
-RESOURCE_LIMIT:
-
-: This indicates that the context was closed to save resources. The recipient
-SHOULD limit its future registration of resource-intensive contexts.
-
-Receipt of an unknown close code MUST be treated as if the NO_ERROR code was
-present. Close codes are registered with IANA, see {{iana-close-codes}}.
-
-
-## The DETAILS Context Extension Type
-
-The DETAILS context extension type (see {{iana-ext-types}} for the value of the
-context extension type) allows an endpoint to provide additional details to
-context capsules. It is meant for debugging purposes. Its Context Extension
-Value field consists of a human-readable string encoded in UTF-8.
 
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
@@ -713,19 +715,19 @@ MUST NOT be assigned by IANA and MUST NOT appear in the listing of assigned
 values.
 
 
-## Context Extension Types {#iana-ext-types}
+## Datagram Format Types {#iana-format-types}
 
-This document establishes a registry for HTTP datagram context extension type
-codes. The "HTTP Context Extension Types" registry governs a 62-bit space.
-Registrations in this registry MUST include the following fields:
+This document establishes a registry for HTTP datagram format type codes. The
+"HTTP Datagram Format Types" registry governs a 62-bit space. Registrations in
+this registry MUST include the following fields:
 
 Type:
 
-A name or label for the context extension type.
+A name or label for the datagram format type.
 
 Value:
 
-: The value of the Context Extension Type field (see {{context-ext}}) is a
+: The value of the Datagram Format Type field (see {{datagram-formats}}) is a
 62bit integer.
 
 Reference:
@@ -737,26 +739,20 @@ Registrations follow the "First Come First Served" policy (see Section 4.4 of
 {{!IANA-POLICY=RFC8126}}) where two registrations MUST NOT have the same Type
 nor Value.
 
-This registry initially contains the following entries:
+This registry is initially empty.
 
-| Context Extension Type       |   Value   | Specification |
-|:-----------------------------|:----------|:--------------|
-| CLOSE_CODE                   | 0xffb340  | This Document |
-| DETAILS                      | 0xffb341  | This Document |
-{: #iana-ext-table title="Initial Context Extension Types Registry Entries"}
-
-Context extension types with a value of the form 41 * N + 17 for integer values
-of N are reserved to exercise the requirement that unknown context extension
-types be ignored. These extensions have no semantics and can carry arbitrary
+Datagram format types with a value of the form 41 * N + 17 for integer values
+of N are reserved to exercise the requirement that unknown datagram format
+types be ignored. These format types have no semantics and can carry arbitrary
 values. These values MUST NOT be assigned by IANA and MUST NOT appear in the
 listing of assigned values.
 
 
 ## Context Close Codes {#iana-close-codes}
 
-This document establishes a registry for HTTP context extension type codes. The
-"HTTP Context Close Codes" registry governs a 62-bit space. Registrations in
-this registry MUST include the following fields:
+This document establishes a registry for HTTP context close codes. The "HTTP
+Context Close Codes" registry governs a 62-bit space. Registrations in this
+registry MUST include the following fields:
 
 Type:
 
@@ -764,8 +760,7 @@ A name or label for the close code.
 
 Value:
 
-: The value of the CLOSE_CODE Context Extension Value field (see
-{{close-code}}) is a 62bit integer.
+: The value of the Close Code field (see {{close-capsule}}) is a 62bit integer.
 
 Reference:
 
@@ -781,8 +776,9 @@ This registry initially contains the following entries:
 | Context Close Code           |   Value   | Specification |
 |:-----------------------------|:----------|:--------------|
 | NO_ERROR                     | 0xff78a0  | This Document |
-| DENIED                       | 0xff78a1  | This Document |
-| RESOURCE_LIMIT               | 0xff78a2  | This Document |
+| UNKNOWN_FORMAT               | 0xff78a1  | This Document |
+| DENIED                       | 0xff78a2  | This Document |
+| RESOURCE_LIMIT               | 0xff78a3  | This Document |
 {: #iana-close-codes-table title="Initial Context Close Code Registry Entries"}
 
 Context close codes with a value of the form 41 * N + 19 for integer values of
@@ -809,7 +805,8 @@ STREAM(44): HEADERS             -------->
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 0
-  Context Extension = {}
+  Datagram Format Type = UDP_PAYLOAD
+  Datagram Format Data = ""
 
 DATAGRAM                        -------->
   Quarter Stream ID = 11
@@ -842,7 +839,8 @@ STREAM(44): HEADERS            -------->
 STREAM(44): DATA               -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 0
-  Context Extension = {}
+  Datagram Format Type = UDP_PAYLOAD
+  Datagram Format Data = ""
 
 DATAGRAM                       -------->
   Quarter Stream ID = 11
@@ -863,7 +861,8 @@ DATAGRAM                       -------->
 STREAM(44): DATA               -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 2
-  Context Extension = {TIMESTAMP=""}
+  Datagram Format Type = UDP_PAYLOAD_WITH_TIMESTAMP
+  Datagram Format Data = ""
 
 DATAGRAM                       -------->
   Quarter Stream ID = 11
@@ -891,7 +890,8 @@ STREAM(44): HEADERS            -------->
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 0
-  Context Extension = {}
+  Datagram Format Type = IP_PACKET
+  Datagram Format Data = ""
 
 DATAGRAM                       -------->
   Quarter Stream ID = 11
@@ -907,13 +907,14 @@ DATAGRAM                       -------->
   Payload = Encapsulated IP Packet
 
 /* After performing some analysis on traffic patterns, */
-/* the client decides it wants to compress a 5-tuple.  */
+/* the client decides it wants to compress a 2-tuple.  */
 
 
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 2
-  Context Extension = {IP_COMPRESSION=tcp,192.0.2.6:9876,192.0.2.7:443}
+  Datagram Format Type = COMPRESSED_IP_PACKET
+  Datagram Format Data = "192.0.2.6,192.0.2.7"
 
 DATAGRAM                       -------->
   Quarter Stream ID = 11
@@ -937,7 +938,8 @@ STREAM(44): HEADERS            -------->
 
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_NO_CONTEXT
-  Context Extension = {}
+  Datagram Format Type = WEBTRANSPORT_DATAGRAM
+  Datagram Format Data = ""
 
            <--------  STREAM(44): HEADERS
                         :status = 200
