@@ -90,8 +90,8 @@ compression to elide some parts of the datagram: the context identifier then
 maps to a compression context that the receiver can use to reconstruct the
 elided data.
 
-Contexts are optional, their use is negotiated on each request stream using
-registration capsules, see {{register-capsule}} and
+Contexts are optional, whether to use them or not is decided by the client on
+each request stream using registration capsules, see {{register-capsule}} and
 {{register-no-context-capsule}}. When contexts are used, they are identified
 within the scope of a given request by a numeric value, referred to as the
 context ID. A context ID is a 62-bit integer (0 to 2^62-1).
@@ -167,10 +167,11 @@ Intermediaries parse the Quarter Stream ID field in order to associate the QUIC
 DATAGRAM frame with a stream. If an intermediary receives a QUIC DATAGRAM frame
 whose payload is too short to allow parsing the Quarter Stream ID field, the
 intermediary MUST treat it as an HTTP/3 connection error of type
-H3_GENERAL_PROTOCOL_ERROR. The Context ID field is optional and its use is
-negotiated end-to-end, see {{register-no-context-capsule}}. Therefore
-intermediaries cannot know whether the Context ID field is present or absent
-and they MUST ignore any HTTP/3 Datagram fields after the Quarter Stream ID.
+H3_GENERAL_PROTOCOL_ERROR. The Context ID field is optional and whether it is
+present or not is decided end-to-end by the client, see
+{{register-no-context-capsule}}. Therefore intermediaries cannot know whether
+the Context ID field is present or absent and they MUST ignore any HTTP/3
+Datagram fields after the Quarter Stream ID.
 
 Endpoints parse both the Quarter Stream ID field and the Context ID field in
 order to associate the QUIC DATAGRAM frame with a stream and context within
@@ -418,8 +419,8 @@ both a REGISTER_DATAGRAM_CONTEXT capsule and a REGISTER_DATAGRAM_NO_CONTEXT
 capsule on the same stream, the server MUST abruptly terminate the
 corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
-Extensions MAY define a different mechanism to negotiate the presence of
-contexts, and they MAY do so in a way which is opaque to intermediaries.
+Extensions MAY define a different mechanism to communicate whether contexts are
+in use, and they MAY do so in a way which is opaque to intermediaries.
 
 
 ### The CLOSE_DATAGRAM_CONTEXT Capsule {#close-capsule}
