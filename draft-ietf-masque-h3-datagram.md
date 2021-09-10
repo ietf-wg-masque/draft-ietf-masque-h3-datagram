@@ -195,41 +195,93 @@ silently or buffer it temporarily while awaiting the creation of the
 corresponding stream.
 
 
-# CAPSULE HTTP/3 Frame Definition {#capsule-frame}
+# Capsules {#capsule}
 
-CAPSULE allows reliably sending request-related information end-to-end, even in
-the presence of HTTP intermediaries.
+This specification introduces the Capsule Protocol. The Capsule Protocol is a
+sequence of type-length-value tuples that allows endpoints to reliably
+communicate request-related information end-to-end, even in the presence of
+HTTP intermediaries.
 
-CAPSULE is an HTTP/3 Frame (as opposed to a QUIC frame) which SHALL only be
-sent in client-initiated bidirectional streams. Intermediaries forward received
-CAPSULE frames on the same stream where it would forward DATA frames. Each
-Capsule Type determines whether it is opaque or transparent to intermediaries:
-opaque capsules are forwarded unmodified while transparent ones can be parsed,
-added, or removed by intermediaries.
 
-This specification of CAPSULE currently uses HTTP/3 frame type 0xffcab5. If this
-document is approved, a lower number will be requested from IANA.
+## Capsule Protocol {#capsule-protocol}
+
+This specification defines the "data stream" of an HTTP request as the
+bidirectional stream of bytes that follow the headers in both directions. In
+HTTP/1.x, the data stream consists of all bytes on the connection that follow
+the blank line that concludes the header section in both directions. In HTTP/2
+and HTTP/3, the data stream of a given HTTP request consists of all bytes sent
+in DATA frames with the corresponding stream ID.
+
+Definitions of new HTTP Methods or of new HTTP Upgrade Tokens can state that
+their data stream uses the Capsule Protocol. If they do so, that means that the
+contents of their data stream uses the following format (using the notation
+from the "Notational Conventions" section of {{QUIC}}):
 
 ~~~
-CAPSULE HTTP/3 Frame {
-  Type (i) = 0xffcab5,
-  Length (i),
-  Capsule Type (i),
-  Capsule Data (..),
+Capsule Protocol {
+  Capsule (..) ...,
 }
 ~~~
-{: #capsule-frame-format title="CAPSULE HTTP/3 Frame Format"}
+{: #capsule-stream-format title="Capsule Protocol Stream Format"}
 
-The Type and Length fields follows the definition of HTTP/3 frames from {{H3}}.
-The payload consists of:
+~~~
+Capsule {
+  Capsule Type (i),
+  Capsule Length (i),
+  Capsule Value (..),
+}
+~~~
+{: #capsule-format title="Capsule Format"}
 
 Capsule Type:
 
-: The type of this capsule.
+: A variable-length integer indicating the Type of the capsule. Endpoints that
+receive a capsule with an unknown Capsule Type MUST silently skip over that
+capsule.
 
-Capsule Data:
+Capsule Length:
 
-: Data whose semantics depends on the Capsule Type.
+: The length of the Capsule Value field following this field, encoded as a
+variable-length integer. Note that this field can have a value of zero.
+
+Capsule Value:
+
+: The payload of this capsule. Its semantics are determined by the value of the
+Capsule Type field.
+
+
+## Requirements
+
+If the definition of an HTTP Method or HTTP Upgrade Token states that it uses
+the capsule protocol, its implementations MUST follow the following
+requirements:
+
+* A server MUST NOT send any Transfer-Encoding or Content-Length header fields
+  in a 2xx (Successful) response. If a client receives a Content-Length or
+  Transfer-Encoding header fields in a successful response, it MUST treat that
+  response as malformed.
+
+* A request message does not have content.
+
+* Responses are not cacheable.
+
+## Intermediary Processing
+
+Intermediaries MUST operate in one of the two following modes:
+
+Pass-through mode:
+
+: In this mode, the intermediary forwards the data stream between two
+associated streams without any modification of the data stream.
+
+Participant mode:
+
+: In this mode, the intermediary terminates the data stream and parses all
+Capsule Type and Capsule Length fields it receives.
+
+Each Capsule Type determines whether it is opaque or transparent to
+intermediaries in participant mode: opaque capsules are forwarded unmodified
+while transparent ones can be parsed, added, or removed by intermediaries.
 
 Unless otherwise specified, all Capsule Types are defined as opaque to
 intermediaries. Intermediaries MUST forward all received opaque CAPSULE frames
@@ -247,18 +299,10 @@ the same order.
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
 drop that Capsule.
 
-Receipt of a CAPSULE HTTP/3 Frame on a stream that is not a client-initiated
-bidirectional stream MUST be treated as a connection error of type
-H3_FRAME_UNEXPECTED.
 
-CAPSULE frames MUST NOT be sent on a stream before at least one HEADERS frame
-has been sent on that stream. This removes the need to buffer capsules when the
-endpoint needs information from headers to determine how to react to the
-capsule. If a CAPSULE frame is received on a stream before a HEADERS frame, the
-receiver MUST treat this as a connection error of type H3_FRAME_UNEXPECTED.
+## Capsule Types
 
-
-## The REGISTER_DATAGRAM_CONTEXT Capsule {#register-capsule}
+### The REGISTER_DATAGRAM_CONTEXT Capsule {#register-capsule}
 
 The REGISTER_DATAGRAM_CONTEXT capsule (see {{iana-types}} for the value of the
 capsule type) allows an endpoint to inform its peer of the encoding and
@@ -319,7 +363,7 @@ REGISTER_DATAGRAM_NO_CONTEXT capsule, the client MUST abruptly terminate the
 corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 
-## The REGISTER_DATAGRAM_NO_CONTEXT Capsule {#register-no-context-capsule}
+### The REGISTER_DATAGRAM_NO_CONTEXT Capsule {#register-no-context-capsule}
 
 The REGISTER_DATAGRAM_NO_CONTEXT capsule (see {{iana-types}} for the value of
 the capsule type) allows a client to inform the server that datagram contexts
@@ -371,7 +415,7 @@ Extensions MAY define a different mechanism to negotiate the presence of
 contexts, and they MAY do so in a way which is opaque to intermediaries.
 
 
-## The CLOSE_DATAGRAM_CONTEXT Capsule {#close-capsule}
+### The CLOSE_DATAGRAM_CONTEXT Capsule {#close-capsule}
 
 The CLOSE_DATAGRAM_CONTEXT capsule (see {{iana-types}} for the value of the
 capsule type) allows an endpoint to inform its peer that it will no longer send
@@ -421,7 +465,7 @@ terminate the corresponding stream with a stream error of type
 H3_GENERAL_PROTOCOL_ERROR.
 
 
-## The DATAGRAM Capsule {#datagram-capsule}
+### The DATAGRAM Capsule {#datagram-capsule}
 
 The DATAGRAM capsule (see {{iana-types}} for the value of the capsule type)
 allows an endpoint to send a datagram frame over an HTTP stream. This is
@@ -600,17 +644,6 @@ extensions MAY define how to prioritize datagrams, and MAY define signaling to
 allow endpoints to communicate their prioritization preferences.
 
 
-# HTTP/1.x and HTTP/2 Support
-
-We can provide DATAGRAM support in HTTP/2 by defining the CAPSULE frame in
-HTTP/2.
-
-We can provide DATAGRAM support in HTTP/1.x by defining its data stream format
-to a sequence of length-value capsules.
-
-TODO: Refactor this document and add definitions for HTTP/1.x and HTTP/2.
-
-
 # Security Considerations {#security}
 
 Since this feature requires sending an HTTP/3 Settings parameter, it "sticks
@@ -621,17 +654,6 @@ HTTP/3 datagrams enabled on this endpoint.
 
 
 # IANA Considerations {#iana}
-
-## HTTP/3 CAPSULE Frame {#iana-frame}
-
-This document will request IANA to register the following entry in the
-"HTTP/3 Frames" registry:
-
-| Frame Type |   Value  | Specification |
-|:-----------|:---------|:--------------|
-|  CAPSULE   | 0xffcab5 | This Document |
-{: #iana-frame-table title="New HTTP/3 Frames"}
-
 
 ## HTTP/3 SETTINGS Parameter {#iana-setting}
 
@@ -656,7 +678,7 @@ A name or label for the capsule type.
 
 Value:
 
-: The value of the Capsule Type field (see {{capsule-frame}}) is a 62bit
+: The value of the Capsule Type field (see {{capsule-protocol}}) is a 62bit
 integer.
 
 Reference:
@@ -777,7 +799,7 @@ STREAM(44): HEADERS             -------->
   :path = /
   :authority = target.example.org:443
 
-STREAM(44): CAPSULE             -------->
+STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 0
   Context Extension = {}
@@ -810,7 +832,7 @@ STREAM(44): HEADERS            -------->
   :path = /
   :authority = target.example.org:443
 
-STREAM(44): CAPSULE            -------->
+STREAM(44): DATA               -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 0
   Context Extension = {}
@@ -831,7 +853,7 @@ DATAGRAM                       -------->
                         Payload = Encapsulated UDP Payload
 
 
-STREAM(44): CAPSULE            -------->
+STREAM(44): DATA               -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 2
   Context Extension = {TIMESTAMP=""}
@@ -859,7 +881,7 @@ STREAM(44): HEADERS            -------->
 
 /* Exchange CONNECT-IP configuration information. */
 
-STREAM(44): CAPSULE             -------->
+STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 0
   Context Extension = {}
@@ -881,7 +903,7 @@ DATAGRAM                       -------->
 /* the client decides it wants to compress a 5-tuple.  */
 
 
-STREAM(44): CAPSULE             -------->
+STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 2
   Context Extension = {IP_COMPRESSION=tcp,192.0.2.6:9876,192.0.2.7:443}
@@ -906,7 +928,7 @@ STREAM(44): HEADERS            -------->
   :authority = webtransport.example.org:443
   Origin = https://www.example.org:443
 
-STREAM(44): CAPSULE             -------->
+STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_NO_CONTEXT
   Context Extension = {}
 
