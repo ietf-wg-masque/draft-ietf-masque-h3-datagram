@@ -260,9 +260,10 @@ receiver MUST treat this as a connection error of type H3_FRAME_UNEXPECTED.
 
 ## The REGISTER_DATAGRAM_CONTEXT Capsule {#register-capsule}
 
-The REGISTER_DATAGRAM_CONTEXT capsule (type=0x00) allows an endpoint to inform
-its peer of the encoding and semantics of datagrams associated with a given
-context ID. Its Capsule Data field consists of:
+The REGISTER_DATAGRAM_CONTEXT capsule (see {{iana-types}} for the value of the
+capsule type) allows an endpoint to inform its peer of the encoding and
+semantics of datagrams associated with a given context ID. Its Capsule Data
+field consists of:
 
 ~~~
 REGISTER_DATAGRAM_CONTEXT Capsule {
@@ -320,10 +321,11 @@ corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 ## The REGISTER_DATAGRAM_NO_CONTEXT Capsule {#register-no-context-capsule}
 
-The REGISTER_DATAGRAM_NO_CONTEXT capsule (type=0x03) allows a client to inform
-the server that datagram contexts will not be used with this stream. It also
-informs the server of the encoding and semantics of datagrams associated with
-this stream. Its Capsule Data field consists of:
+The REGISTER_DATAGRAM_NO_CONTEXT capsule (see {{iana-types}} for the value of
+the capsule type) allows a client to inform the server that datagram contexts
+will not be used with this stream. It also informs the server of the encoding
+and semantics of datagrams associated with this stream. Its Capsule Data field
+consists of:
 
 ~~~
 REGISTER_DATAGRAM_NO_CONTEXT Capsule {
@@ -371,9 +373,10 @@ contexts, and they MAY do so in a way which is opaque to intermediaries.
 
 ## The CLOSE_DATAGRAM_CONTEXT Capsule {#close-capsule}
 
-The CLOSE_DATAGRAM_CONTEXT capsule (type=0x01) allows an endpoint to inform
-its peer that it will no longer send or parse received datagrams associated with
-a given context ID. Its Capsule Data field consists of:
+The CLOSE_DATAGRAM_CONTEXT capsule (see {{iana-types}} for the value of the
+capsule type) allows an endpoint to inform its peer that it will no longer send
+or parse received datagrams associated with a given context ID. Its Capsule
+Data field consists of:
 
 ~~~
 CLOSE_DATAGRAM_CONTEXT Capsule {
@@ -420,9 +423,10 @@ H3_GENERAL_PROTOCOL_ERROR.
 
 ## The DATAGRAM Capsule {#datagram-capsule}
 
-The DATAGRAM capsule (type=0x02) allows an endpoint to send a datagram frame
-over an HTTP stream. This is particularly useful when using a version of HTTP
-that does not support QUIC DATAGRAM frames. Its Capsule Data field consists of:
+The DATAGRAM capsule (see {{iana-types}} for the value of the capsule type)
+allows an endpoint to send a datagram frame over an HTTP stream. This is
+particularly useful when using a version of HTTP that does not support QUIC
+DATAGRAM frames. Its Capsule Data field consists of:
 
 ~~~
 DATAGRAM Capsule {
@@ -512,25 +516,26 @@ defined by the corresponding Context Extension Type.
 
 ## The CLOSE_CODE Context Extension Type {#close-code}
 
-The CLOSE_CODE context extension type (type=0x00) allows an endpoint to provide
-additional information as to why a datagram context was closed. This type SHALL
-only be sent in CLOSE_DATAGRAM_CONTEXT capsules. Its Context Extension Value
-field consists of a single variable-length integer which contains the close
-code. The following codes are defined:
+The CLOSE_CODE context extension type (see {{iana-ext-types}} for the value of
+the context extension type) allows an endpoint to provide additional
+information as to why a datagram context was closed. This type SHALL only be
+sent in CLOSE_DATAGRAM_CONTEXT capsules. Its Context Extension Value field
+consists of a single variable-length integer which contains the close code. The
+following codes are defined:
 
-NO_ERROR (code=0x00):
+NO_ERROR:
 
 : This indicates that the registration was closed without any additional
 information.
 
-DENIED (code=0x01):
+DENIED:
 
 : This indicates that the sender has rejected the context registration based on
 its local policy. The endpoint that had originally registered this context MUST
 NOT try to register another context with the same context extensions on this
 stream.
 
-RESOURCE_LIMIT (code=0x02):
+RESOURCE_LIMIT:
 
 : This indicates that the context was closed to save resources. The recipient
 SHOULD limit its future registration of resource-intensive contexts.
@@ -541,10 +546,10 @@ present. Close codes are registered with IANA, see {{iana-close-codes}}.
 
 ## The DETAILS Context Extension Type
 
-The DETAILS context extension type (type=0x01) allows an endpoint to provide
-additional details to context capsules. It is meant for debugging purposes. Its
-Context Extension Value field consists of a human-readable string encoded in
-UTF-8.
+The DETAILS context extension type (see {{iana-ext-types}} for the value of the
+context extension type) allows an endpoint to provide additional details to
+context capsules. It is meant for debugging purposes. Its Context Extension
+Value field consists of a human-readable string encoded in UTF-8.
 
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
@@ -664,12 +669,12 @@ Registrations follow the "First Come First Served" policy (see Section 4.4 of
 
 This registry initially contains the following entries:
 
-| Capsule Type                 | Value | Specification |
-|:-----------------------------|:------|:--------------|
-| REGISTER_DATAGRAM_CONTEXT    | 0x00  | This Document |
-| CLOSE_DATAGRAM_CONTEXT       | 0x01  | This Document |
-| DATAGRAM                     | 0x02  | This Document |
-| REGISTER_DATAGRAM_NO_CONTEXT | 0x03  | This Document |
+| Capsule Type                 |   Value   | Specification |
+|:-----------------------------|:----------|:--------------|
+| DATAGRAM                     | 0xff37a0  | This Document |
+| REGISTER_DATAGRAM_CONTEXT    | 0xff37a1  | This Document |
+| REGISTER_DATAGRAM_NO_CONTEXT | 0xff37a2  | This Document |
+| CLOSE_DATAGRAM_CONTEXT       | 0xff37a3  | This Document |
 {: #iana-types-table title="Initial Capsule Types Registry Entries"}
 
 Capsule types with a value of the form 41 * N + 23 for integer values of N are
@@ -705,10 +710,10 @@ nor Value.
 
 This registry initially contains the following entries:
 
-| Context Extension Type       | Value | Specification |
-|:-----------------------------|:------|:--------------|
-| CLOSE_CODE                   | 0x00  | This Document |
-| DETAILS                      | 0x01  | This Document |
+| Context Extension Type       |   Value   | Specification |
+|:-----------------------------|:----------|:--------------|
+| CLOSE_CODE                   | 0xffb340  | This Document |
+| DETAILS                      | 0xffb341  | This Document |
 {: #iana-ext-table title="Initial Context Extension Types Registry Entries"}
 
 Context extension types with a value of the form 41 * N + 17 for integer values
@@ -744,11 +749,11 @@ nor Value.
 
 This registry initially contains the following entries:
 
-| Context Close Code           | Value | Specification |
-|:-----------------------------|:------|:--------------|
-| NO_ERROR                     | 0x00  | This Document |
-| DENIED                       | 0x01  | This Document |
-| RESOURCE_LIMIT               | 0x02  | This Document |
+| Context Close Code           |   Value   | Specification |
+|:-----------------------------|:----------|:--------------|
+| NO_ERROR                     | 0xff78a0  | This Document |
+| DENIED                       | 0xff78a1  | This Document |
+| RESOURCE_LIMIT               | 0xff78a2  | This Document |
 {: #iana-close-codes-table title="Initial Context Close Code Registry Entries"}
 
 Context close codes with a value of the form 41 * N + 19 for integer values of
