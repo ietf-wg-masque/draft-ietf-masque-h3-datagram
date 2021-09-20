@@ -112,15 +112,16 @@ part of the registration capsule, see {{register-capsule}} and
 {{register-no-context-capsule}}. This type identifier is registered with IANA
 (see {{iana-format-types}}) and allows applications that use HTTP Datagrams to
 indicate what the content of datagrams are. Registration capsules carry a
-Datagram Format Data field which allows sending some additional information
-that would impact the format of datagrams.
+Datagram Format Additional Data field which allows sending some additional
+information that would impact the format of datagrams.
 
 For example, a protocol which proxies IP packets can define a Datagram Format
-Type which represents an IP packet. The corresponding Datagram Format Data
-field would be empty. An extension to such a protocol that wishes to compress
-IP addresses could define a distinct Datagram Format Type and exchange two IP
-addresses via the Datagram Format Data field. Then any datagrams with that type
-would contain the IP packet with addresses elided.
+Type which represents an IP packet. The corresponding Datagram Format
+Additional Data field would be empty. An extension to such a protocol that
+wishes to compress IP addresses could define a distinct Datagram Format Type
+and exchange two IP addresses via the Datagram Format Additional Data field.
+Then any datagrams with that type would contain the IP packet with addresses
+elided.
 
 
 ## Context ID Allocation {#context-id-alloc}
@@ -341,7 +342,7 @@ field consists of:
 REGISTER_DATAGRAM_CONTEXT Capsule {
   Context ID (i),
   Datagram Format Type (i),
-  Datagram Format Data (..),
+  Datagram Format Additional Data (..),
 }
 ~~~
 {: #register-capsule-format title="REGISTER_DATAGRAM_CONTEXT Capsule Format"}
@@ -356,7 +357,7 @@ Datagram Format Type:
 Datagram Payload field of datagrams with this context ID, see
 {{datagram-formats}}.
 
-Datagram Format Data:
+Datagram Format Additional Data:
 
 : This field carries additional information that impact the format of datagrams
 with this context ID, see {{datagram-formats}}.
@@ -410,7 +411,7 @@ consists of:
 ~~~
 REGISTER_DATAGRAM_NO_CONTEXT Capsule {
   Datagram Format Type (i),
-  Datagram Format Data (..),
+  Datagram Format Additional Data (..),
 }
 ~~~
 {: #register-no-context-capsule-format title="REGISTER_DATAGRAM_NO_CONTEXT Capsule Format"}
@@ -420,7 +421,7 @@ Datagram Format Type:
 : A variable-length integer that defines the semantics and encoding of the HTTP
 Datagram Payload field of datagrams, see {{datagram-formats}}.
 
-Datagram Format Data:
+Datagram Format Additional Data:
 
 : This field carries additional information that impact the format of
 datagrams, see {{datagram-formats}}.
@@ -806,7 +807,7 @@ STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 0
   Datagram Format Type = UDP_PAYLOAD
-  Datagram Format Data = ""
+  Datagram Format Additional Data = ""
 
 DATAGRAM                        -------->
   Quarter Stream ID = 11
@@ -840,7 +841,7 @@ STREAM(44): DATA               -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 0
   Datagram Format Type = UDP_PAYLOAD
-  Datagram Format Data = ""
+  Datagram Format Additional Data = ""
 
 DATAGRAM                       -------->
   Quarter Stream ID = 11
@@ -862,7 +863,7 @@ STREAM(44): DATA               -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 2
   Datagram Format Type = UDP_PAYLOAD_WITH_TIMESTAMP
-  Datagram Format Data = ""
+  Datagram Format Additional Data = ""
 
 DATAGRAM                       -------->
   Quarter Stream ID = 11
@@ -891,7 +892,7 @@ STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 0
   Datagram Format Type = IP_PACKET
-  Datagram Format Data = ""
+  Datagram Format Additional Data = ""
 
 DATAGRAM                       -------->
   Quarter Stream ID = 11
@@ -914,7 +915,7 @@ STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
   Context ID = 2
   Datagram Format Type = COMPRESSED_IP_PACKET
-  Datagram Format Data = "192.0.2.6,192.0.2.7"
+  Datagram Format Additional Data = "192.0.2.6,192.0.2.7"
 
 DATAGRAM                       -------->
   Quarter Stream ID = 11
@@ -939,7 +940,7 @@ STREAM(44): HEADERS            -------->
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_NO_CONTEXT
   Datagram Format Type = WEBTRANSPORT_DATAGRAM
-  Datagram Format Data = ""
+  Datagram Format Additional Data = ""
 
            <--------  STREAM(44): HEADERS
                         :status = 200
