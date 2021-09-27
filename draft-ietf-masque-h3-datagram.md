@@ -335,11 +335,12 @@ drop that Capsule.
 
 The REGISTER_DATAGRAM_CONTEXT capsule (see {{iana-types}} for the value of the
 capsule type) allows an endpoint to inform its peer of the encoding and
-semantics of datagrams associated with a given context ID. Its Capsule Data
-field consists of:
+semantics of datagrams associated with a given context ID.
 
 ~~~
 REGISTER_DATAGRAM_CONTEXT Capsule {
+  Type (i) = REGISTER_DATAGRAM_CONTEXT,
+  Length (i),
   Context ID (i),
   Datagram Format Type (i),
   Datagram Format Additional Data (..),
@@ -405,11 +406,12 @@ corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 The REGISTER_DATAGRAM_NO_CONTEXT capsule (see {{iana-types}} for the value of
 the capsule type) allows a client to inform the server that datagram contexts
 will not be used with this stream. It also informs the server of the encoding
-and semantics of datagrams associated with this stream. Its Capsule Data field
-consists of:
+and semantics of datagrams associated with this stream.
 
 ~~~
 REGISTER_DATAGRAM_NO_CONTEXT Capsule {
+  Type (i) = REGISTER_DATAGRAM_NO_CONTEXT,
+  Length (i),
   Datagram Format Type (i),
   Datagram Format Additional Data (..),
 }
@@ -463,11 +465,12 @@ in use, and they MAY do so in a way which is opaque to intermediaries.
 
 The CLOSE_DATAGRAM_CONTEXT capsule (see {{iana-types}} for the value of the
 capsule type) allows an endpoint to inform its peer that it will no longer send
-or parse received datagrams associated with a given context ID. Its Capsule
-Data field consists of:
+or parse received datagrams associated with a given context ID.
 
 ~~~
 CLOSE_DATAGRAM_CONTEXT Capsule {
+  Type (i) = CLOSE_DATAGRAM_CONTEXT,
+  Length (i),
   Context ID (i),
   Close Code (i),
   Close Details (..),
@@ -548,10 +551,12 @@ present. Close codes are registered with IANA, see {{iana-close-codes}}.
 The DATAGRAM capsule (see {{iana-types}} for the value of the capsule type)
 allows an endpoint to send a datagram frame over an HTTP stream. This is
 particularly useful when using a version of HTTP that does not support QUIC
-DATAGRAM frames. Its Capsule Data field consists of:
+DATAGRAM frames.
 
 ~~~
 DATAGRAM Capsule {
+  Type (i) = DATAGRAM,
+  Length (i),
   [Context ID (i)],
   HTTP Datagram Payload (..),
 }
