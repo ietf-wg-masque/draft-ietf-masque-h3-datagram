@@ -55,6 +55,28 @@ bidirectional streams and defines an optional additional demultiplexing layer.
 Additionally, this document defines how to convey datagrams over prior versions
 of HTTP.
 
+This document is structured as follows:
+
+* {{multiplexing}} presents core concepts for multiplexing across HTTP versions.
+  * {{datagram-contexts}} defines datagram contexts, an optional end-to-end
+    multiplexing concept scoped to each HTTP request.
+  * {{datagram-formats}} defines datagram formats, which are scoped to contexts.
+    Formats communicate the format and encoding of datagrams sent using the
+    associated context.
+  * Contexts are identified using a variable-length integer. Requirements for
+    allocating identifier values are detailed in {{context-id-alloc}}.
+* {{format}} defines how QUIC DATAGRAM frames are used with HTTP/3. {{setting}}
+  defines an HTTP/3 setting that endpoints can use to advertise support of the
+  frame.
+* {{capsule}} introduces the Capsule Protocol and the "data stream" concept.
+  Data streams are initiated using special-purpose HTTP requests, after which
+  Capsules, an end-to-end message, can be sent.
+  * The following Capsule types are defined, together with guidance for defining new types:
+    * REGISTER_DATAGRAM_CONTEXT {{register-capsule}}
+    * REGISTER_DATAGRAM_NO_CONTEXT {{register-no-context-capsule}}
+    * CLOSE_DATAGRAM_CONTEXT {{close-capsule}}
+    * DATAGRAM {{datagram-capsule}}
+
 
 ## Conventions and Definitions {#defs}
 
