@@ -94,7 +94,7 @@ Contexts are optional, whether to use them or not is decided by the client on
 each request stream using registration capsules, see {{register-capsule}} and
 {{register-no-context-capsule}}. When contexts are used, they are identified
 within the scope of a given request by a numeric value, referred to as the
-context ID. A context ID is a 62-bit integer (0 to 2^62-1).
+context ID. A context ID is a 62-bit integer (0 to 2<sup>62</sup>-1).
 
 While stream IDs are a per-hop concept, context IDs are an end-to-end concept.
 In other words, if a datagram travels through one or more intermediaries on its
@@ -161,10 +161,13 @@ HTTP/3 Datagram {
 Quarter Stream ID:
 
 : A variable-length integer that contains the value of the client-initiated
-bidirectional stream that this datagram is associated with, divided by four.
-(The division by four stems from the fact that HTTP requests are sent on
+bidirectional stream that this datagram is associated with, divided by four (The
+division by four stems from the fact that HTTP requests are sent on
 client-initiated bidirectional streams, and those have stream IDs that are
-divisible by four.)
+divisible by four.). The largest legal QUIC stream ID value is 2<sup>62</sup>-1,
+so the largest legal value value of Quarter Stream ID is 2<sup>62</sup>-1 / 4.
+Receipt of a frame that includes a larger value MUST be treated as a connection
+error of type FRAME_ENCODING_ERROR.
 
 Context ID:
 
