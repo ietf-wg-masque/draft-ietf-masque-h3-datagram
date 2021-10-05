@@ -161,11 +161,11 @@ HTTP/3 Datagram {
 Quarter Stream ID:
 
 : A variable-length integer that contains the value of the client-initiated
-bidirectional stream that this datagram is associated with, divided by four (The
+bidirectional stream that this datagram is associated with, divided by four (the
 division by four stems from the fact that HTTP requests are sent on
 client-initiated bidirectional streams, and those have stream IDs that are
 divisible by four.). The largest legal QUIC stream ID value is 2<sup>62</sup>-1,
-so the largest legal value value of Quarter Stream ID is 2<sup>62</sup>-1 / 4.
+so the largest legal value of Quarter Stream ID is 2<sup>62</sup>-1 / 4.
 Receipt of a frame that includes a larger value MUST be treated as a connection
 error of type FRAME_ENCODING_ERROR.
 
