@@ -718,7 +718,7 @@ Type:
 
 Value:
 
-: The value of the Capsule Type field (see {{capsule-protocol}}) is a 62bit
+: The value of the Capsule Type field (see {{capsule-protocol}}) is a 62-bit
 integer.
 
 Reference:
@@ -759,7 +759,7 @@ Type:
 Value:
 
 : The value of the Datagram Format Type field (see {{datagram-formats}}) is a
-62bit integer.
+62-bit integer.
 
 Reference:
 
@@ -791,7 +791,7 @@ Type:
 
 Value:
 
-: The value of the Close Code field (see {{close-capsule}}) is a 62bit integer.
+: The value of the Close Code field (see {{close-capsule}}) is a 62-bit integer.
 
 Reference:
 
