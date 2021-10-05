@@ -714,7 +714,7 @@ MUST include the following fields:
 
 Type:
 
-A name or label for the capsule type.
+: A name or label for the capsule type.
 
 Value:
 
@@ -754,7 +754,7 @@ this registry MUST include the following fields:
 
 Type:
 
-A name or label for the datagram format type.
+: A name or label for the datagram format type.
 
 Value:
 
@@ -787,7 +787,7 @@ registry MUST include the following fields:
 
 Type:
 
-A name or label for the close code.
+: A name or label for the close code.
 
 Value:
 
