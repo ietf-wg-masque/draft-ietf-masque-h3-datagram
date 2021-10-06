@@ -526,8 +526,8 @@ and they SHOULD state how receivers react to them.
 
 NO_ERROR:
 
-: This indicates that a context was closed without any without any action
-specified for the receiver.
+: This indicates that a context was closed without any action specified for the
+receiver.
 
 UNKNOWN_FORMAT:
 
