@@ -510,7 +510,8 @@ Context ID:
 Close Code:
 
 : The close code allows an endpoint to provide additional information as to why
-a datagram context was closed. The codes are defined in {{close-codes}}.
+a datagram context was closed. {{close-codes}} defines a set of codes, the
+circumstances under which an implementation sends them, and how receivers react.
 
 Close Details:
 
@@ -540,13 +541,18 @@ stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 #### Close Codes {#close-codes}
 
+Close codes are intended to allow implementations to react differently when they
+receive them - for example, some close codes require the receiver to not open
+another context under certain conditions.
+
 This specification defines the close codes below. Their numeric values are in
-{{iana-close-codes}}.
+{{iana-close-codes}}. Extensions to this mechanism MAY define new close codes
+and they SHOULD state how receivers react to them.
 
 NO_ERROR:
 
-: This indicates that the registration was closed without any additional
-information.
+: This indicates that a context was closed without any action specified for the
+receiver.
 
 UNKNOWN_FORMAT:
 
