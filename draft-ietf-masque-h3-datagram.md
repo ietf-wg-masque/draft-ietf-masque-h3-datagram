@@ -685,6 +685,10 @@ endpoints negotiate the same draft version.
 
 # Prioritization
 
+Data streams (see {{capsule-protocol}}) can be prioritized using any means
+suited to stream or request prioritization. For example, {{Section 11 of
+?PRIORITY=I-D.ietf-httpbis-priority}}.
+
 Prioritization of HTTP/3 datagrams is not defined in this document. Future
 extensions MAY define how to prioritize datagrams, and MAY define signaling to
 allow endpoints to communicate their prioritization preferences.
