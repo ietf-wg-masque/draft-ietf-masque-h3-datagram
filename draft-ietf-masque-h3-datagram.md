@@ -27,6 +27,8 @@ author:
     organization: "Cloudflare"
     email: lucaspardue.24.7@gmail.com
 
+informative:
+  PRIORITY: I-D.ietf-httpbis-priority
 
 --- abstract
 
@@ -686,8 +688,8 @@ endpoints negotiate the same draft version.
 # Prioritization
 
 Data streams (see {{capsule-protocol}}) can be prioritized using any means
-suited to stream or request prioritization. For example, {{Section 11 of
-?PRIORITY=I-D.ietf-httpbis-priority}}.
+suited to stream or request prioritization. For example, see {{Section 11 of
+PRIORITY}}.
 
 Prioritization of HTTP/3 datagrams is not defined in this document. Future
 extensions MAY define how to prioritize datagrams, and MAY define signaling to
