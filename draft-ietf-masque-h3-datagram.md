@@ -840,10 +840,11 @@ appear in the listing of assigned values.
 Client                                             Server
 
 STREAM(44): HEADERS             -------->
-  :method = CONNECT-UDP
+  :method = CONNECT
+  :protocol = connect-udp
   :scheme = https
-  :path = /
-  :authority = target.example.org:443
+  :path = /target.example.org/443/
+  :authority = proxy.example.org:443
 
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
@@ -874,10 +875,11 @@ DATAGRAM                        -------->
 Client                                             Server
 
 STREAM(44): HEADERS            -------->
-  :method = CONNECT-UDP
+  :method = CONNECT
+  :protocol = connect-udp
   :scheme = https
-  :path = /
-  :authority = target.example.org:443
+  :path = /target.example.org/443/
+  :authority = proxy.example.org:443
 
 STREAM(44): DATA               -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
@@ -920,7 +922,8 @@ DATAGRAM                       -------->
 Client                                             Server
 
 STREAM(44): HEADERS            -------->
-  :method = CONNECT-IP
+  :method = CONNECT
+  :protocol = connect-ip
   :scheme = https
   :path = /
   :authority = proxy.example.org:443
