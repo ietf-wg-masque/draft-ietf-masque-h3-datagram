@@ -61,7 +61,8 @@ This document is structured as follows:
 
 * {{multiplexing}} presents core concepts for multiplexing across HTTP versions.
   * {{datagram-contexts}} defines datagram contexts, an optional end-to-end
-    multiplexing concept scoped to each HTTP request.
+    multiplexing concept scoped to each HTTP request. Whether contexts are in
+    use is defined in {{context-hdr}}.
   * {{datagram-formats}} defines datagram formats, which are scoped to contexts.
     Formats communicate the format and encoding of datagrams sent using the
     associated context.
@@ -74,10 +75,9 @@ This document is structured as follows:
   Data streams are initiated using special-purpose HTTP requests, after which
   Capsules, an end-to-end message, can be sent.
   * The following Capsule types are defined, together with guidance for defining new types:
-    * REGISTER_DATAGRAM_CONTEXT {{register-capsule}}
-    * REGISTER_DATAGRAM_NO_CONTEXT {{register-no-context-capsule}}
-    * CLOSE_DATAGRAM_CONTEXT {{close-capsule}}
-    * DATAGRAM {{datagram-capsule}}
+    * Datagram registration capsules {{register-capsule}}
+    * Datagram close capsule {{close-capsule}}
+    * Datagram capsules {{datagram-capsule}}
 
 
 ## Conventions and Definitions {#defs}
@@ -114,17 +114,21 @@ compression to elide some parts of the datagram: the context identifier then
 maps to a compression context that the receiver can use to reconstruct the
 elided data.
 
-Contexts are optional, whether to use them or not is decided by the client on
-each request stream using registration capsules, see {{register-capsule}} and
-{{register-no-context-capsule}}. When contexts are used, they are identified
-within the scope of a given request by a numeric value, referred to as the
-context ID. A context ID is a 62-bit integer (0 to 2<sup>62</sup>-1).
-
 While stream IDs are a per-hop concept, context IDs are an end-to-end concept.
 In other words, if a datagram travels through one or more intermediaries on its
 way from client to server, the stream ID will most likely change from hop to
 hop, but the context ID will remain the same. Context IDs are opaque to
 intermediaries.
+
+Contexts are OPTIONAL to implement for both endpoints. Intermediaries do not
+require any context-specific software to enable contexts. When contexts are
+supported by the implementation, their use is optional and can be selected on
+each stream. Endpoints inform their peer of whether they wish to use contexts
+via the Sec-Use-Datagram-Contexts HTTP header, see {{context-hdr}}.
+
+When contexts are used, they are identified within the scope of a given request
+by a numeric value, referred to as the context ID. A context ID is a 62-bit
+integer (0 to 2<sup>62</sup>-1).
 
 
 ## Datagram Formats {#datagram-formats}
@@ -132,12 +136,12 @@ intermediaries.
 When an endpoint registers a datagram context (or the lack of contexts), it
 communicates the format (i.e., the semantics and encoding) of datagrams sent
 using this context. This is acccomplished by sending a Datagram Format Type as
-part of the registration capsule, see {{register-capsule}} and
-{{register-no-context-capsule}}. This type identifier is registered with IANA
-(see {{iana-format-types}}) and allows applications that use HTTP Datagrams to
-indicate what the content of datagrams are. Registration capsules carry a
-Datagram Format Additional Data field which allows sending some additional
-information that would impact the format of datagrams.
+part of the datagram registration capsule, see {{register-capsule}}. This type
+identifier is registered with IANA (see {{iana-format-types}}) and allows
+applications that use HTTP Datagrams to indicate what the content of datagrams
+are. Registration capsules carry a Datagram Format Additional Data field which
+allows sending some additional information that would impact the format of
+datagrams.
 
 For example, a protocol which proxies IP packets can define a Datagram Format
 Type which represents an IP packet. The corresponding Datagram Format
@@ -150,11 +154,12 @@ elided.
 
 ## Context ID Allocation {#context-id-alloc}
 
-Implementations of HTTP Datagrams MUST provide a context ID allocation service.
-That service will allow applications co-located with HTTP to request a unique
-context ID that they can subsequently use for their own purposes. The HTTP
-implementation will then parse the context ID of incoming HTTP Datagrams and
-use it to deliver the frame to the appropriate application context.
+Implementations of HTTP Datagrams that support datagram contexts MUST provide
+a context ID allocation service. That service will allow applications
+co-located with HTTP to request a unique context ID that they can subsequently
+use for their own purposes. The HTTP implementation will then parse the context
+ID of incoming HTTP Datagrams and use it to deliver the frame to the
+appropriate application context.
 
 Even-numbered context IDs are client-initiated, while odd-numbered context IDs
 are server-initiated. This means that an HTTP client implementation of the
@@ -196,15 +201,12 @@ error of type FRAME_ENCODING_ERROR.
 Context ID:
 
 : A variable-length integer indicating the context ID of the datagram (see
-{{datagram-contexts}}). Whether or not this field is present depends on which
-registration capsules were exchanged on the associated stream: if a
-REGISTER_DATAGRAM_CONTEXT capsule (see {{register-capsule}}) has been sent or
-received on this stream, then the field is present; if a
-REGISTER_DATAGRAM_NO_CONTEXT capsule (see {{register-no-context-capsule}}) has
-been sent or received, then this field is absent; if neither has been sent or
-received, then it is not yet possible to parse this datagram and the receiver
-MUST either drop that datagram silently or buffer it temporarily while awaiting
-the registration capsule.
+{{datagram-contexts}}). Whether or not this field is present depends on whether
+datagram contexts are in use on this stream, see {{context-hdr}}. If this QUIC
+DATAGRAM frame is reordered and arrives before the receiver knows whether
+datagram contexts are in use on this stream, then the receiver cannot parse
+this datagram and the receiver MUST either drop that datagram silently or
+buffer it temporarily.
 
 HTTP Datagram Payload:
 
@@ -216,10 +218,10 @@ DATAGRAM frame with a stream. If an intermediary receives a QUIC DATAGRAM frame
 whose payload is too short to allow parsing the Quarter Stream ID field, the
 intermediary MUST treat it as an HTTP/3 connection error of type
 H3_GENERAL_PROTOCOL_ERROR. The Context ID field is optional and whether it is
-present or not is decided end-to-end by the client, see
-{{register-no-context-capsule}}. Therefore intermediaries cannot know whether
-the Context ID field is present or absent and they MUST ignore any HTTP/3
-Datagram fields after the Quarter Stream ID.
+present or not is decided end-to-end by the endpoints, see {{context-hdr}}.
+Therefore intermediaries cannot know whether the Context ID field is present or
+absent and they MUST ignore any HTTP/3 Datagram fields after the Quarter Stream
+ID.
 
 Endpoints parse both the Quarter Stream ID field and the Context ID field in
 order to associate the QUIC DATAGRAM frame with a stream and context within
@@ -343,7 +345,7 @@ Unless otherwise specified, all Capsule Types are defined as opaque to
 intermediaries. Intermediaries MUST forward all received opaque CAPSULE frames
 in their unmodified entirety. Intermediaries MUST NOT send any opaque CAPSULE
 frames other than the ones it is forwarding. All Capsule Types defined in this
-document are opaque, with the exception of the DATAGRAM Capsule, see
+document are opaque, with the exception of the datagram capsules, see
 {{datagram-capsule}}. Definitions of new Capsule Types MAY specify that the
 newly introduced type is transparent. Intermediaries MUST treat unknown Capsule
 Types as opaque.
@@ -358,17 +360,21 @@ drop that Capsule.
 
 ## Capsule Types
 
-### The REGISTER_DATAGRAM_CONTEXT Capsule {#register-capsule}
+### The Datagram Registration Capsules {#register-capsule}
 
-The REGISTER_DATAGRAM_CONTEXT capsule (see {{iana-types}} for the value of the
-capsule type) allows an endpoint to inform its peer of the encoding and
-semantics of datagrams associated with a given context ID.
+This document defines the REGISTER_DATAGRAM and REGISTER_DATAGRAM_CONTEXT
+capsules types, known collectively as the datagram registration capsules (see
+{{iana-types}} for the value of the capsule types). The REGISTER_DATAGRAM
+capsule is used by endpoints to inform their peer of the encoding and semantics
+of all datagrams associated with a stream. The REGISTER_DATAGRAM_CONTEXT
+capsule is used by endpoints to inform their peer of the encoding and semantics
+of all datagrams associated with a given context ID on this stream.
 
 ~~~
-REGISTER_DATAGRAM_CONTEXT Capsule {
-  Type (i) = REGISTER_DATAGRAM_CONTEXT,
+Datagram Registration Capsule {
+  Type (i) = REGISTER_DATAGRAM or REGISTER_DATAGRAM_CONTEXT,
   Length (i),
-  Context ID (i),
+  [Context ID (i)],
   Datagram Format Type (i),
   Datagram Format Additional Data (..),
 }
@@ -377,7 +383,12 @@ REGISTER_DATAGRAM_CONTEXT Capsule {
 
 Context ID:
 
-: The context ID to register.
+: A variable-length integer indicating the context ID to register (see
+{{datagram-contexts}}). This field is present in REGISTER_DATAGRAM_CONTEXT
+capsules but not in REGISTER_DATAGRAM capsules. If a REGISTER_DATAGRAM capsule
+is used on a stream where datagram contexts are in use, it is associated with
+context ID 0. REGISTER_DATAGRAM_CONTEXT capsules MUST NOT carry context ID 0 as
+that context ID is conveyed using the REGISTER_DATAGRAM capsule.
 
 Datagram Format Type:
 
@@ -391,18 +402,17 @@ Datagram Format Additional Data:
 with this context ID, see {{datagram-formats}}.
 
 Note that these registrations are unilateral and bidirectional: the sender of
-the frame unilaterally defines the semantics it will apply to the datagrams it
-sends and receives using this context ID. Once a context ID is registered, it
-can be used in both directions.
+the capsule unilaterally defines the semantics it will apply to the datagrams
+it sends and receives using this context ID. Once a context ID is registered,
+it can be used in both directions.
 
-Endpoints MUST NOT send DATAGRAM frames using a Context ID until they have
-either sent or received a REGISTER_DATAGRAM_CONTEXT Capsule with the same
-Context ID. However, reordering can cause DATAGRAM frames to be received with an
-unknown Context ID. Receipt of such frames MUST NOT be treated as an error.
-Endpoints SHALL drop the DATAGRAM frame silently, or buffer it temporarily while
-awaiting the corresponding REGISTER_DATAGRAM_CONTEXT Capsule. Intermediaries
-SHALL drop the DATAGRAM frame silently, MAY buffer it, or forward it on
-immediately.
+Endpoints MUST NOT send HTTP Datagrams until they have either sent or received
+a datagram registration capsule with the same Context ID. However, reordering
+can cause HTTP Datagrams to be received with an unknown Context ID. Receipt of
+such HTTP datagrams MUST NOT be treated as an error. Endpoints SHALL drop the
+HTTP Datagram silently, or buffer it temporarily while awaiting the
+corresponding datagram registration capsule. Intermediaries SHALL drop the HTTP
+Datagram silently, MAY buffer it, or forward it on immediately.
 
 Endpoints MUST NOT register the same Context ID twice on the same stream. This
 also applies to Context IDs that have been closed using a
@@ -412,83 +422,14 @@ endpoint receives a REGISTER_DATAGRAM_CONTEXT capsule that violates one or more
 of these requirements, the endpoint MUST abruptly terminate the corresponding
 stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
-Servers MUST NOT send a REGISTER_DATAGRAM_CONTEXT capsule on a stream before
-they have received at least one REGISTER_DATAGRAM_CONTEXT capsule or one
-REGISTER_DATAGRAM_NO_CONTEXT capsule from the client on that stream. This
-ensures that clients control whether datagrams are allowed for a given request.
-If a client receives a REGISTER_DATAGRAM_CONTEXT capsule on a stream where the
-client has not yet sent a REGISTER_DATAGRAM_CONTEXT capsule, the client MUST
-abruptly terminate the corresponding stream with a stream error of type
-H3_GENERAL_PROTOCOL_ERROR.
-
-Servers MUST NOT send a REGISTER_DATAGRAM_CONTEXT capsule on a stream where it
-has received a REGISTER_DATAGRAM_NO_CONTEXT capsule. If a client receives a
-REGISTER_DATAGRAM_CONTEXT capsule on a stream where the client has sent a
-REGISTER_DATAGRAM_NO_CONTEXT capsule, the client MUST abruptly terminate the
-corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
+If datagrams contexts are not in use, the client is responsible for choosing
+the datagram format and informing the server via a REGISTER_DATAGRAM capsule.
+Servers MUST NOT send the REGISTER_DATAGRAM capsule. If a client receives a
+REGISTER_DATAGRAM capsule, the client MUST abruptly terminate the corresponding
+stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 
-### The REGISTER_DATAGRAM_NO_CONTEXT Capsule {#register-no-context-capsule}
-
-The REGISTER_DATAGRAM_NO_CONTEXT capsule (see {{iana-types}} for the value of
-the capsule type) allows a client to inform the server that datagram contexts
-will not be used with this stream. It also informs the server of the encoding
-and semantics of datagrams associated with this stream.
-
-~~~
-REGISTER_DATAGRAM_NO_CONTEXT Capsule {
-  Type (i) = REGISTER_DATAGRAM_NO_CONTEXT,
-  Length (i),
-  Datagram Format Type (i),
-  Datagram Format Additional Data (..),
-}
-~~~
-{: #register-no-context-capsule-format title="REGISTER_DATAGRAM_NO_CONTEXT Capsule Format"}
-
-Datagram Format Type:
-
-: A variable-length integer that defines the semantics and encoding of the HTTP
-Datagram Payload field of datagrams, see {{datagram-formats}}.
-
-Datagram Format Additional Data:
-
-: This field carries additional information that impact the format of
-datagrams, see {{datagram-formats}}.
-
-Note that this registration is unilateral and bidirectional: the client
-unilaterally defines the semantics it will apply to the datagrams it sends and
-receives with this stream.
-
-Endpoints MUST NOT send DATAGRAM frames without a Context ID until they have
-either sent or received a REGISTER_DATAGRAM_NO_CONTEXT Capsule. However, due to
-reordering, an endpoint that receives a DATAGRAM frame before receiving either
-a REGISTER_DATAGRAM_CONTEXT capsule or a REGISTER_DATAGRAM_NO_CONTEXT capsule
-MUST NOT treat it as an error, it SHALL instead drop the DATAGRAM frame
-silently, or buffer it temporarily while awaiting a
-REGISTER_DATAGRAM_NO_CONTEXT capsule or the corresponding
-REGISTER_DATAGRAM_CONTEXT capsule.
-
-Servers MUST NOT send the REGISTER_DATAGRAM_NO_CONTEXT capsule. If a client
-receives a REGISTER_DATAGRAM_NO_CONTEXT capsule, the client MUST abruptly
-terminate the corresponding stream with a stream error of type
-H3_GENERAL_PROTOCOL_ERROR.
-
-Clients MUST NOT send more than one REGISTER_DATAGRAM_NO_CONTEXT capsule on a
-stream. If a server receives a second REGISTER_DATAGRAM_NO_CONTEXT capsule on
-the same stream, the server MUST abruptly terminate the corresponding stream
-with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
-
-Clients MUST NOT send both REGISTER_DATAGRAM_CONTEXT capsules and
-REGISTER_DATAGRAM_NO_CONTEXT capsules on the same stream. If a server receives
-both a REGISTER_DATAGRAM_CONTEXT capsule and a REGISTER_DATAGRAM_NO_CONTEXT
-capsule on the same stream, the server MUST abruptly terminate the
-corresponding stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
-
-Extensions MAY define a different mechanism to communicate whether contexts are
-in use, and they MAY do so in a way which is opaque to intermediaries.
-
-
-### The CLOSE_DATAGRAM_CONTEXT Capsule {#close-capsule}
+### The Datagram Close Capsule {#close-capsule}
 
 The CLOSE_DATAGRAM_CONTEXT capsule (see {{iana-types}} for the value of the
 capsule type) allows an endpoint to inform its peer that it will no longer send
@@ -529,9 +470,9 @@ registered using a REGISTER_DATAGRAM_CONTEXT capsule if they find its Datagram
 Format Type field to be unacceptable.
 
 After an endpoint has either sent or received a CLOSE_DATAGRAM_CONTEXT frame,
-it MUST NOT send any DATAGRAM frames with that Context ID. However, due to
-reordering, an endpoint that receives a DATAGRAM frame with a closed Context ID
-MUST NOT treat it as an error, it SHALL instead drop the DATAGRAM frame
+it MUST NOT send any HTTP Datagrams with that Context ID. However, due to
+reordering, an endpoint that receives an HTTP Datagram with a closed Context ID
+MUST NOT treat it as an error, it SHALL instead drop the HTTP Datagram
 silently.
 
 Endpoints MUST NOT close a Context ID that was not previously registered.
@@ -579,16 +520,17 @@ Receipt of an unknown close code MUST be treated as if the NO_ERROR code was
 present. Close codes are registered with IANA, see {{iana-close-codes}}.
 
 
-### The DATAGRAM Capsule {#datagram-capsule}
+### The Datagram Capsules {#datagram-capsule}
 
-The DATAGRAM capsule (see {{iana-types}} for the value of the capsule type)
-allows an endpoint to send a datagram frame over an HTTP stream. This is
-particularly useful when using a version of HTTP that does not support QUIC
-DATAGRAM frames.
+This document defines the DATAGRAM and DATAGRAM_WITH_CONTEXT capsules types,
+known collectively as the datagram capsules (see {{iana-types}} for the value
+of the capsule types). These capsules allow an endpoint to send a datagram
+frame over an HTTP stream. This is particularly useful when using a version of
+HTTP that does not support QUIC DATAGRAM frames.
 
 ~~~
-DATAGRAM Capsule {
-  Type (i) = DATAGRAM,
+Datagram Capsule {
+  Type (i) = DATAGRAM or DATAGRAM_WITH_CONTEXT,
   Length (i),
   [Context ID (i)],
   HTTP Datagram Payload (..),
@@ -599,33 +541,29 @@ DATAGRAM Capsule {
 Context ID:
 
 : A variable-length integer indicating the context ID of the datagram (see
-{{datagram-contexts}}). Whether or not this field is present depends on which
-registration capsules were exchanged on the associated stream: if a
-REGISTER_DATAGRAM_CONTEXT capsule (see {{register-capsule}}) has been sent or
-received on this stream, then the field is present; if a
-REGISTER_DATAGRAM_NO_CONTEXT capsule (see {{register-no-context-capsule}}) has
-been sent or received, then this field is absent; if neither has been sent or
-received, then it is not yet possible to parse this datagram and the receiver
-MUST either drop that datagram silently or buffer it temporarily while awaiting
-the registration capsule.
+{{datagram-contexts}}). This field is present in DATAGRAM_WITH_CONTEXT capsules
+but not in DATAGRAM capsules. If a DATAGRAM capsule is used on a stream where
+datagram contexts are in use, it is associated with context ID 0.
+DATAGRAM_WITH_CONTEXT capsules MUST NOT carry context ID 0 as that context ID
+is conveyed using the DATAGRAM capsule.
 
 HTTP Datagram Payload:
 
 : The payload of the datagram, whose semantics are defined by individual
 applications. Note that this field can be empty.
 
-Datagrams sent using the DATAGRAM Capsule have the exact same semantics as
+Datagrams sent using the datagram capsule have the exact same semantics as
 datagrams sent in QUIC DATAGRAM frames. In particular, the restrictions on when
 it is allowed to send an HTTP Datagram and how to process them from {{format}}
-also apply to HTTP Datagrams sent and received using the DATAGRAM capsule.
+also apply to HTTP Datagrams sent and received using the datagram capsules.
 
-The DATAGRAM Capsule is transparent to intermediaries, meaning that
-intermediaries MAY parse it and send DATAGRAM Capsules that they did not
+The datagram capsules are transparent to intermediaries, meaning that
+intermediaries MAY parse them and send datagram capsules that they did not
 receive. This allows an intermediary to reencode HTTP Datagrams as it forwards
-them: in other words, an intermediary MAY send a DATAGRAM Capsule to forward an
+them: in other words, an intermediary MAY send a datagram capsule to forward an
 HTTP Datagram which was received in a QUIC DATAGRAM frame, and vice versa.
 
-Note that while DATAGRAM capsules are sent on a stream, intermediaries can
+Note that while datagram capsules are sent on a stream, intermediaries can
 reencode HTTP Datagrams into QUIC DATAGRAM frames over the next hop, and those
 could be dropped. Because of this, applications have to always consider HTTP
 Datagrams to be unreliable, even if they were initially sent in a capsule.
@@ -639,7 +577,7 @@ size advertised on that connection is too low), the intermediary SHOULD drop
 the HTTP Datagram instead of converting it to a DATAGRAM capsule. This
 preserves the end-to-end unreliability characteristic that methods such as
 Datagram Packetization Layer Path MTU Discovery (DPLPMTUD) depend on
-{{?RFC8899}}. An intermediary that converts QUIC DATAGRAM frames to DATAGRAM
+{{?RFC8899}}. An intermediary that converts QUIC DATAGRAM frames to datagram
 capsules allows HTTP Datagrams to be arbitrarily large without suffering any
 loss; this can misrepresent the true path properties, defeating methods such a
 DPLPMTUD.
@@ -668,6 +606,70 @@ parameter sent by the server in the handshake is greater than or equal to the
 stored value; if not, the client MUST terminate the connection with error
 H3_SETTINGS_ERROR. In all cases, the maximum permitted value of the H3_DATAGRAM
 SETTINGS parameter is 1.
+
+
+# The Sec-Use-Datagram-Contexts HTTP Header {#context-hdr}
+
+Endpoints indicate their support for datagram contexts by sending the
+Sec-Use-Datagram-Contexts header with a value of ?1. If the header is missing
+or has a value different from ?1, that indicates that its sender does not wish
+to use datagram contexts. Endpoints that wish to use datagram contexts SHALL
+send the Sec-Use-Datagram-Contexts header with a value of ?1 on requests and
+responses that use the capsule protocol.
+
+"Sec-Use-Datagram-Contexts" is an Item Structured Header {{!RFC8941}}. Its
+value MUST be a Boolean, its ABNF is:
+
+~~~
+Sec-Use-Datagram-Contexts = sf-boolean
+~~~
+
+The REGISTER_DATAGRAM_CONTEXT, DATAGRAM_WITH_CONTEXT, and
+CLOSE_DATAGRAM_CONTEXT capsules as refered to as context-related capsules.
+Endpoints which do not wish to use contexts MUST NOT send context-related
+capsules, and MUST silently ignore any received context-related capsules.
+
+Both endpoints unilaterally decide whether they wish to use datagram contexts
+on a given stream. Contexts are used on a given stream if and only if both
+endpoints indicate they wish to use them on this stream. Once an endpoint has
+received the HTTP request or response, it knows whether datagram contexts are
+in use on this stream or not.
+
+Conceptually, when datagram contexts are not in use on a stream, all datagrams
+use context ID 0, which is client-initiated. This means that the client chooses
+the datagram format for all datagrams when datagram contexts are not in use.
+
+If datagram contexts are not in use on a stream, endpoints MUST NOT send
+context-related capsules to the peer on that stream. Clients MAY optimistically
+send context-related capsules before learning whether the server wishes to
+support datagram contexts or not.
+
+This allows a client to optimistically use extensions that rely on datagram
+contexts without knowing a priori whether the server supports them, and without
+incurring a latency cost to negotiate extension support. In this scenario, the
+client would send its request with the Sec-Use-Datagram-Contexts header set to
+?1, and register two datagram contexts: the main context would use context ID 0
+and the extension context would use context ID 2. The client then sends a
+REGISTER_DATAGRAM capsule to register the main context, and a
+REGISTER_DATAGRAM_CONTEXT to register the extension context. The client can
+then immediately send DATAGRAM capsules to send main datagrams and
+DATAGRAM_WITH_CONTEXT capsules to send extension datagrams.
+
+* If the server wishes to use datagram contexts, it will set
+  Sec-Use-Datagram-Contexts to ?1 on its response and correctly parse all the
+  received capsules.
+
+* If the server does not wish to use datagram contexts (for example if the
+  server implementation does not support them), it will not set
+  Sec-Use-Datagram-Contexts to ?1 on its response. It will then parse the
+  REGISTER_DATAGRAM and DATAGRAM capsules without datagram contexts being in
+  use on this stream, and parse the main datagrams correctly while silently
+  dropping the extension datagrams. Once the client receives the server's
+  response, it will know datagram contexts are not in use, and then will be
+  able to send HTTP Datagrams via the QUIC DATAGRAM frame.
+
+Extensions MAY define a different mechanism to communicate whether contexts are
+in use, and they MAY do so in a way which is opaque to intermediaries.
 
 
 ## Note About Draft Versions
@@ -718,6 +720,32 @@ This document will request IANA to register the following entry in the
 {: #iana-setting-table title="New HTTP/3 Settings"}
 
 
+## HTTP Header Field Name {#iana-hdr}
+
+This document will request IANA to register the following entry in the
+"HTTP Field Name" registry:
+
+Field Name:
+
+: Sec-Use-Datagram-Contexts
+
+Template:
+
+: None
+
+Status:
+
+: provisional (permanent if this document is approved)
+
+Reference:
+
+: This document
+
+Comments:
+
+: None
+
+
 ## Capsule Types {#iana-types}
 
 This document establishes a registry for HTTP capsule type codes. The "HTTP
@@ -745,10 +773,11 @@ This registry initially contains the following entries:
 
 | Capsule Type                 |   Value   | Specification |
 |:-----------------------------|:----------|:--------------|
-| DATAGRAM                     | 0xff37a0  | This Document |
 | REGISTER_DATAGRAM_CONTEXT    | 0xff37a1  | This Document |
-| REGISTER_DATAGRAM_NO_CONTEXT | 0xff37a2  | This Document |
+| REGISTER_DATAGRAM            | 0xff37a2  | This Document |
 | CLOSE_DATAGRAM_CONTEXT       | 0xff37a3  | This Document |
+| DATAGRAM_WITH_CONTEXT        | 0xff37a4  | This Document |
+| DATAGRAM                     | 0xff37a5  | This Document |
 {: #iana-types-table title="Initial Capsule Types Registry Entries"}
 
 Capsule types with a value of the form 41 * N + 23 for integer values of N are
@@ -836,6 +865,9 @@ appear in the listing of assigned values.
 
 ## CONNECT-UDP
 
+In this example, the client does not support any CONNECT-UDP nor HTTP Datagram
+extensions, and therefore has no use for datagram contexts on this stream.
+
 ~~~
 Client                                             Server
 
@@ -847,14 +879,12 @@ STREAM(44): HEADERS             -------->
   :authority = proxy.example.org:443
 
 STREAM(44): DATA                -------->
-  Capsule Type = REGISTER_DATAGRAM_CONTEXT
-  Context ID = 0
+  Capsule Type = REGISTER_DATAGRAM
   Datagram Format Type = UDP_PAYLOAD
   Datagram Format Additional Data = ""
 
 DATAGRAM                        -------->
   Quarter Stream ID = 11
-  Context ID = 0
   Payload = Encapsulated UDP Payload
 
            <--------  STREAM(44): HEADERS
@@ -864,12 +894,21 @@ DATAGRAM                        -------->
 
            <--------  DATAGRAM
                         Quarter Stream ID = 11
-                        Context ID = 0
                         Payload = Encapsulated UDP Payload
 ~~~
 
 
-## CONNECT-UDP with Timestamp Extension
+## CONNECT-UDP with Delayed Timestamp Extension
+
+In these examples, the client supports a CONNECT-UDP Timestamp Extension, which
+uses a different Datagram Format Type that carries a timestamp followed by the
+encapsulated UDP payload.
+
+
+### With Delay
+
+In this instance, the client prefers to wait a round trip to learn whether the
+server supports datagram contexts.
 
 ~~~
 Client                                             Server
@@ -880,6 +919,11 @@ STREAM(44): HEADERS            -------->
   :scheme = https
   :path = /target.example.org/443/
   :authority = proxy.example.org:443
+  Sec-Use-Datagram-Contexts = ?1
+
+           <--------  STREAM(44): HEADERS
+                        :status = 200
+                        Sec-Use-Datagram-Contexts = ?1
 
 STREAM(44): DATA               -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
@@ -887,21 +931,15 @@ STREAM(44): DATA               -------->
   Datagram Format Type = UDP_PAYLOAD
   Datagram Format Additional Data = ""
 
-DATAGRAM                       -------->
+DATAGRAM                        -------->
   Quarter Stream ID = 11
   Context ID = 0
   Payload = Encapsulated UDP Payload
-
-           <--------  STREAM(44): HEADERS
-                        :status = 200
-
-/* Wait for target server to respond to UDP packet. */
 
            <--------  DATAGRAM
                         Quarter Stream ID = 11
                         Context ID = 0
                         Payload = Encapsulated UDP Payload
-
 
 STREAM(44): DATA               -------->
   Capsule Type = REGISTER_DATAGRAM_CONTEXT
@@ -913,6 +951,99 @@ DATAGRAM                       -------->
   Quarter Stream ID = 11
   Context ID = 2
   Payload = Encapsulated UDP Payload With Timestamp
+~~~
+
+## Successful Optimistic
+
+In this instance, the client does not wish to spend a round trip waiting to
+learn whether the server supports datagram contexts. It registers its context
+optimistically in such a way that the server will react well whether it
+supports contexts or not. In this case, the server does support datagram
+contexts.
+
+~~~
+Client                                             Server
+
+STREAM(44): HEADERS            -------->
+  :method = CONNECT
+  :protocol = connect-udp
+  :scheme = https
+  :path = /target.example.org/443/
+  :authority = proxy.example.org:443
+  Sec-Use-Datagram-Contexts = ?1
+
+STREAM(44): DATA               -------->
+  Capsule Type = REGISTER_DATAGRAM
+  Datagram Format Type = UDP_PAYLOAD
+  Datagram Format Additional Data = ""
+
+STREAM(44): DATA               -------->
+  Capsule Type = DATAGRAM
+  Payload = Encapsulated UDP Payload
+
+           <--------  STREAM(44): HEADERS
+                        :status = 200
+                        Sec-Use-Datagram-Contexts = ?1
+
+/* Datagram contexts are in use on this stream */
+
+           <--------  DATAGRAM
+                        Quarter Stream ID = 11
+                        Context ID = 0
+                        Payload = Encapsulated UDP Payload
+
+STREAM(44): DATA               -------->
+  Capsule Type = REGISTER_DATAGRAM_CONTEXT
+  Context ID = 2
+  Datagram Format Type = UDP_PAYLOAD_WITH_TIMESTAMP
+  Datagram Format Additional Data = ""
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Context ID = 2
+  Payload = Encapsulated UDP Payload With Timestamp
+~~~
+
+## Optimistic but Unsupported
+
+In this instance, the client does not wish to spend a round trip waiting to
+learn whether the server supports datagram contexts. It registers its context
+optimistically in such a way that the server will react well whether it
+supports contexts or not. In this case, the server does not support datagram
+contexts.
+
+~~~
+Client                                             Server
+
+STREAM(44): HEADERS            -------->
+  :method = CONNECT
+  :protocol = connect-udp
+  :scheme = https
+  :path = /target.example.org/443/
+  :authority = proxy.example.org:443
+  Sec-Use-Datagram-Contexts = ?1
+
+STREAM(44): DATA               -------->
+  Capsule Type = REGISTER_DATAGRAM
+  Datagram Format Type = UDP_PAYLOAD
+  Datagram Format Additional Data = ""
+
+STREAM(44): DATA               -------->
+  Capsule Type = DATAGRAM
+  Payload = Encapsulated UDP Payload
+
+           <--------  STREAM(44): HEADERS
+                        :status = 200
+
+/* Datagram contexts are not in use on this stream */
+
+           <--------  DATAGRAM
+                        Quarter Stream ID = 11
+                        Payload = Encapsulated UDP Payload
+
+DATAGRAM                       -------->
+  Quarter Stream ID = 11
+  Payload = Encapsulated UDP Payload
 ~~~
 
 
@@ -927,9 +1058,11 @@ STREAM(44): HEADERS            -------->
   :scheme = https
   :path = /
   :authority = proxy.example.org:443
+  Sec-Use-Datagram-Contexts = ?1
 
            <--------  STREAM(44): HEADERS
                         :status = 200
+                        Sec-Use-Datagram-Contexts = ?1
 
 /* Exchange CONNECT-IP configuration information. */
 
@@ -983,7 +1116,7 @@ STREAM(44): HEADERS            -------->
   Origin = https://www.example.org:443
 
 STREAM(44): DATA                -------->
-  Capsule Type = REGISTER_DATAGRAM_NO_CONTEXT
+  Capsule Type = REGISTER_DATAGRAM
   Datagram Format Type = WEBTRANSPORT_DATAGRAM
   Datagram Format Additional Data = ""
 
