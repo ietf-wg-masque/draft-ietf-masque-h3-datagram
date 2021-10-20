@@ -362,13 +362,13 @@ drop that Capsule.
 
 ### The Datagram Registration Capsules {#register-capsule}
 
-The REGISTER_DATAGRAM and REGISTER_DATAGRAM_CONTEXT capsules (see
-{{iana-types}} for the value of the capsule types) allow an endpoint to inform
-its peer of the encoding and semantics of datagrams associated with a given
-context ID, or with all datagrams if context IDs are not in use on this stream.
-In this document we refer to the REGISTER_DATAGRAM and
-REGISTER_DATAGRAM_CONTEXT capsules collectively as the datagram registration
-capsules.
+This document defines the REGISTER_DATAGRAM and REGISTER_DATAGRAM_CONTEXT
+capsules types, known collectively as the datagram registration capsules (see
+{{iana-types}} for the value of the capsule types). The REGISTER_DATAGRAM
+capsule is used by endpoints to inform their peer of the encoding and semantics
+of all datagrams associated with a stream. The REGISTER_DATAGRAM_CONTEXT
+capsule is used by endpoints to inform their peer of the encoding and semantics
+of all datagrams associated with a given context ID on this stream.
 
 ~~~
 Datagram Registration Capsule {
@@ -521,11 +521,11 @@ present. Close codes are registered with IANA, see {{iana-close-codes}}.
 
 ### The Datagram Capsules {#datagram-capsule}
 
-The DATAGRAM and DATAGRAM_WITH_CONTEXT capsules (see {{iana-types}} for the
-value of the capsule types) allow an endpoint to send a datagram frame over an
-HTTP stream. This is particularly useful when using a version of HTTP that does
-not support QUIC DATAGRAM frames. In this document we refer to the DATAGRAM and
-DATAGRAM_WITH_CONTEXT capsules collectively as the datagram capsules.
+This document defines the DATAGRAM and DATAGRAM_WITH_CONTEXT capsules types,
+known collectively as the datagram capsules (see {{iana-types}} for the value
+of the capsule types). These capsules allow an endpoint to send a datagram
+frame over an HTTP stream. This is particularly useful when using a version of
+HTTP that does not support QUIC DATAGRAM frames.
 
 ~~~
 Datagram Capsule {
