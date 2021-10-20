@@ -154,7 +154,7 @@ elided.
 
 ## Context ID Allocation {#context-id-alloc}
 
-Implementations of HTTP Datagrams which support datagram contexts MUST provide
+Implementations of HTTP Datagrams that support datagram contexts MUST provide
 a context ID allocation service. That service will allow applications
 co-located with HTTP to request a unique context ID that they can subsequently
 use for their own purposes. The HTTP implementation will then parse the context
@@ -897,8 +897,8 @@ DATAGRAM                        -------->
 
 ## CONNECT-UDP with Delayed Timestamp Extension
 
-In these examples, the client supports a CONNECT-UDP Timestamp Extension which
-uses a different Datagram Format Type which carries a timestamp followed by the
+In these examples, the client supports a CONNECT-UDP Timestamp Extension, which
+uses a different Datagram Format Type that carries a timestamp followed by the
 encapsulated UDP payload.
 
 
