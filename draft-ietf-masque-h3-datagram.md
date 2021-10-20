@@ -203,10 +203,10 @@ Context ID:
 : A variable-length integer indicating the context ID of the datagram (see
 {{datagram-contexts}}). Whether or not this field is present depends on whether
 datagram contexts are in use on this stream, see {{context-hdr}}. If this QUIC
-DATAGRAM frame arrives before the QUIC DATA frame which carries the HTTP
-headers, then it is not yet possible to parse this datagram and the receiver
-MUST either drop that datagram silently or buffer it temporarily while awaiting
-the HTTP headers.
+DATAGRAM frame is reordered and arrives before the receiver knows whether
+datagram contexts are in use on this stream, then the receiver cannot parse
+this datagram and the receiver MUST either drop that datagram silently or
+buffer it temporarily.
 
 HTTP Datagram Payload:
 
@@ -387,7 +387,8 @@ Context ID:
 {{datagram-contexts}}). This field is present in REGISTER_DATAGRAM_CONTEXT
 capsules but not in REGISTER_DATAGRAM capsules. If a REGISTER_DATAGRAM capsule
 is used on a stream where datagram contexts are in use, it is associated with
-context ID 0.
+context ID 0. REGISTER_DATAGRAM_CONTEXT capsules MUST NOT carry context ID 0 as
+that context ID is conveyed using the REGISTER_DATAGRAM capsule.
 
 Datagram Format Type:
 
@@ -428,7 +429,7 @@ REGISTER_DATAGRAM capsule, the client MUST abruptly terminate the corresponding
 stream with a stream error of type H3_GENERAL_PROTOCOL_ERROR.
 
 
-### The CLOSE_DATAGRAM_CONTEXT Capsule {#close-capsule}
+### The Datagram Close Capsule {#close-capsule}
 
 The CLOSE_DATAGRAM_CONTEXT capsule (see {{iana-types}} for the value of the
 capsule type) allows an endpoint to inform its peer that it will no longer send
@@ -543,6 +544,8 @@ Context ID:
 {{datagram-contexts}}). This field is present in DATAGRAM_WITH_CONTEXT capsules
 but not in DATAGRAM capsules. If a DATAGRAM capsule is used on a stream where
 datagram contexts are in use, it is associated with context ID 0.
+DATAGRAM_WITH_CONTEXT capsules MUST NOT carry context ID 0 as that context ID
+is conveyed using the DATAGRAM capsule.
 
 HTTP Datagram Payload:
 
