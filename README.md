@@ -4,6 +4,7 @@ This is the working area for the MASQUE Working Group Internet-Draft, "Using QUI
 
 * [Editor's Copy](https://ietf-wg-masque.github.io/draft-ietf-masque-h3-datagram/draft-ietf-masque-h3-datagram.html)
 * [Working Group Draft](https://datatracker.ietf.org/doc/html/draft-ietf-masque-h3-datagram)
+* [Diff Between Editor's Copy and Working Group Draft](https://www.ietf.org/rfcdiff?url1=draft-ietf-masque-h3-datagram&url2=https://ietf-wg-masque.github.io/draft-ietf-masque-h3-datagram/draft-ietf-masque-h3-datagram.txt)
 
 ## Building the Draft
 
