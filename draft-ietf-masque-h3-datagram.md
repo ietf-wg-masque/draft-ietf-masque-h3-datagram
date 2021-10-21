@@ -608,6 +608,21 @@ H3_SETTINGS_ERROR. In all cases, the maximum permitted value of the H3_DATAGRAM
 SETTINGS parameter is 1.
 
 
+## Note About Draft Versions
+
+\[\[RFC editor: please remove this section before publication.]]
+
+Some revisions of this draft specification use a different value (the
+Identifier field of a Setting in the HTTP/3 SETTINGS frame) for the H3_DATAGRAM
+Settings Parameter. This allows new draft revisions to make incompatible
+changes. Multiple draft versions MAY be supported by either endpoint in a
+connection. Such endpoints MUST send multiple values for H3_DATAGRAM. Once an
+endpoint has sent and received SETTINGS, it MUST compute the intersection of
+the values it has sent and received, and then it MUST select and use the most
+recent draft version from the intersection set. This ensures that both
+endpoints negotiate the same draft version.
+
+
 # The Sec-Use-Datagram-Contexts HTTP Header {#context-hdr}
 
 Endpoints indicate their support for datagram contexts by sending the
@@ -670,21 +685,6 @@ DATAGRAM_WITH_CONTEXT capsules to send extension datagrams.
 
 Extensions MAY define a different mechanism to communicate whether contexts are
 in use, and they MAY do so in a way which is opaque to intermediaries.
-
-
-## Note About Draft Versions
-
-\[\[RFC editor: please remove this section before publication.]]
-
-Some revisions of this draft specification use a different value (the
-Identifier field of a Setting in the HTTP/3 SETTINGS frame) for the H3_DATAGRAM
-Settings Parameter. This allows new draft revisions to make incompatible
-changes. Multiple draft versions MAY be supported by either endpoint in a
-connection. Such endpoints MUST send multiple values for H3_DATAGRAM. Once an
-endpoint has sent and received SETTINGS, it MUST compute the intersection of
-the values it has sent and received, and then it MUST select and use the most
-recent draft version from the intersection set. This ensures that both
-endpoints negotiate the same draft version.
 
 
 # Prioritization
