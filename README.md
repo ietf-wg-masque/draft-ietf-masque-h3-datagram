@@ -1,6 +1,6 @@
-# Using QUIC Datagrams with HTTP/3
+# Using Datagrams with HTTP
 
-This is the working area for the MASQUE Working Group Internet-Draft, "Using QUIC Datagrams with HTTP/3".
+This is the working area for the MASQUE Working Group Internet-Draft, "Using Datagrams with HTTP".
 
 * [Editor's Copy](https://ietf-wg-masque.github.io/draft-ietf-masque-h3-datagram/draft-ietf-masque-h3-datagram.html)
 * [Working Group Draft](https://datatracker.ietf.org/doc/html/draft-ietf-masque-h3-datagram)
