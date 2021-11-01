@@ -361,7 +361,7 @@ drop that Capsule.
 
 Each capsule's payload MUST contain exactly the fields identified in its
 description. A capsule payload that contains additional bytes after the
-identified fields or a frame payload that terminates before the end of the
+identified fields or a capsule payload that terminates before the end of the
 identified fields MUST be treated as a stream error of type H3_FRAME_ERROR. In
 particular, redundant length encodings MUST be verified to be self-consistent.
 
