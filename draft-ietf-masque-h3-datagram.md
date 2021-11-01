@@ -196,7 +196,7 @@ client-initiated bidirectional streams, and those have stream IDs that are
 divisible by four). The largest legal QUIC stream ID value is 2<sup>62</sup>-1,
 so the largest legal value of Quarter Stream ID is 2<sup>62</sup>-1 / 4.
 Receipt of a frame that includes a larger value MUST be treated as a connection
-error of type H3_FRAME_ERROR.
+error of type TBD.
 
 Context ID:
 
@@ -359,15 +359,20 @@ drop that Capsule.
 
 ## Error Handling
 
+When an error occurs processing the capsule protocol, the receiver abruptly
+terminates the enclosing stream.  When running over HTTP/3 or HTTP/2, the
+receiver resets the stream.  When running over HTTP/1.1, the receiver terminates
+the underlying connection with an error.
+
 Each capsule's payload MUST contain exactly the fields identified in its
 description. A capsule payload that contains additional bytes after the
 identified fields or a capsule payload that terminates before the end of the
-identified fields MUST be treated as a stream error of type H3_FRAME_ERROR. In
+identified fields MUST be treated as a stream error of type TBD. In
 particular, redundant length encodings MUST be verified to be self-consistent.
 
 When a stream carrying capsules terminates cleanly, if the last capsule on the
 stream was truncated, this MUST be treated as a stream error of type
-H3_FRAME_ERROR.
+TBD.
 
 ## Capsule Types
 
