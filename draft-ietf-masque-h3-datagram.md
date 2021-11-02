@@ -196,7 +196,7 @@ client-initiated bidirectional streams, and those have stream IDs that are
 divisible by four). The largest legal QUIC stream ID value is 2<sup>62</sup>-1,
 so the largest legal value of Quarter Stream ID is 2<sup>62</sup>-1 / 4.
 Receipt of a frame that includes a larger value MUST be treated as a connection
-error of type TBD.
+error of type H3_DATAGRAM_ERROR.
 
 Context ID:
 
@@ -359,20 +359,21 @@ drop that Capsule.
 
 ## Error Handling
 
-When an error occurs processing the capsule protocol, the receiver abruptly
-terminates the enclosing stream.  When running over HTTP/3 or HTTP/2, the
-receiver resets the stream.  When running over HTTP/1.1, the receiver terminates
-the underlying connection with an error.
+When an error occurs processing the capsule protocol, the receiver MUST treat
+the message as malformed or incomplete, according to the underlying transport
+protocol.  For HTTP/3, the handling of malformed messages is described in
+section 4.1.3 of {{H3}}.  For HTTP/2, the handling of malformed messages is
+described in section 8.1.2.6 of {{!H2=RFC7540}}.  For HTTP/1.1, the handling of
+incomplete messages is described in section 8 of {{!CORE-MESSAGING=I-D.draft-ietf-httpbis-messaging}}.
 
 Each capsule's payload MUST contain exactly the fields identified in its
 description. A capsule payload that contains additional bytes after the
 identified fields or a capsule payload that terminates before the end of the
-identified fields MUST be treated as a stream error of type TBD. In
+identified fields MUST be treated as a malformed or incomplete message. In
 particular, redundant length encodings MUST be verified to be self-consistent.
 
 When a stream carrying capsules terminates cleanly, if the last capsule on the
-stream was truncated, this MUST be treated as a stream error of type
-TBD.
+stream was truncated, this MUST be treated as a malformed or incomplete message.
 
 ## Capsule Types
 
@@ -734,6 +735,18 @@ This document will request IANA to register the following entry in the
 |:-------------|:---------|:--------------|:--------|
 | H3_DATAGRAM  | 0xffd277 | This Document |    0    |
 {: #iana-setting-table title="New HTTP/3 Settings"}
+
+
+## HTTP/3 Error Code {#iana-error}
+
+This document will request IANA to register the following entry in the
+"HTTP/3 Error Code" registry:
+
+| Name              |   Value  | Description    | Specification |
+|:------------------|:---------|:---------------|:--------------|
+| H3_DATAGRAM_ERROR |  0x0111  | Datagram parse | This document |
+|                   |          | error          |               |
+{: #iana-error-table title="New HTTP/3 Error Codes"}
 
 
 ## HTTP Header Field Name {#iana-hdr}
