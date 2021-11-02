@@ -217,21 +217,20 @@ Intermediaries parse the Quarter Stream ID field in order to associate the QUIC
 DATAGRAM frame with a stream. If an intermediary receives a QUIC DATAGRAM frame
 whose payload is too short to allow parsing the Quarter Stream ID field, the
 intermediary MUST treat it as an HTTP/3 connection error of type
-H3_GENERAL_PROTOCOL_ERROR. The Context ID field is optional and whether it is
-present or not is decided end-to-end by the endpoints, see {{context-hdr}}.
-Therefore intermediaries cannot know whether the Context ID field is present or
-absent and they MUST ignore any HTTP/3 Datagram fields after the Quarter Stream
-ID.
+H3_DATAGRAM_ERROR. The Context ID field is optional and whether it is present or
+not is decided end-to-end by the endpoints, see {{context-hdr}}.  Therefore
+intermediaries cannot know whether the Context ID field is present or absent and
+they MUST ignore any HTTP/3 Datagram fields after the Quarter Stream ID.
 
 Endpoints parse both the Quarter Stream ID field and the Context ID field in
-order to associate the QUIC DATAGRAM frame with a stream and context within
-that stream. If an endpoint receives a QUIC DATAGRAM frame whose payload is too
-short to allow parsing the Quarter Stream ID field, the endpoint MUST treat it
-as an HTTP/3 connection error of type H3_GENERAL_PROTOCOL_ERROR. If an endpoint
-receives a QUIC DATAGRAM frame whose payload is long enough to allow parsing
-the Quarter Stream ID field but too short to allow parsing the Context ID
-field, the endpoint MUST abruptly terminate the corresponding stream with a
-stream error of type H3_GENERAL_PROTOCOL_ERROR.
+order to associate the QUIC DATAGRAM frame with a stream and context within that
+stream. If an endpoint receives a QUIC DATAGRAM frame whose payload is too short
+to allow parsing the Quarter Stream ID field, the endpoint MUST treat it as an
+HTTP/3 connection error of type H3_DATAGRAM_ERROR. If an endpoint receives a
+QUIC DATAGRAM frame whose payload is long enough to allow parsing the Quarter
+Stream ID field but too short to allow parsing the Context ID field, the
+endpoint MUST abruptly terminate the corresponding stream with a stream error of
+type H3_DATAGRAM_ERROR.
 
 Endpoints MUST NOT send HTTP/3 datagrams unless the corresponding stream's send
 side is open. On a given endpoint, once the receive side of a stream is closed,
@@ -364,7 +363,8 @@ the message as malformed or incomplete, according to the underlying transport
 protocol.  For HTTP/3, the handling of malformed messages is described in
 section 4.1.3 of {{H3}}.  For HTTP/2, the handling of malformed messages is
 described in section 8.1.2.6 of {{!H2=RFC7540}}.  For HTTP/1.1, the handling of
-incomplete messages is described in section 8 of {{!CORE-MESSAGING=I-D.draft-ietf-httpbis-messaging}}.
+incomplete messages is described in section 8 of
+{{!CORE-MESSAGING=I-D.draft-ietf-httpbis-messaging}}.
 
 Each capsule's payload MUST contain exactly the fields identified in its
 description. A capsule payload that contains additional bytes after the
