@@ -953,7 +953,7 @@ DATAGRAM                       -------->
   Payload = Encapsulated UDP Payload With Timestamp
 ~~~
 
-## Successful Optimistic
+### Successful Optimistic
 
 In this instance, the client does not wish to spend a round trip waiting to
 learn whether the server supports datagram contexts. It registers its context
@@ -1004,7 +1004,7 @@ DATAGRAM                       -------->
   Payload = Encapsulated UDP Payload With Timestamp
 ~~~
 
-## Optimistic but Unsupported
+### Optimistic but Unsupported
 
 In this instance, the client does not wish to spend a round trip waiting to
 learn whether the server supports datagram contexts. It registers its context
