@@ -898,7 +898,7 @@ DATAGRAM                        -------->
 ~~~
 
 
-## CONNECT-UDP with Delayed Timestamp Extension
+## CONNECT-UDP with Timestamp Extension
 
 In these examples, the client supports a CONNECT-UDP Timestamp Extension, which
 uses a different Datagram Format Type that carries a timestamp followed by the
