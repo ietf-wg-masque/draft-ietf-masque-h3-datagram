@@ -70,8 +70,8 @@ This document is structured as follows:
 * {{capsule}} introduces the Capsule Protocol and the "data stream" concept.
   Data streams are initiated using special-purpose HTTP requests, after which
   Capsules, an end-to-end message, can be sent.
-  * Datagram Capsule types {{datagram-capsule}} are defined, along with guidance
-    for defining new capsule types.
+  * {{datagram-capsule}} defines Datagram Capsule types, along with guidance
+    for specifying new capsule types.
 
 
 ## Conventions and Definitions {#defs}
