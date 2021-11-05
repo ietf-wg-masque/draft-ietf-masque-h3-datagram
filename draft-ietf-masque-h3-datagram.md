@@ -406,9 +406,9 @@ DPLPMTUD.
 
 ## Registering Datagram Contexts with Capsules {#register-capsules}
 
-Methods or protocols that support multiple datagram payload formats or
-separate types of datagrams can differentiate them using datagram contexts
-({{datagram-contexts}}).
+HTTP Methods or protocols enabled by HTTP Upgrade Tokens that support
+multiple datagram payload formats or separate types of datagrams can
+differentiate them using datagram contexts ({{datagram-contexts}}).
 
 Such protocols can define a new Capsule type that is used to register
 a context ID with the peer endpoint.
@@ -499,7 +499,7 @@ This document will request IANA to register the following entry in the
 
 | Setting Name |   Value  | Specification | Default |
 |:-------------|:---------|:--------------|:--------|
-| H3_DATAGRAM  | 0xffd277 | This Document |    0    |
+| H3_DATAGRAM  | 0xffd278 | This Document |    0    |
 {: #iana-setting-table title="New HTTP/3 Settings"}
 
 
@@ -556,8 +556,8 @@ This registry initially contains the following entries:
 
 | Capsule Type                 |   Value   | Specification |
 |:-----------------------------|:----------|:--------------|
-| DATAGRAM                     | 0xff37a1  | This Document |
-| DATAGRAM_WITH_CONTEXT        | 0xff37a2  | This Document |
+| DATAGRAM_WITH_CONTEXT        | 0xff37a4  | This Document |
+| DATAGRAM                     | 0xff37a5  | This Document |
 {: #iana-types-table title="Initial Capsule Types Registry Entries"}
 
 Capsule types with a value of the form 41 * N + 23 for integer values of N are
@@ -610,7 +610,7 @@ uses a different Datagram Format Type that carries a timestamp followed by the
 encapsulated UDP payload. Datagrams on the default context (0) are expected to
 contain UDP payloads, while contexts established with the
 REGISTER_UDP_WITH_TIMESTAMP_CONTEXT capsule include a timestamp along with the
-UDP payload. A new header, Sec-UDP-Timestamps, indicates support for the
+UDP payload. A new header, Sec-Use-UDP-Timestamps, indicates support for the
 extension.
 
 
@@ -629,7 +629,7 @@ STREAM(44): HEADERS            -------->
   :scheme = https
   :path = /target.example.org/443/
   :authority = proxy.example.org:443
-  Sec-UDP-Timestamps = ?1
+  sec-use-udp-timestamps = ?1
 
 DATAGRAM                        -------->
   Encoded Stream ID = 22
@@ -637,7 +637,7 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
-                        Sec-UDP-Timestamps = ?1
+                        sec-use-udp-timestamps = ?1
 
 /* UDP timestamps are supported on this stream */
 
@@ -651,8 +651,9 @@ DATAGRAM                        -------->
   Payload = Encapsulated UDP Payload With Timestamp
 
            <--------  DATAGRAM
-                        Encoded Stream ID = 22
-                        Payload = Encapsulated UDP Payload
+                        Encoded Stream ID = 23
+                        Context ID = 2
+                        Payload = Encapsulated UDP Payload With Timestamp
 ~~~
 
 
@@ -671,7 +672,7 @@ STREAM(44): HEADERS            -------->
   :scheme = https
   :path = /target.example.org/443/
   :authority = proxy.example.org:443
-  Sec-UDP-Timestamps = ?1
+  sec-use-udp-timestamps = ?1
 
 DATAGRAM                        -------->
   Encoded Stream ID = 22
@@ -699,11 +700,11 @@ STREAM(44): HEADERS            -------->
   :scheme = https
   :path = /
   :authority = proxy.example.org:443
-  Sec-Use-IP-Compression = ?1
+  sec-use-ip-compression = ?1
 
            <--------  STREAM(44): HEADERS
                         :status = 200
-                        Sec-Use-IP-Compression = ?1
+                        sec-use-ip-compression = ?1
 
 /* Exchange CONNECT-IP configuration information. */
 
@@ -745,7 +746,7 @@ STREAM(44): HEADERS            -------->
   :method = webtransport
   :path = /hello
   :authority = webtransport.example.org:443
-  Origin = https://www.example.org:443
+  origin = https://www.example.org:443
 
            <--------  STREAM(44): HEADERS
                         :status = 200
