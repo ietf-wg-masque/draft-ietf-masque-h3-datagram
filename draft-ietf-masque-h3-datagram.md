@@ -62,9 +62,6 @@ This document is structured as follows:
 * {{multiplexing}} presents core concepts for multiplexing across HTTP versions.
   * {{datagram-contexts}} defines datagram contexts, an optional end-to-end
     multiplexing concept scoped to each HTTP request.
-  * {{datagram-formats}} defines datagram formats, which are scoped to contexts.
-    Formats communicate the format and encoding of datagrams sent using the
-    associated context.
   * Contexts are identified using a variable-length integer. Requirements for
     allocating identifier values are detailed in {{context-id-alloc}}.
 * {{format}} defines how QUIC DATAGRAM frames are used with HTTP/3. {{setting}}
