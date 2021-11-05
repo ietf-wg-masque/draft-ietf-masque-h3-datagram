@@ -609,7 +609,7 @@ In these examples, the client supports a CONNECT-UDP Timestamp Extension, which
 uses a different Datagram Format Type that carries a timestamp followed by the
 encapsulated UDP payload. Datagrams on the default context (0) are expected to
 contain UDP payloads, while contexts established with the
-REGISTER_UDP_WITH_TIMESTAMP_CONTEXT capsule include a timestamp along with the
+REGISTER_UDP_WITH_TIMESTAMP_CONTEXT capsule include a timestamp followed by the
 UDP payload. A new header, Sec-Use-UDP-Timestamps, indicates support for the
 extension.
 
