@@ -187,9 +187,10 @@ Context ID:
 
 : A variable-length integer indicating the context ID of the datagram (see
 {{datagram-contexts}}). Whether or not this field is present depends on whether
-the least-significant bit of the Encoded Stream ID, as described above. If the
+the least-significant bit of the Encoded Stream ID is set, as described above. If the
 receiver of a datagram does not support Context IDs, it will drop any datagram
-that contains a context ID.
+that contains a context ID. If the Context ID field is not present, this datagram
+is associated with the default context (which has its Context ID set to 0).
 
 HTTP Datagram Payload:
 
