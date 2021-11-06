@@ -414,7 +414,7 @@ multiple datagram payload formats or separate types of datagrams can
 differentiate them using datagram contexts ({{datagram-contexts}}).
 
 Such protocols can define a new Capsule type that is used to register a context
-ID with the peer endpoint. Registering a context ID is the action by which and
+ID with the peer endpoint. Registering a context ID is the action by which an
 endpoint informs its peer of the semantics and format of a given context.
 
 For example, if a new method needed to define a non-default context for the
