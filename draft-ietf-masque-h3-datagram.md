@@ -140,8 +140,8 @@ corresponding stream.
 
 This specification introduces the Capsule Protocol. The Capsule Protocol is a
 sequence of type-length-value tuples that allows endpoints to reliably
-communicate request-related information end-to-end, even in the presence of
-HTTP intermediaries.
+communicate request-related information end-to-end on HTTP request streams, even
+in the presence of HTTP intermediaries.
 
 
 ## Capsule Protocol {#capsule-protocol}
