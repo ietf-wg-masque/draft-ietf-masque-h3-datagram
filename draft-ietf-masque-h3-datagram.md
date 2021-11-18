@@ -229,24 +229,10 @@ Participant mode:
 : In this mode, the intermediary terminates the data stream and parses all
 Capsule Type and Capsule Length fields it receives.
 
-Each Capsule Type determines whether it is opaque or transparent to
-intermediaries in participant mode: opaque capsules are forwarded unmodified
-while transparent ones can be parsed, added, or removed by intermediaries.
-Intermediaries MAY modify the contents of the Capsule Data field of transparent
-capsule types.
-
-Unless otherwise specified, all Capsule Types are defined as opaque to
-intermediaries. Intermediaries MUST forward all received opaque CAPSULE frames
-in their unmodified entirety. Intermediaries MUST NOT send any opaque CAPSULE
-frames other than the ones it is forwarding. All Capsule Types defined in this
-document are opaque, with the exception of the DATAGRAM capsule, see
-{{datagram-capsule}}. Definitions of new Capsule Types MAY specify that the
-newly introduced type is transparent. Intermediaries MUST treat unknown Capsule
-Types as opaque.
-
-Intermediaries respect the order of opaque CAPSULE frames: if an intermediary
-receives two opaque CAPSULE frames in a given order, it MUST forward them in
-the same order.
+Capsules MUST be forwarded unmodified by intermediaries, with the exception of
+the DATAGRAM capsule; the DATAGRAM capsule MAY be parsed, added, or removed by
+intermediaries, see {{datagram-capsule}}. Definitions of new Capsule Types MAY
+specify custom intermediary processing.
 
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
 drop that Capsule.
@@ -278,11 +264,11 @@ datagrams sent in QUIC DATAGRAM frames. In particular, the restrictions on when
 it is allowed to send an HTTP Datagram and how to process them from {{format}}
 also apply to HTTP Datagrams sent and received using the DATAGRAM capsule.
 
-The DATAGRAM capsule is transparent to intermediaries, meaning that
-intermediaries MAY parse them and send DATAGRAM capsules that they did not
-receive. This allows an intermediary to reencode HTTP Datagrams as it forwards
-them: in other words, an intermediary MAY send a DATAGRAM capsule to forward an
-HTTP Datagram which was received in a QUIC DATAGRAM frame, and vice versa.
+Intermediaries MAY parse DATAGRAM capsules and MAY send DATAGRAM capsules that
+they did not receive. This allows an intermediary to reencode HTTP Datagrams as
+it forwards them: in other words, an intermediary MAY send a DATAGRAM capsule to
+forward an HTTP Datagram which was received in a QUIC DATAGRAM frame, and vice
+versa.
 
 Note that while DATAGRAM capsules are sent on a stream, intermediaries can
 reencode DATAGRAM capsules into QUIC DATAGRAM frames over the next hop, and
@@ -307,10 +293,10 @@ DPLPMTUD.
 
 This document defines the RELIABLE_DATAGRAM capsule type (see {{iana-types}} for
 the value of the capsule type). This capsule has the same format and semantics
-as the DATAGRAM capsules, however it is opaque to intermediaries: intermediaries
-MUST NOT convert between RELIABLE_DATAGRAM caspules and other encodings of HTTP
-Datagrams, or vice versa. Endpoints MUST treat receipt of a RELIABLE_DATAGRAM
-capsule as equivalent to receipt of a DATAGRAM capsule with the same contents.
+as the DATAGRAM capsules, however intermediaries MUST NOT convert between
+RELIABLE_DATAGRAM caspules and other encodings of HTTP Datagrams, or vice versa.
+Endpoints MUST treat receipt of a RELIABLE_DATAGRAM capsule as equivalent to
+receipt of a DATAGRAM capsule with the same contents.
 
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
