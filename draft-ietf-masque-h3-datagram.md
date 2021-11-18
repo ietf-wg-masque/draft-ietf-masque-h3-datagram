@@ -110,9 +110,9 @@ bidirectional stream that this datagram is associated with, divided by four (the
 division by four stems from the fact that HTTP requests are sent on
 client-initiated bidirectional streams, and those have stream IDs that are
 divisible by four). The largest legal QUIC stream ID value is 2<sup>62</sup>-1,
-so the largest legal value of Quarter Stream ID is (2<sup>62</sup>-1) / 4.
-Receipt of a frame that includes a larger value MUST be treated as a connection
-error of type FRAME_ENCODING_ERROR.
+so the largest legal value of Quarter Stream ID is 2<sup>60</sup>-1. Receipt of
+a frame that includes a larger value MUST be treated as a connection error of
+type FRAME_ENCODING_ERROR.
 
 HTTP Datagram Payload:
 
@@ -139,22 +139,28 @@ corresponding stream.
 # Capsules {#capsule}
 
 This specification introduces the Capsule Protocol. The Capsule Protocol is a
-sequence of type-length-value tuples that allows endpoints to reliably
-communicate request-related information end-to-end on HTTP request streams, even
-in the presence of HTTP intermediaries.
-
-
-## Capsule Protocol {#capsule-protocol}
+sequence of type-length-value tuples that new HTTP Methods or new HTTP Upgrade
+Tokens can choose to use. It allows endpoints to reliably communicate
+request-related information end-to-end on HTTP request streams, even in the
+presence of HTTP intermediaries. The Capsule Protocol can be used to exchange
+HTTP Datagrams over versions of HTTP that do not support the QUIC DATAGRAM frame.
 
 This specification defines the "data stream" of an HTTP request as the
 bidirectional stream of bytes that follow the headers in both directions. In
 HTTP/1.x, the data stream consists of all bytes on the connection that follow
 the blank line that concludes either the request header section, or the 2xx
-(Successful) response header section. In HTTP/2 and HTTP/3, the data stream of
-a given HTTP request consists of all bytes sent in DATA frames with the
+(Successful) response header section. In HTTP/2 and HTTP/3, the data stream of a
+given HTTP request consists of all bytes sent in DATA frames with the
 corresponding stream ID. The concept of a data stream is particularly relevant
 for methods such as CONNECT where there is no HTTP message content after the
 headers.
+
+Note that use of the Capsule Protocol is not required to use HTTP Datagrams.
+Definitions of new HTTP Methods or of new HTTP Upgrade Tokens can use HTTP
+Datagrams with their own data stream protocol.
+
+
+## Capsule Protocol {#capsule-protocol}
 
 Definitions of new HTTP Methods or of new HTTP Upgrade Tokens can state that
 their data stream uses the Capsule Protocol. If they do so, that means that the
@@ -193,50 +199,19 @@ Capsule Value:
 : The payload of this capsule. Its semantics are determined by the value of the
 Capsule Type field.
 
-Note that use of the Capsule Protocol is not required to use HTTP Datagrams.
-Definitions of new HTTP Methods or of new HTTP Upgrade Tokens can use HTTP
-Datagrams with their own data stream protocol.
-
-
-## Requirements
-
-If the definition of an HTTP Method or HTTP Upgrade Token states that it uses
-the capsule protocol, its implementations MUST follow the following
-requirements:
-
-* A server MUST NOT send any Transfer-Encoding or Content-Length header fields
-  in a 2xx (Successful) response. If a client receives a Content-Length or
-  Transfer-Encoding header fields in a successful response, it MUST treat that
-  response as malformed.
-
-* A request message does not have content.
-
-* A successful response message does not have content.
-
-* Responses are not cacheable.
-
-## Intermediary Processing
-
-Intermediaries MUST operate in one of the two following modes:
-
-Pass-through mode:
-
-: In this mode, the intermediary forwards the data stream between two
-associated streams without any modification of the data stream.
-
-Participant mode:
-
-: In this mode, the intermediary terminates the data stream and parses all
-Capsule Type and Capsule Length fields it receives.
-
 Capsules MUST be forwarded unmodified by intermediaries, with the exception of
-the DATAGRAM capsule. An intermediary that understands the request semantics 
-sufficient to know that capsules are in use MAY parse, add, or remove DATAGRAM
+the DATAGRAM capsule. An intermediary that understands the request semantics
+enough to know that capsules are in use MAY parse, add, or remove DATAGRAM
 capsules; see {{datagram-capsule}}. Definitions of new Capsule Types MAY specify
-custom intermediary processing.
+optional custom intermediary processing.
 
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
 drop that Capsule.
+
+By virtue of the definition of the data stream, the Capsule Protocol is not in
+use on responses unless the response includes a 2xx (Successful) status code.
+The Capsule Protocol MUST NOT be used with messages that contain Content-Length
+or Transfer-Encoding header fields.
 
 
 ## The DATAGRAM Capsule {#datagram-capsule}
@@ -265,14 +240,14 @@ datagrams sent in QUIC DATAGRAM frames. In particular, the restrictions on when
 it is allowed to send an HTTP Datagram and how to process them from {{format}}
 also apply to HTTP Datagrams sent and received using the DATAGRAM capsule.
 
-Intermediaries MAY parse DATAGRAM capsules and MAY send DATAGRAM capsules that
-they did not receive. This allows an intermediary to reencode HTTP Datagrams as
-it forwards them: in other words, an intermediary MAY send a DATAGRAM capsule to
-forward an HTTP Datagram which was received in a QUIC DATAGRAM frame, and vice
-versa.
+Intermediary can reencode HTTP Datagrams as it forwards them: in other words, an
+intermediary MAY send a DATAGRAM capsule to forward an HTTP Datagram which was
+received in a QUIC DATAGRAM frame, and vice versa.
 
-Note that while DATAGRAM capsules that are sent on a stream are reliably delivered in order, intermediaries can
-reencode DATAGRAM capsules into QUIC DATAGRAM frames when forwarding messages, which could result in loss or reordering.
+Note that while DATAGRAM capsules that are sent on a stream are reliably
+delivered in order, intermediaries can reencode DATAGRAM capsules into QUIC
+DATAGRAM frames when forwarding messages, which could result in loss or
+reordering.
 
 If an intermediary receives an HTTP Datagram in a QUIC DATAGRAM frame and is
 forwarding it on a connection that supports QUIC DATAGRAM frames, the
@@ -356,6 +331,13 @@ be a Boolean, its ABNF is:
 ~~~
 Sec-Capsule-Protocol = sf-boolean
 ~~~
+
+The Sec-Capsule-Protocol header field MUST NOT be sent multiple times on a
+message. The Sec-Capsule-Protocol header field MUST NOT be used on HTTP
+responses with a status code different from 2xx (Successful). This specification
+does not define any parameters for the Sec-Capsule-Protocol header field value,
+but future documents MAY define parameters. Receivers MUST ignore unknown
+parameters.
 
 
 # Prioritization
@@ -513,11 +495,9 @@ STREAM(44): HEADERS            -------->
   :path = /hello
   :authority = webtransport.example.org:443
   origin = https://www.example.org:443
-  sec-capsule-protocol = ?1
 
            <--------  STREAM(44): HEADERS
                         :status = 200
-                        sec-capsule-protocol = ?1
 
 /* Both endpoints can now send WebTransport datagrams. */
 ~~~
