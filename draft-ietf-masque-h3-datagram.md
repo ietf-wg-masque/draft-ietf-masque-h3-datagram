@@ -308,9 +308,9 @@ DPLPMTUD.
 This document defines the RELIABLE_DATAGRAM capsule type (see {{iana-types}} for
 the value of the capsule type). This capsule has the same format and semantics
 as the DATAGRAM capsules, however it is opaque to intermediaries: intermediaries
-MUST NOT convert between QUIC DATAGRAM frames and RELIABLE_DATAGRAM capsules or
-vice versa. Endpoints MUST treat receipt of a RELIABLE_DATAGRAM capsule as
-equivalent to receipt of a DATAGRAM capsule with the same contents.
+MUST NOT convert between RELIABLE_DATAGRAM caspules and other encodings of HTTP
+Datagrams, or vice versa. Endpoints MUST treat receipt of a RELIABLE_DATAGRAM
+capsule as equivalent to receipt of a DATAGRAM capsule with the same contents.
 
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
@@ -505,6 +505,7 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
+                        sec-capsule-protocol = ?1
 
 /* Wait for target server to respond to UDP packet. */
 
@@ -530,6 +531,7 @@ STREAM(44): HEADERS            -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
+                        sec-capsule-protocol = ?1
 
 /* Both endpoints can now send WebTransport datagrams. */
 ~~~
