@@ -321,9 +321,9 @@ Capsule Protocol MAY use the Sec-Capsule-Protocol header field to simplify
 intermediary processing.
 
 Endpoints indicate that the Capsule Protocol is in use on the data stream by
-sending the Sec-Capsule-Protocol header with a value of ?1. Intermediaries MAY
-use this header to allow processing of HTTP Datagrams for unknown HTTP methods
-or unknown HTTP Upgrade Tokens.
+sending the Sec-Capsule-Protocol header field with a value of ?1. Intermediaries
+MAY use this header field to allow processing of HTTP Datagrams for unknown HTTP
+methods or unknown HTTP Upgrade Tokens.
 
 "Sec-Capsule-Protocol" is an Item Structured Header {{!RFC8941}}. Its value MUST
 be a Boolean, its ABNF is:
