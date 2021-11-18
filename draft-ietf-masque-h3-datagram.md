@@ -320,17 +320,19 @@ Definitions of new HTTP Methods or of new HTTP Upgrade Tokens that use the
 Capsule Protocol MAY use the Sec-Capsule-Protocol header field to simplify
 intermediary processing.
 
-Endpoints indicate that the Capsule Protocol is in use on the data stream by
-sending the Sec-Capsule-Protocol header field with a value of ?1. Intermediaries
-MAY use this header field to allow processing of HTTP Datagrams for unknown HTTP
-methods or unknown HTTP Upgrade Tokens.
-
 "Sec-Capsule-Protocol" is an Item Structured Header {{!RFC8941}}. Its value MUST
 be a Boolean, its ABNF is:
 
 ~~~
 Sec-Capsule-Protocol = sf-boolean
 ~~~
+
+Endpoints indicate that the Capsule Protocol is in use on the data stream by
+sending the Sec-Capsule-Protocol header field with a value of ?1. A
+Sec-Capsule-Protocol header field with a value of ?0 has the same semantics as
+when the header is not present. Intermediaries MAY use this header field to
+allow processing of HTTP Datagrams for unknown HTTP methods or unknown HTTP
+Upgrade Tokens.
 
 The Sec-Capsule-Protocol header field MUST NOT be sent multiple times on a
 message. The Sec-Capsule-Protocol header field MUST NOT be used on HTTP
