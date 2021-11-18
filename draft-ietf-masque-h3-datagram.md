@@ -82,7 +82,7 @@ when, and only when, they appear in all capitals, as shown here.
 When running over HTTP/3, multiple exchanges of datagrams need the ability to
 coexist on a given QUIC connection. To allow this, the QUIC DATAGRAM frame
 payload starts with an encoded stream identifier that associates the datagram
-with a given QUIC stream.
+with a request stream.
 
 When running over HTTP/2, demultiplexing is provided by the HTTP/2 framing
 layer. When running over HTTP/1, requests are strictly serialized in the
@@ -230,9 +230,10 @@ Participant mode:
 Capsule Type and Capsule Length fields it receives.
 
 Capsules MUST be forwarded unmodified by intermediaries, with the exception of
-the DATAGRAM capsule; the DATAGRAM capsule MAY be parsed, added, or removed by
-intermediaries, see {{datagram-capsule}}. Definitions of new Capsule Types MAY
-specify custom intermediary processing.
+the DATAGRAM capsule. An intermediary that understands the request semantics 
+sufficient to know that capsules are in use MAY parse, add, or remove DATAGRAM
+capsules; see {{datagram-capsule}}. Definitions of new Capsule Types MAY specify
+custom intermediary processing.
 
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
 drop that Capsule.
@@ -270,9 +271,8 @@ it forwards them: in other words, an intermediary MAY send a DATAGRAM capsule to
 forward an HTTP Datagram which was received in a QUIC DATAGRAM frame, and vice
 versa.
 
-Note that while DATAGRAM capsules are sent on a stream, intermediaries can
-reencode DATAGRAM capsules into QUIC DATAGRAM frames over the next hop, and
-those could be dropped.
+Note that while DATAGRAM capsules that are sent on a stream are reliably delivered in order, intermediaries can
+reencode DATAGRAM capsules into QUIC DATAGRAM frames when forwarding messages, which could result in loss or reordering.
 
 If an intermediary receives an HTTP Datagram in a QUIC DATAGRAM frame and is
 forwarding it on a connection that supports QUIC DATAGRAM frames, the
@@ -342,7 +342,7 @@ endpoints negotiate the same draft version.
 # The Sec-Capsule-Protocol Header
 
 Definitions of new HTTP Methods or of new HTTP Upgrade Tokens that use the
-Capsule Protocol MAY use the Sec-Capsule-Protocol header to simplify
+Capsule Protocol MAY use the Sec-Capsule-Protocol header field to simplify
 intermediary processing.
 
 Endpoints indicate that the Capsule Protocol is in use on the data stream by
