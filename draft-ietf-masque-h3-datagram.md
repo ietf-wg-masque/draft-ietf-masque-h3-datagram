@@ -218,7 +218,7 @@ or Transfer-Encoding header fields.
 
 This document defines the DATAGRAM capsule type (see {{iana-types}} for the
 value of the capsule type). This capsule allows an endpoint to send an HTTP
-Datagram over an HTTP stream. This is particularly useful when using a version
+Datagram on a stream using the Capsule Protocol. This is particularly useful when using a version
 of HTTP that does not support QUIC DATAGRAM frames.
 
 ~~~
@@ -235,7 +235,7 @@ HTTP Datagram Payload:
 : The payload of the datagram, whose semantics are defined by individual
 applications. Note that this field can be empty.
 
-Datagrams sent using the DATAGRAM capsule have the exact same semantics as
+Datagrams sent using the DATAGRAM capsule have the same semantics as
 datagrams sent in QUIC DATAGRAM frames. In particular, the restrictions on when
 it is allowed to send an HTTP Datagram and how to process them from {{format}}
 also apply to HTTP Datagrams sent and received using the DATAGRAM capsule.
@@ -260,7 +260,7 @@ preserves the end-to-end unreliability characteristic that methods such as
 Datagram Packetization Layer Path MTU Discovery (DPLPMTUD) depend on
 {{?RFC8899}}. An intermediary that converts QUIC DATAGRAM frames to DATAGRAM
 capsules allows HTTP Datagrams to be arbitrarily large without suffering any
-loss; this can misrepresent the true path properties, defeating methods such a
+loss; this can misrepresent the true path properties, defeating methods such as
 DPLPMTUD.
 
 
