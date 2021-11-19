@@ -201,9 +201,9 @@ Capsule Type field.
 
 Capsules MUST be forwarded unmodified by intermediaries, with the exception of
 the DATAGRAM capsule. An intermediary that understands the request semantics
-enough to know that capsules are in use MAY parse, add, or remove DATAGRAM
-capsules; see {{datagram-capsule}}. Definitions of new Capsule Types MAY specify
-optional custom intermediary processing.
+enough to know that capsules are in use MAY convert between QUIC DATAGRAM frames
+and DATAGRAM capsules; see {{datagram-capsule}}. Definitions of new Capsule
+Types MAY specify optional custom intermediary processing.
 
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
 drop that Capsule.
@@ -218,8 +218,8 @@ or Transfer-Encoding header fields.
 
 This document defines the DATAGRAM capsule type (see {{iana-types}} for the
 value of the capsule type). This capsule allows an endpoint to send an HTTP
-Datagram on a stream using the Capsule Protocol. This is particularly useful when using a version
-of HTTP that does not support QUIC DATAGRAM frames.
+Datagram on a stream using the Capsule Protocol. This is particularly useful
+when using a version of HTTP that does not support QUIC DATAGRAM frames.
 
 ~~~
 Datagram Capsule {
