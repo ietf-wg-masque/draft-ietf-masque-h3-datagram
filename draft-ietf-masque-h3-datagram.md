@@ -314,32 +314,30 @@ recent draft version from the intersection set. This ensures that both
 endpoints negotiate the same draft version.
 
 
-# The Sec-Capsule-Protocol Header
+# The Capsule-Protocol Header
 
 Definitions of new HTTP Methods or of new HTTP Upgrade Tokens that use the
-Capsule Protocol MAY use the Sec-Capsule-Protocol header field to simplify
+Capsule Protocol MAY use the Capsule-Protocol header field to simplify
 intermediary processing.
 
-"Sec-Capsule-Protocol" is an Item Structured Header {{!RFC8941}}. Its value MUST
-be a Boolean, its ABNF is:
+"Capsule-Protocol" is an Item Structured Header {{!RFC8941}}. Its value MUST be
+a Boolean, its ABNF is:
 
 ~~~
-Sec-Capsule-Protocol = sf-boolean
+Capsule-Protocol = sf-boolean
 ~~~
 
 Endpoints indicate that the Capsule Protocol is in use on the data stream by
-sending the Sec-Capsule-Protocol header field with a value of ?1. A
-Sec-Capsule-Protocol header field with a value of ?0 has the same semantics as
-when the header is not present. Intermediaries MAY use this header field to
-allow processing of HTTP Datagrams for unknown HTTP methods or unknown HTTP
-Upgrade Tokens.
+sending the Capsule-Protocol header field with a value of ?1. A Capsule-Protocol
+header field with a value of ?0 has the same semantics as when the header is not
+present. Intermediaries MAY use this header field to allow processing of HTTP
+Datagrams for unknown HTTP methods or unknown HTTP Upgrade Tokens.
 
-The Sec-Capsule-Protocol header field MUST NOT be sent multiple times on a
-message. The Sec-Capsule-Protocol header field MUST NOT be used on HTTP
-responses with a status code different from 2xx (Successful). This specification
-does not define any parameters for the Sec-Capsule-Protocol header field value,
-but future documents MAY define parameters. Receivers MUST ignore unknown
-parameters.
+The Capsule-Protocol header field MUST NOT be sent multiple times on a message.
+The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
+status code different from 2xx (Successful). This specification does not define
+any parameters for the Capsule-Protocol header field value, but future documents
+MAY define parameters. Receivers MUST ignore unknown parameters.
 
 
 # Prioritization
@@ -382,7 +380,7 @@ Field Name" registry:
 
 Field Name:
 
-: Sec-Capsule-Protocol
+: Capsule-Protocol
 
 Template:
 
@@ -467,7 +465,7 @@ STREAM(44): HEADERS             -------->
   :scheme = https
   :path = /target.example.org/443/
   :authority = proxy.example.org:443
-  sec-capsule-protocol = ?1
+  capsule-protocol = ?1
 
 DATAGRAM                        -------->
   Quarter Stream ID = 11
@@ -475,7 +473,7 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
-                        sec-capsule-protocol = ?1
+                        capsule-protocol = ?1
 
 /* Wait for target server to respond to UDP packet. */
 
