@@ -38,8 +38,8 @@ congestion-control properties of QUIC. However, QUIC DATAGRAM frames do not
 provide a means to demultiplex application contexts. This document describes how
 to use QUIC DATAGRAM frames when the application protocol running over QUIC is
 HTTP/3. It associates datagrams with client-initiated bidirectional streams.
-Additionally, this document defines how to convey datagrams over prior versions
-of HTTP.
+Additionally, this document defines a mechanism to convey datagrams over prior
+versions of HTTP.
 
 
 --- middle
@@ -53,7 +53,7 @@ properties of QUIC. However, QUIC DATAGRAM frames do not provide a means to
 demultiplex application contexts. This document describes how to use QUIC
 DATAGRAM frames when the application protocol running over QUIC is HTTP/3
 {{!H3=I-D.ietf-quic-http}}. It associates datagrams with client-initiated
-bidirectional streams. Additionally, this document defines how to convey
+bidirectional streams. Additionally, this document defines a mechanism to convey
 datagrams over prior versions of HTTP.
 
 This document is structured as follows:
@@ -78,6 +78,8 @@ when, and only when, they appear in all capitals, as shown here.
 
 
 # Multiplexing
+
+All HTTP Datagrams are associated with an HTTP request stream.
 
 When running over HTTP/3, multiple exchanges of datagrams need the ability to
 coexist on a given QUIC connection. To allow this, the QUIC DATAGRAM frame
