@@ -266,16 +266,6 @@ loss; this can misrepresent the true path properties, defeating methods such as
 DPLPMTUD.
 
 
-## The RELIABLE_DATAGRAM Capsule
-
-This document defines the RELIABLE_DATAGRAM capsule type (see {{iana-types}} for
-the value of the capsule type). This capsule has the same format and semantics
-as the DATAGRAM capsules, however intermediaries MUST NOT convert between
-RELIABLE_DATAGRAM caspules and other encodings of HTTP Datagrams, or vice versa.
-Endpoints MUST treat receipt of a RELIABLE_DATAGRAM capsule as equivalent to
-receipt of a DATAGRAM capsule with the same contents.
-
-
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
 
 Implementations of HTTP/3 that support HTTP Datagrams can indicate that to
@@ -429,7 +419,6 @@ This registry initially contains the following entries:
 | Capsule Type                 |   Value   | Specification |
 |:-----------------------------|:----------|:--------------|
 | DATAGRAM                     | 0xff37a0  | This Document |
-| RELIABLE_DATAGRAM            | 0xff37a5  | This Document |
 {: #iana-types-table title="Initial Capsule Types Registry Entries"}
 
 Capsule types with a value of the form 41 * N + 23 for integer values of N are
@@ -440,19 +429,6 @@ values.
 
 
 --- back
-
-# Creating a Demultiplexing Extension
-
-A future extension to this protocol could add a layer of demultiplexing to
-datagrams. Such an extension could add a demultiplexing identifier at the start
-of the HTTP Datagram Payload and change the semantics of the QUIC DATAGRAM frame
-payload and DATAGRAM capsule to both include the demultiplexing identifier when
-both endpoints support the extension. The extension could have the
-RELIABLE_DATAGRAM capsule not include the identifier, and introduce a new
-RELIABLE_DATAGRAM_EXT capsule which always includes the identifier. That would
-allow an endpoint to use the extension before it knows whether its peer supports
-it.
-
 
 # Examples
 
