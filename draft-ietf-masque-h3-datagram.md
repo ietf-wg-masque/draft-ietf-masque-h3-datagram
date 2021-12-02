@@ -204,9 +204,10 @@ Capsule Type field.
 
 Capsules MUST be forwarded unmodified by intermediaries, with the exception of
 the DATAGRAM capsule; see {{datagram-capsule}}. An intermediary that understands
-the request semantics enough to know that capsules are in use MAY convert
-between QUIC DATAGRAM frames and DATAGRAM capsules. Definitions of new Capsule
-Types MAY specify optional custom intermediary processing.
+the request semantics enough to know that capsules are in use (either by
+recognizing the HTTP Upgrade token, or the Capsule-Protocol header from {{hdr}})
+MAY convert between QUIC DATAGRAM frames and DATAGRAM capsules. Definitions of
+new Capsule Types MAY specify optional custom intermediary processing.
 
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
 drop that Capsule.
@@ -217,7 +218,7 @@ The Capsule Protocol MUST NOT be used with messages that contain Content-Length
 or Transfer-Encoding header fields.
 
 
-## The Capsule-Protocol Header
+## The Capsule-Protocol Header {#hdr}
 
 Definitions of new HTTP Methods or of new HTTP Upgrade Tokens that use the
 Capsule Protocol MAY use the Capsule-Protocol header field to simplify
