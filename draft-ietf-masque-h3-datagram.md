@@ -145,7 +145,8 @@ sequence of type-length-value tuples that new HTTP Methods or new HTTP Upgrade
 Tokens can choose to use. It allows endpoints to reliably communicate
 request-related information end-to-end on HTTP request streams, even in the
 presence of HTTP intermediaries. The Capsule Protocol can be used to exchange
-HTTP Datagrams over versions of HTTP that do not support the QUIC DATAGRAM frame.
+HTTP Datagrams when HTTP is running over a transport that does not support the
+QUIC DATAGRAM frame.
 
 This specification defines the "data stream" of an HTTP request as the
 bidirectional stream of bytes that follow the headers in both directions. In
@@ -202,9 +203,9 @@ Capsule Value:
 Capsule Type field.
 
 Capsules MUST be forwarded unmodified by intermediaries, with the exception of
-the DATAGRAM capsule. An intermediary that understands the request semantics
-enough to know that capsules are in use MAY convert between QUIC DATAGRAM frames
-and DATAGRAM capsules; see {{datagram-capsule}}. Definitions of new Capsule
+the DATAGRAM capsule; see {{datagram-capsule}}. An intermediary that understands
+the request semantics enough to know that capsules are in use MAY convert
+between QUIC DATAGRAM frames and DATAGRAM capsules. Definitions of new Capsule
 Types MAY specify optional custom intermediary processing.
 
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
@@ -216,12 +217,39 @@ The Capsule Protocol MUST NOT be used with messages that contain Content-Length
 or Transfer-Encoding header fields.
 
 
+## The Capsule-Protocol Header
+
+Definitions of new HTTP Methods or of new HTTP Upgrade Tokens that use the
+Capsule Protocol MAY use the Capsule-Protocol header field to simplify
+intermediary processing.
+
+"Capsule-Protocol" is an Item Structured Header {{!RFC8941}}. Its value MUST be
+a Boolean. Its ABNF is:
+
+~~~
+Capsule-Protocol = sf-boolean
+~~~
+
+Endpoints indicate that the Capsule Protocol is in use on the data stream by
+sending the Capsule-Protocol header field with a value of ?1. A Capsule-Protocol
+header field with a value of ?0 has the same semantics as when the header is not
+present. Intermediaries MAY use this header field to allow processing of HTTP
+Datagrams for unknown HTTP methods or unknown HTTP Upgrade Tokens.
+
+The Capsule-Protocol header field MUST NOT be sent multiple times on a message.
+The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
+status code different from 2xx (Successful). This specification does not define
+any parameters for the Capsule-Protocol header field value, but future documents
+MAY define parameters. Receivers MUST ignore unknown parameters.
+
+
 ## The DATAGRAM Capsule {#datagram-capsule}
 
 This document defines the DATAGRAM capsule type (see {{iana-types}} for the
 value of the capsule type). This capsule allows an endpoint to send an HTTP
 Datagram on a stream using the Capsule Protocol. This is particularly useful
-when using a version of HTTP that does not support QUIC DATAGRAM frames.
+when HTTP is running over a transport that does not support the QUIC DATAGRAM
+frame.
 
 ~~~
 Datagram Capsule {
@@ -304,32 +332,6 @@ endpoint has sent and received SETTINGS, it MUST compute the intersection of
 the values it has sent and received, and then it MUST select and use the most
 recent draft version from the intersection set. This ensures that both
 endpoints negotiate the same draft version.
-
-
-# The Capsule-Protocol Header
-
-Definitions of new HTTP Methods or of new HTTP Upgrade Tokens that use the
-Capsule Protocol MAY use the Capsule-Protocol header field to simplify
-intermediary processing.
-
-"Capsule-Protocol" is an Item Structured Header {{!RFC8941}}. Its value MUST be
-a Boolean. Its ABNF is:
-
-~~~
-Capsule-Protocol = sf-boolean
-~~~
-
-Endpoints indicate that the Capsule Protocol is in use on the data stream by
-sending the Capsule-Protocol header field with a value of ?1. A Capsule-Protocol
-header field with a value of ?0 has the same semantics as when the header is not
-present. Intermediaries MAY use this header field to allow processing of HTTP
-Datagrams for unknown HTTP methods or unknown HTTP Upgrade Tokens.
-
-The Capsule-Protocol header field MUST NOT be sent multiple times on a message.
-The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
-status code different from 2xx (Successful). This specification does not define
-any parameters for the Capsule-Protocol header field value, but future documents
-MAY define parameters. Receivers MUST ignore unknown parameters.
 
 
 # Prioritization
