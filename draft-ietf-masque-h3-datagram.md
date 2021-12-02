@@ -79,7 +79,7 @@ when, and only when, they appear in all capitals, as shown here.
 
 # Multiplexing
 
-All HTTP Datagrams are associated with an HTTP request stream.
+All HTTP Datagrams are associated with an HTTP request.
 
 When running over HTTP/3, multiple exchanges of datagrams need the ability to
 coexist on a given QUIC connection. To allow this, the QUIC DATAGRAM frame
@@ -313,7 +313,7 @@ Capsule Protocol MAY use the Capsule-Protocol header field to simplify
 intermediary processing.
 
 "Capsule-Protocol" is an Item Structured Header {{!RFC8941}}. Its value MUST be
-a Boolean, its ABNF is:
+a Boolean. Its ABNF is:
 
 ~~~
 Capsule-Protocol = sf-boolean
