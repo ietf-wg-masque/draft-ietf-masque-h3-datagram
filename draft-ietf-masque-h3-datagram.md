@@ -229,7 +229,7 @@ intermediary processing.
 a Boolean. Its ABNF is:
 
 ~~~
-Capsule-Protocol = sf-boolean
+Capsule-Protocol = sf-boolean parameters
 ~~~
 
 Endpoints indicate that the Capsule Protocol is in use on the data stream by
