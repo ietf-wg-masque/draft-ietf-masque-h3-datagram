@@ -473,7 +473,7 @@ Client                                             Server
 STREAM(44): HEADERS            -------->
   :method = CONNECT
   :scheme = https
-  :method = webtransport
+  :protocol = webtransport
   :path = /hello
   :authority = webtransport.example.org:443
   origin = https://www.example.org:443
