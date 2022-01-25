@@ -158,9 +158,13 @@ corresponding stream ID. The concept of a data stream is particularly relevant
 for methods such as CONNECT where there is no HTTP message content after the
 headers.
 
-Note that use of the Capsule Protocol is not required to use HTTP Datagrams.
-Definitions of new HTTP Methods or of new HTTP Upgrade Tokens can use HTTP
-Datagrams with their own data stream protocol.
+Note that use of the Capsule Protocol is not required to use HTTP Datagrams. If
+a new HTTP Method or Upgrade Token is only defined over transports that support
+QUIC DATAGRAM frames, they might not need a stream encoding. Additionally,
+definitions of new HTTP Methods or of new HTTP Upgrade Tokens can use HTTP
+Datagrams with their own data stream protocol. However, new HTTP Method or
+Upgrade Tokens SHOULD use the Capsule Protocol unless they have a good reason
+not to.
 
 
 ## Capsule Protocol {#capsule-protocol}
