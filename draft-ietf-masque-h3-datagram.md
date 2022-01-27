@@ -206,13 +206,15 @@ Capsule Value:
 : The payload of this capsule. Its semantics are determined by the value of the
 Capsule Type field.
 
-Capsules MUST be forwarded unmodified by intermediaries, with the exception of
-the DATAGRAM capsule; see {{datagram-capsule}}. An intermediary can identify the
-use of the capsule protocol either through the presence of the Capsule-Protocol
-header field ({{hdr}}) or by understanding the chosen HTTP Upgrade token. An
-intermediary that identifies the use of the capsule protocol MAY convert between
-DATAGRAM capsules and QUIC DATAGRAM frames when forwarding. Definitions of new
-Capsule Types MAY specify optional custom intermediary processing.
+Because new protocols or extensions may involve defining new capsule types,
+intermediaries that wish to allow for future extensibility SHOULD forward
+capsules unmodified. One exception to this rule is the DATAGRAM capsule; see
+{{datagram-capsule}}. An intermediary can identify the use of the capsule
+protocol either through the presence of the Capsule-Protocol header field
+({{hdr}}) or by understanding the chosen HTTP Upgrade token. An intermediary
+that identifies the use of the capsule protocol MAY convert between DATAGRAM
+capsules and QUIC DATAGRAM frames when forwarding. Definitions of new Capsule
+Types MAY specify optional custom intermediary processing.
 
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
 drop that Capsule.
