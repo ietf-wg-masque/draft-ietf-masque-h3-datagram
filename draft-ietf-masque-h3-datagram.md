@@ -369,10 +369,33 @@ HTTP/3 datagrams enabled on this endpoint.
 This document will request IANA to register the following entry in the
 "HTTP/3 Settings" registry:
 
-| Setting Name |   Value  | Specification | Default |
-|:-------------|:---------|:--------------|:--------|
-| H3_DATAGRAM  | 0xffd277 | This Document |    0    |
-{: #iana-setting-table title="New HTTP/3 Settings"}
+Value:
+
+: 0xffd277 (note that this will switch to a lower value before publication)
+
+Setting Name:
+
+: H3_DATAGRAM
+
+Default:
+
+: 0
+
+Status:
+
+: provisional (permanent if this document is approved)
+
+Specification:
+
+: This Document
+
+Change Controller:
+
+: IETF
+
+Contact:
+
+: HTTP_WG; HTTP working group; ietf-http-wg@w3.org
 
 
 ## HTTP Header Field Name {#iana-hdr}
