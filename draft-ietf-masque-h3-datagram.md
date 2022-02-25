@@ -355,11 +355,12 @@ allow endpoints to communicate their prioritization preferences.
 
 # Security Considerations {#security}
 
-Since this feature requires sending an HTTP/3 Settings parameter, it "sticks
-out". In other words, probing clients can learn whether a server supports this
-feature. Implementations that support this feature SHOULD always send this
-Settings parameter to avoid leaking the fact that there are applications using
-HTTP/3 datagrams enabled on this endpoint.
+Since transmitting HTTP Datagrams using QUIC DATAGRAM frames requires sending an
+HTTP/3 Settings parameter, it "sticks out". In other words, probing clients can
+learn whether a server supports HTTP Datagrams over QUIC DATAGRAM frames.
+Implementations that support this feature SHOULD always send this Settings
+parameter to avoid leaking the fact that there are applications using HTTP
+datagrams enabled on this endpoint.
 
 
 # IANA Considerations {#iana}
