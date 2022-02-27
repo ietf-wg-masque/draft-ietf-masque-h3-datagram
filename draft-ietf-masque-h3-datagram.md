@@ -326,6 +326,11 @@ stored value; if not, the client MUST terminate the connection with error
 H3_SETTINGS_ERROR. In all cases, the maximum permitted value of the H3_DATAGRAM
 SETTINGS parameter is 1.
 
+It is RECOMMENDED that implementations that support receiving HTTP Datagrams
+using QUIC always send the H3_DATAGRAM SETTINGS parameter with a value of 1,
+even if the application does not intend to use HTTP Datagrams. This helps to
+avoid "sticking out"; see {{security}}.
+
 
 ## Note About Draft Versions
 
@@ -357,10 +362,10 @@ allow endpoints to communicate their prioritization preferences.
 
 Since transmitting HTTP Datagrams using QUIC DATAGRAM frames requires sending an
 HTTP/3 Settings parameter, it "sticks out". In other words, probing clients can
-learn whether a server supports HTTP Datagrams over QUIC DATAGRAM frames.
-Implementations that support this feature SHOULD always send this Settings
-parameter to avoid leaking the fact that there are applications using HTTP
-datagrams enabled on this endpoint.
+learn whether a server supports HTTP Datagrams over QUIC DATAGRAM frames. As
+some servers might wish to obfuscate the fact that they offer application
+services that use HTTP datagrams, it's best for all implementations that support
+this feature to always send this Settings parameter, see {{setting}}.
 
 
 # IANA Considerations {#iana}
