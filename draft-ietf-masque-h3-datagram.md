@@ -137,6 +137,13 @@ that has not yet been created, the receiver SHALL either drop that datagram
 silently or buffer it temporarily while awaiting the creation of the
 corresponding stream.
 
+If an HTTP/3 datagram is received and its Quarter Stream ID maps to a stream
+that cannot be created due to client-initiated bidirectional stream limits, it
+SHOULD be treated as a connection error of type H3_ID_ERROR. Generating an error
+is not mandatory in this case because HTTP/3 implementations might have
+practical barriers to determining the active stream concurrency limit that is
+applied by the QUIC layer.
+
 
 # Capsules {#capsule}
 
