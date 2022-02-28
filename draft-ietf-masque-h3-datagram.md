@@ -135,11 +135,12 @@ that has not yet been created, the receiver SHALL either drop that datagram
 silently or buffer it temporarily while awaiting the creation of the
 corresponding stream.
 
-HTTP/3 datagrams MUST NOT be sent associated with streams that do not define
+HTTP/3 datagrams MUST only be sent with an association to a stream that supports
 semantics for HTTP Datagrams. For example, existing HTTP methods GET and POST do
-not define semantics for associated HTTP Datagrams. If an endpoint receives an
-HTTP/3 datagram associated with a method that has no known semantics for HTTP
-Datagrams, it MUST abort the corresponding stream with
+not define semantics for associated HTTP Datagrams; therefore, HTTP/3 datagrams
+cannot be sent associated with GET or POST request streams. If an endpoint
+receives an HTTP/3 datagram associated with a method that has no known semantics
+for HTTP Datagrams, it MUST abort the corresponding stream with
 H3_GENERAL_PROTOCOL_ERROR. Future extensions MAY remove these requirements if
 they define semantics for such HTTP Datagrams and negotiate mutual support.
 
@@ -367,8 +368,9 @@ feature. Implementations that support this feature SHOULD always send this
 Settings parameter to avoid leaking the fact that there are applications using
 HTTP/3 datagrams enabled on this endpoint.
 
-Since use of the Capsule Protocol is restricted to new HTTP Upgrade Tokens, it is
-not accessible from JavaScript.
+Since use of the Capsule Protocol is restricted to new HTTP Upgrade Tokens, it
+is not accessible from Web Platform APIs (such as those commonly accessed via
+JavaScript in web browsers).
 
 
 # IANA Considerations {#iana}
