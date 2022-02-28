@@ -305,7 +305,7 @@ While DATAGRAM capsules can theoretically carry a payload of length
 2<sup>62</sup>-1, most applications will have their own limits on what datagran
 payload sizes are practical. Implementations SHOULD take those limits into
 account when parsing DATAGRAM capsules: if an incoming DATAGRAM capsule has a
-length that is known to be so high as to not be usable, the implementation
+length that is known to be so large as to not be usable, the implementation
 SHOULD discard the capsule without buffering its contents into memory.
 
 
