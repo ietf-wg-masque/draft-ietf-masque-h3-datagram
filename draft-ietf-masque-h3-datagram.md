@@ -111,8 +111,8 @@ division by four stems from the fact that HTTP requests are sent on
 client-initiated bidirectional streams, and those have stream IDs that are
 divisible by four). The largest legal QUIC stream ID value is 2<sup>62</sup>-1,
 so the largest legal value of Quarter Stream ID is 2<sup>60</sup>-1. Receipt of
-a frame that includes a larger value MUST be treated as a connection error of
-type H3_DATAGRAM_ERROR.
+a frame that includes a larger value MUST be treated as an HTTP/3 connection
+error of type H3_DATAGRAM_ERROR.
 
 HTTP Datagram Payload:
 
@@ -137,8 +137,8 @@ corresponding stream.
 
 If an HTTP/3 datagram is received and its Quarter Stream ID maps to a stream
 that cannot be created due to client-initiated bidirectional stream limits, it
-SHOULD be treated as a connection error of type H3_ID_ERROR. Generating an error
-is not mandatory in this case because HTTP/3 implementations might have
+SHOULD be treated as an HTTP/3 connection error of type H3_ID_ERROR. Generating
+an error is not mandatory in this case because HTTP/3 implementations might have
 practical barriers to determining the active stream concurrency limit that is
 applied by the QUIC layer.
 
@@ -148,8 +148,8 @@ not define semantics for associated HTTP Datagrams; therefore, HTTP/3 datagrams
 cannot be sent associated with GET or POST request streams. If an endpoint
 receives an HTTP/3 datagram associated with a method that has no known semantics
 for HTTP Datagrams, it MUST abort the corresponding stream with
-H3_GENERAL_PROTOCOL_ERROR. Future extensions MAY remove these requirements if
-they define semantics for such HTTP Datagrams and negotiate mutual support.
+H3_DATAGRAM_ERROR. Future extensions MAY remove these requirements if they
+define semantics for such HTTP Datagrams and negotiate mutual support.
 
 
 # Capsules {#capsule}
@@ -454,13 +454,35 @@ Contact:
 ## HTTP/3 Error Code {#iana-error}
 
 This document will request IANA to register the following entry in the
-"HTTP/3 Error Code" registry:
+"HTTP/3 Error Codes" registry:
 
-| Name              |   Value  | Description    | Specification |
-|:------------------|:---------|:---------------|:--------------|
-| H3_DATAGRAM_ERROR |  0x0111  | Datagram parse | This document |
-|                   |          | error          |               |
-{: #iana-error-table title="New HTTP/3 Error Codes"}
+Value:
+
+: 0x4A1268 (note that this will switch to a lower value before publication)
+
+Name:
+
+: H3_DATAGRAM_ERROR
+
+Description:
+
+: Datagram or capsule protocol parse error
+
+Status:
+
+: provisional (permanent if this document is approved)
+
+Specification:
+
+: This Document
+
+Change Controller:
+
+: IETF
+
+Contact:
+
+: HTTP_WG; HTTP working group; ietf-http-wg@w3.org
 
 
 ## HTTP Header Field Name {#iana-hdr}
