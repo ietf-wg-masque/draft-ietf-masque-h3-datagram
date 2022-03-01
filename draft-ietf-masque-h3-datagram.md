@@ -267,8 +267,8 @@ stream was truncated, this MUST be treated as a malformed or incomplete message.
 Definitions of new HTTP Upgrade Tokens that use the Capsule Protocol MAY use the
 Capsule-Protocol header field to simplify intermediary processing.
 
-"Capsule-Protocol" is an Item Structured Header {{!RFC8941}}. Its value MUST be
-a Boolean. Its ABNF is:
+"Capsule-Protocol" is an Item Structured Header (see {{Section 3.3 of
+!STRUCTURED-FIELDS=RFC8941}}. Its value MUST be a Boolean. Its ABNF is:
 
 ~~~
 Capsule-Protocol = sf-boolean parameters
