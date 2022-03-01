@@ -57,9 +57,9 @@ that can convey datagrams over prior versions of HTTP.
 This document is structured as follows:
 
 * {{multiplexing}} presents core concepts for multiplexing across HTTP versions.
-* {{format}} defines how QUIC DATAGRAM frames are used with HTTP/3. {{setting}}
-  defines an HTTP/3 setting that endpoints can use to advertise support of the
-  frame.
+* {{format}} defines how QUIC DATAGRAM frames are used with HTTP/3.
+  * {{setting}} defines an HTTP/3 setting that endpoints can use to advertise
+  support of the frame.
 * {{capsule}} introduces the Capsule Protocol and the "data stream" concept.
   Data streams are initiated using special-purpose HTTP requests, after which
   Capsules, an end-to-end message, can be sent.
@@ -150,6 +150,51 @@ receives an HTTP/3 datagram associated with a method that has no known semantics
 for HTTP Datagrams, it MUST abort the corresponding stream with
 H3_DATAGRAM_ERROR. Future extensions MAY remove these requirements if they
 define semantics for such HTTP Datagrams and negotiate mutual support.
+
+
+## The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
+
+Implementations of HTTP/3 that support HTTP Datagrams can indicate that to
+their peer by sending the H3_DATAGRAM SETTINGS parameter with a value of 1.
+The value of the H3_DATAGRAM SETTINGS parameter MUST be either 0 or 1. A value
+of 0 indicates that HTTP Datagrams are not supported. An endpoint that receives
+the H3_DATAGRAM SETTINGS parameter with a value that is neither 0 or 1 MUST
+terminate the connection with error H3_SETTINGS_ERROR.
+
+Endpoints MUST NOT send QUIC DATAGRAM frames until they have both sent and
+received the H3_DATAGRAM SETTINGS parameter with a value of 1.
+
+When clients use 0-RTT, they MAY store the value of the server's H3_DATAGRAM
+SETTINGS parameter. Doing so allows the client to send QUIC DATAGRAM frames in
+0-RTT packets. When servers decide to accept 0-RTT data, they MUST send a
+H3_DATAGRAM SETTINGS parameter greater than or equal to the value they sent to
+the client in the connection where they sent them the NewSessionTicket message.
+If a client stores the value of the H3_DATAGRAM SETTINGS parameter with their
+0-RTT state, they MUST validate that the new value of the H3_DATAGRAM SETTINGS
+parameter sent by the server in the handshake is greater than or equal to the
+stored value; if not, the client MUST terminate the connection with error
+H3_SETTINGS_ERROR. In all cases, the maximum permitted value of the H3_DATAGRAM
+SETTINGS parameter is 1.
+
+It is RECOMMENDED that implementations that support receiving HTTP Datagrams
+using QUIC always send the H3_DATAGRAM SETTINGS parameter with a value of 1,
+even if the application does not intend to use HTTP Datagrams. This helps to
+avoid "sticking out"; see {{security}}.
+
+
+### Note About Draft Versions
+
+\[\[RFC editor: please remove this section before publication.]]
+
+Some revisions of this draft specification use a different value (the
+Identifier field of a Setting in the HTTP/3 SETTINGS frame) for the H3_DATAGRAM
+Settings Parameter. This allows new draft revisions to make incompatible
+changes. Multiple draft versions MAY be supported by either endpoint in a
+connection. Such endpoints MUST send multiple values for H3_DATAGRAM. Once an
+endpoint has sent and received SETTINGS, it MUST compute the intersection of
+the values it has sent and received, and then it MUST select and use the most
+recent draft version from the intersection set. This ensures that both
+endpoints negotiate the same draft version.
 
 
 # Capsules {#capsule}
@@ -343,51 +388,6 @@ payload sizes are practical. Implementations SHOULD take those limits into
 account when parsing DATAGRAM capsules: if an incoming DATAGRAM capsule has a
 length that is known to be so large as to not be usable, the implementation
 SHOULD discard the capsule without buffering its contents into memory.
-
-
-# The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
-
-Implementations of HTTP/3 that support HTTP Datagrams can indicate that to
-their peer by sending the H3_DATAGRAM SETTINGS parameter with a value of 1.
-The value of the H3_DATAGRAM SETTINGS parameter MUST be either 0 or 1. A value
-of 0 indicates that HTTP Datagrams are not supported. An endpoint that receives
-the H3_DATAGRAM SETTINGS parameter with a value that is neither 0 or 1 MUST
-terminate the connection with error H3_SETTINGS_ERROR.
-
-Endpoints MUST NOT send QUIC DATAGRAM frames until they have both sent and
-received the H3_DATAGRAM SETTINGS parameter with a value of 1.
-
-When clients use 0-RTT, they MAY store the value of the server's H3_DATAGRAM
-SETTINGS parameter. Doing so allows the client to send QUIC DATAGRAM frames in
-0-RTT packets. When servers decide to accept 0-RTT data, they MUST send a
-H3_DATAGRAM SETTINGS parameter greater than or equal to the value they sent to
-the client in the connection where they sent them the NewSessionTicket message.
-If a client stores the value of the H3_DATAGRAM SETTINGS parameter with their
-0-RTT state, they MUST validate that the new value of the H3_DATAGRAM SETTINGS
-parameter sent by the server in the handshake is greater than or equal to the
-stored value; if not, the client MUST terminate the connection with error
-H3_SETTINGS_ERROR. In all cases, the maximum permitted value of the H3_DATAGRAM
-SETTINGS parameter is 1.
-
-It is RECOMMENDED that implementations that support receiving HTTP Datagrams
-using QUIC always send the H3_DATAGRAM SETTINGS parameter with a value of 1,
-even if the application does not intend to use HTTP Datagrams. This helps to
-avoid "sticking out"; see {{security}}.
-
-
-## Note About Draft Versions
-
-\[\[RFC editor: please remove this section before publication.]]
-
-Some revisions of this draft specification use a different value (the
-Identifier field of a Setting in the HTTP/3 SETTINGS frame) for the H3_DATAGRAM
-Settings Parameter. This allows new draft revisions to make incompatible
-changes. Multiple draft versions MAY be supported by either endpoint in a
-connection. Such endpoints MUST send multiple values for H3_DATAGRAM. Once an
-endpoint has sent and received SETTINGS, it MUST compute the intersection of
-the values it has sent and received, and then it MUST select and use the most
-recent draft version from the intersection set. This ensures that both
-endpoints negotiate the same draft version.
 
 
 # Prioritization
