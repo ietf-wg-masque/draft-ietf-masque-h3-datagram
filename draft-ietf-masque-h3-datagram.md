@@ -36,8 +36,8 @@ congestion-control properties of QUIC. However, QUIC DATAGRAM frames do not
 provide a means to demultiplex application contexts. This document describes how
 to use QUIC DATAGRAM frames when the application protocol running over QUIC is
 HTTP/3. It associates datagrams with client-initiated bidirectional streams.
-Additionally, this document defines a mechanism to convey datagrams over prior
-versions of HTTP.
+Additionally, this document defines the Capsule Protocol that can convey
+datagrams over prior versions of HTTP.
 
 
 --- middle
@@ -51,8 +51,8 @@ properties of QUIC. However, QUIC DATAGRAM frames do not provide a means to
 demultiplex application contexts. This document describes how to use QUIC
 DATAGRAM frames when the application protocol running over QUIC is HTTP/3
 {{!H3=I-D.ietf-quic-http}}. It associates datagrams with client-initiated
-bidirectional streams. Additionally, this document defines a mechanism to convey
-datagrams over prior versions of HTTP.
+bidirectional streams. Additionally, this document defines the Capsule Protocol
+that can convey datagrams over prior versions of HTTP.
 
 This document is structured as follows:
 
