@@ -158,11 +158,12 @@ This specification defines the "data stream" of an HTTP request as the
 bidirectional stream of bytes that follow the headers in both directions. In
 HTTP/1.x, the data stream consists of all bytes on the connection that follow
 the blank line that concludes either the request header section, or the 2xx
-(Successful) response header section. In HTTP/2 and HTTP/3, the data stream of a
-given HTTP request consists of all bytes sent in DATA frames with the
-corresponding stream ID. The concept of a data stream is particularly relevant
-for methods such as CONNECT where there is no HTTP message content after the
-headers.
+(Successful) response header section. (Note that only a single HTTP request
+starting the capsule protocol can be sent on HTTP/1.x connections.) In HTTP/2
+and HTTP/3, the data stream of a given HTTP request consists of all bytes sent
+in DATA frames with the corresponding stream ID. The concept of a data stream is
+particularly relevant for methods such as CONNECT where there is no HTTP message
+content after the headers.
 
 Note that use of the Capsule Protocol is not required to use HTTP Datagrams. If
 a new HTTP Upgrade Token is only defined over transports that support QUIC
