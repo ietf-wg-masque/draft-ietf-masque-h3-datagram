@@ -34,7 +34,7 @@ The QUIC DATAGRAM extension provides application protocols running over QUIC
 with a mechanism to send unreliable data while leveraging the security and
 congestion-control properties of QUIC. However, QUIC DATAGRAM frames do not
 provide a means to demultiplex application contexts. This document describes how
-to use QUIC DATAGRAM frames can be used with HTTP/3 by association with HTTP
+to use QUIC DATAGRAM frames with HTTP/3 by association with HTTP
 requests. Additionally, this document defines the Capsule Protocol that can
 convey datagrams over prior versions of HTTP.
 
@@ -48,7 +48,7 @@ application protocols running over QUIC {{!QUIC=RFC9000}} with a mechanism to
 send unreliable data while leveraging the security and congestion-control
 properties of QUIC. However, QUIC DATAGRAM frames do not provide a means to
 demultiplex application contexts. This document describes how to use QUIC
-DATAGRAM frames can be used with HTTP/3 {{!H3=I-D.ietf-quic-http}} by
+DATAGRAM frames with HTTP/3 {{!H3=I-D.ietf-quic-http}} by
 association with HTTP requests. Additionally, this document defines the Capsule
 Protocol that can convey datagrams over prior versions of HTTP.
 
