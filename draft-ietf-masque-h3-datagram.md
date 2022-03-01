@@ -200,11 +200,12 @@ endpoints negotiate the same draft version.
 # Capsules {#capsule}
 
 This specification introduces the Capsule Protocol. The Capsule Protocol is a
-sequence of type-length-value tuples that new HTTP Upgrade Tokens can choose to
-use. It allows endpoints to reliably communicate request-related information
-end-to-end on HTTP request streams, even in the presence of HTTP intermediaries.
-The Capsule Protocol can be used to exchange HTTP Datagrams when HTTP is running
-over a transport that does not support the QUIC DATAGRAM frame.
+sequence of type-length-value tuples that new HTTP Upgrade Tokens (see {{Section
+16.7 of ?HTTP=I-D.ietf-httpbis-semantics}}) can choose to use. It allows
+endpoints to reliably communicate request-related information end-to-end on HTTP
+request streams, even in the presence of HTTP intermediaries. The Capsule
+Protocol can be used to exchange HTTP Datagrams when HTTP is running over a
+transport that does not support the QUIC DATAGRAM frame.
 
 This specification defines the "data stream" of an HTTP request as the
 bidirectional stream of bytes that follow the headers in both directions. In
@@ -291,10 +292,10 @@ be sent on responses that use the Capsule Protocol.
 When an error occurs processing the capsule protocol, the receiver MUST treat
 the message as malformed or incomplete, according to the underlying transport
 protocol.  For HTTP/3, the handling of malformed messages is described in
-section 4.1.3 of {{H3}}.  For HTTP/2, the handling of malformed messages is
-described in section 8.1.2.6 of {{!H2=RFC7540}}.  For HTTP/1.1, the handling of
-incomplete messages is described in section 8 of
-{{!CORE-MESSAGING=I-D.draft-ietf-httpbis-messaging}}.
+{{Section 4.1.3 of H3}}.  For HTTP/2, the handling of malformed messages is
+described in {{Section 8.1.1 of !H2=I-D.draft-ietf-httpbis-http2bis}}.  For
+HTTP/1.1, the handling of incomplete messages is described in {{Section 8 of
+!H1=I-D.draft-ietf-httpbis-messaging}}.
 
 Each capsule's payload MUST contain exactly the fields identified in its
 description. A capsule payload that contains additional bytes after the
@@ -311,8 +312,8 @@ stream was truncated, this MUST be treated as a malformed or incomplete message.
 Definitions of new HTTP Upgrade Tokens that use the Capsule Protocol MAY use the
 Capsule-Protocol header field to simplify intermediary processing.
 
-"Capsule-Protocol" is an Item Structured Header {{!RFC8941}}. Its value MUST be
-a Boolean. Its ABNF is:
+"Capsule-Protocol" is an Item Structured Header (see {{Section 3.3 of
+!STRUCTURED-FIELDS=RFC8941}}. Its value MUST be a Boolean. Its ABNF is:
 
 ~~~
 Capsule-Protocol = sf-boolean parameters
