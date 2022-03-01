@@ -112,7 +112,7 @@ client-initiated bidirectional streams, and those have stream IDs that are
 divisible by four). The largest legal QUIC stream ID value is 2<sup>62</sup>-1,
 so the largest legal value of Quarter Stream ID is 2<sup>60</sup>-1. Receipt of
 a frame that includes a larger value MUST be treated as a connection error of
-type FRAME_ENCODING_ERROR.
+type H3_DATAGRAM_ERROR.
 
 HTTP Datagram Payload:
 
@@ -121,7 +121,7 @@ applications. Note that this field can be empty.
 
 Receipt of a QUIC DATAGRAM frame whose payload is too short to allow parsing the
 Quarter Stream ID field MUST be treated as an HTTP/3 connection error of type
-H3_GENERAL_PROTOCOL_ERROR.
+H3_DATAGRAM_ERROR.
 
 Endpoints MUST NOT send HTTP/3 datagrams unless the corresponding stream's send
 side is open. On a given endpoint, once the receive side of a stream is closed,
@@ -239,6 +239,27 @@ The Capsule Protocol MUST NOT be used with messages that contain Content-Length,
 Content-Type, or Transfer-Encoding header fields. Additionally, HTTP status
 codes 204 (No Content), 205 (Reset Content), and 206 (Partial Content) MUST NOT
 be sent on responses that use the Capsule Protocol.
+
+
+## Error Handling
+
+When an error occurs processing the capsule protocol, the receiver MUST treat
+the message as malformed or incomplete, according to the underlying transport
+protocol.  For HTTP/3, the handling of malformed messages is described in
+section 4.1.3 of {{H3}}.  For HTTP/2, the handling of malformed messages is
+described in section 8.1.2.6 of {{!H2=RFC7540}}.  For HTTP/1.1, the handling of
+incomplete messages is described in section 8 of
+{{!CORE-MESSAGING=I-D.draft-ietf-httpbis-messaging}}.
+
+Each capsule's payload MUST contain exactly the fields identified in its
+description. A capsule payload that contains additional bytes after the
+identified fields or a capsule payload that terminates before the end of the
+identified fields MUST be treated as a malformed or incomplete message. In
+particular, redundant length encodings MUST be verified to be self-consistent.
+
+When a stream carrying capsules terminates cleanly, if the last capsule on the
+stream was truncated, this MUST be treated as a malformed or incomplete message.
+
 
 ## The Capsule-Protocol Header {#hdr}
 
@@ -428,6 +449,18 @@ Change Controller:
 Contact:
 
 : HTTP_WG; HTTP working group; ietf-http-wg@w3.org
+
+
+## HTTP/3 Error Code {#iana-error}
+
+This document will request IANA to register the following entry in the
+"HTTP/3 Error Code" registry:
+
+| Name              |   Value  | Description    | Specification |
+|:------------------|:---------|:---------------|:--------------|
+| H3_DATAGRAM_ERROR |  0x0111  | Datagram parse | This document |
+|                   |          | error          |               |
+{: #iana-error-table title="New HTTP/3 Error Codes"}
 
 
 ## HTTP Header Field Name {#iana-hdr}
