@@ -308,6 +308,13 @@ capsules allows HTTP Datagrams to be arbitrarily large without suffering any
 loss; this can misrepresent the true path properties, defeating methods such as
 DPLPMTUD.
 
+While DATAGRAM capsules can theoretically carry a payload of length
+2<sup>62</sup>-1, most applications will have their own limits on what datagran
+payload sizes are practical. Implementations SHOULD take those limits into
+account when parsing DATAGRAM capsules: if an incoming DATAGRAM capsule has a
+length that is known to be so large as to not be usable, the implementation
+SHOULD discard the capsule without buffering its contents into memory.
+
 
 # The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
 
