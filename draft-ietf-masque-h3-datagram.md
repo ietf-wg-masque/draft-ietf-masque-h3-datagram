@@ -303,16 +303,13 @@ When a stream carrying capsules terminates cleanly, if the last capsule on the
 stream was truncated, this MUST be treated as a malformed or incomplete message.
 
 
-## The Capsule-Protocol Header {#hdr}
+## The Capsule-Protocol Header Field {#hdr}
 
-Definitions of new HTTP Upgrade Tokens that use the Capsule Protocol MAY use the
-Capsule-Protocol header field to simplify intermediary processing.
+This document defines the "Capsule-Protocol" header field. It is an Item
+Structured Header {{!RFC8941}}; its value MUST be a Boolean. Its ABNF is:
 
-"Capsule-Protocol" is an Item Structured Header (see {{Section 3.3 of
-!STRUCTURED-FIELDS=RFC8941}}. Its value MUST be a Boolean. Its ABNF is:
-
-~~~
-Capsule-Protocol = sf-boolean parameters
+~~~ abnf
+Capsule-Protocol = sf-item
 ~~~
 
 Endpoints indicate that the Capsule Protocol is in use on the data stream by
@@ -327,6 +324,9 @@ The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
 status code different from 2xx (Successful). This specification does not define
 any parameters for the Capsule-Protocol header field value, but future documents
 MAY define parameters. Receivers MUST ignore unknown parameters.
+
+Definitions of new HTTP Upgrade Tokens that use the Capsule Protocol MAY use the
+Capsule-Protocol header field to simplify intermediary processing.
 
 
 ## The DATAGRAM Capsule {#datagram-capsule}
