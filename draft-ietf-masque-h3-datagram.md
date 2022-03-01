@@ -2,6 +2,7 @@
 title: Using Datagrams with HTTP
 abbrev: HTTP Datagrams
 docname: draft-ietf-masque-h3-datagram-latest
+submissiontype: IETF
 category: std
 wg: MASQUE
 
@@ -34,9 +35,9 @@ The QUIC DATAGRAM extension provides application protocols running over QUIC
 with a mechanism to send unreliable data while leveraging the security and
 congestion-control properties of QUIC. However, QUIC DATAGRAM frames do not
 provide a means to demultiplex application contexts. This document describes how
-to use QUIC DATAGRAM frames with HTTP/3 by association with HTTP
-requests. Additionally, this document defines the Capsule Protocol that can
-convey datagrams over prior versions of HTTP.
+to use QUIC DATAGRAM frames with HTTP/3 by association with HTTP requests.
+Additionally, this document defines the Capsule Protocol that can convey
+datagrams over prior versions of HTTP.
 
 
 --- middle
@@ -48,9 +49,9 @@ application protocols running over QUIC {{!QUIC=RFC9000}} with a mechanism to
 send unreliable data while leveraging the security and congestion-control
 properties of QUIC. However, QUIC DATAGRAM frames do not provide a means to
 demultiplex application contexts. This document describes how to use QUIC
-DATAGRAM frames with HTTP/3 {{!H3=I-D.ietf-quic-http}} by
-association with HTTP requests. Additionally, this document defines the Capsule
-Protocol that can convey datagrams over prior versions of HTTP.
+DATAGRAM frames with HTTP/3 {{!H3=I-D.ietf-quic-http}} by association with HTTP
+requests. Additionally, this document defines the Capsule Protocol that can
+convey datagrams over prior versions of HTTP.
 
 
 This document is structured as follows:
@@ -197,7 +198,7 @@ endpoints negotiate the same draft version.
 
 This specification introduces the Capsule Protocol. The Capsule Protocol is a
 sequence of type-length-value tuples that new HTTP Upgrade Tokens (see {{Section
-16.7 of ?HTTP=I-D.ietf-httpbis-semantics}}) can choose to use. It allows
+16.7 of !HTTP=I-D.ietf-httpbis-semantics}}) can choose to use. It allows
 endpoints to reliably communicate request-related information end-to-end on HTTP
 request streams, even in the presence of HTTP intermediaries. The Capsule
 Protocol can be used to exchange HTTP Datagrams when HTTP is running over a
@@ -306,7 +307,8 @@ stream was truncated, this MUST be treated as a malformed or incomplete message.
 ## The Capsule-Protocol Header Field {#hdr}
 
 This document defines the "Capsule-Protocol" header field. It is an Item
-Structured Header {{!RFC8941}}; its value MUST be a Boolean. Its ABNF is:
+Structured Field, see {{Section 3.3 of !STRUCT-FIELD=RFC8941}}; its value MUST
+be a Boolean. Its ABNF is:
 
 ~~~ abnf
 Capsule-Protocol = sf-item
@@ -351,10 +353,10 @@ HTTP Datagram Payload:
 : The payload of the datagram, whose semantics are defined by individual
 applications. Note that this field can be empty.
 
-Datagrams sent using the DATAGRAM capsule have the same semantics as
-datagrams sent in QUIC DATAGRAM frames. In particular, the restrictions on when
-it is allowed to send an HTTP Datagram and how to process them from {{format}}
-also apply to HTTP Datagrams sent and received using the DATAGRAM capsule.
+Datagrams sent using the DATAGRAM capsule have the same semantics as datagrams
+sent in QUIC DATAGRAM frames. In particular, the restrictions on when it is
+allowed to send an HTTP Datagram and how to process them from {{format}} also
+apply to HTTP Datagrams sent and received using the DATAGRAM capsule.
 
 An intermediary can reencode HTTP Datagrams as it forwards them. In other words,
 an intermediary MAY send a DATAGRAM capsule to forward an HTTP Datagram which
@@ -367,17 +369,17 @@ reordering.
 
 If an intermediary receives an HTTP Datagram in a QUIC DATAGRAM frame and is
 forwarding it on a connection that supports QUIC DATAGRAM frames, the
-intermediary SHOULD NOT convert that HTTP Datagram to a DATAGRAM capsule. If
-the HTTP Datagram is too large to fit in a DATAGRAM frame (for example because
-the path MTU of that QUIC connection is too low or if the maximum UDP payload
-size advertised on that connection is too low), the intermediary SHOULD drop
-the HTTP Datagram instead of converting it to a DATAGRAM capsule. This
-preserves the end-to-end unreliability characteristic that methods such as
-Datagram Packetization Layer Path MTU Discovery (DPLPMTUD) depend on
-{{?RFC8899}}. An intermediary that converts QUIC DATAGRAM frames to DATAGRAM
-capsules allows HTTP Datagrams to be arbitrarily large without suffering any
-loss; this can misrepresent the true path properties, defeating methods such as
-DPLPMTUD.
+intermediary SHOULD NOT convert that HTTP Datagram to a DATAGRAM capsule. If the
+HTTP Datagram is too large to fit in a DATAGRAM frame (for example because the
+path MTU of that QUIC connection is too low or if the maximum UDP payload size
+advertised on that connection is too low), the intermediary SHOULD drop the HTTP
+Datagram instead of converting it to a DATAGRAM capsule. This preserves the
+end-to-end unreliability characteristic that methods such as Datagram
+Packetization Layer Path MTU Discovery (DPLPMTUD) depend on
+{{?DPLPMTUD=RFC8899}}. An intermediary that converts QUIC DATAGRAM frames to
+DATAGRAM capsules allows HTTP Datagrams to be arbitrarily large without
+suffering any loss; this can misrepresent the true path properties, defeating
+methods such as DPLPMTUD.
 
 While DATAGRAM capsules can theoretically carry a payload of length
 2<sup>62</sup>-1, most applications will have their own limits on what datagran
@@ -603,8 +605,8 @@ STREAM(44): HEADERS            -------->
 
 The DATAGRAM context identifier was previously part of the DATAGRAM frame
 definition itself, the authors would like to acknowledge the authors of that
-document and the members of the IETF MASQUE working group for their
-suggestions. Additionally, the authors would like to thank Martin Thomson for
-suggesting the use of an HTTP/3 SETTINGS parameter. Furthermore, the authors
-would like to thank Ben Schwartz for writing the first proposal that used two
-layers of indirection.
+document and the members of the IETF MASQUE working group for their suggestions.
+Additionally, the authors would like to thank Martin Thomson for suggesting the
+use of an HTTP/3 SETTINGS parameter. Furthermore, the authors would like to
+thank Ben Schwartz for writing the first proposal that used two layers of
+indirection.
