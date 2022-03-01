@@ -155,11 +155,12 @@ define semantics for such HTTP Datagrams and negotiate mutual support.
 # Capsules {#capsule}
 
 This specification introduces the Capsule Protocol. The Capsule Protocol is a
-sequence of type-length-value tuples that new HTTP Upgrade Tokens can choose to
-use. It allows endpoints to reliably communicate request-related information
-end-to-end on HTTP request streams, even in the presence of HTTP intermediaries.
-The Capsule Protocol can be used to exchange HTTP Datagrams when HTTP is running
-over a transport that does not support the QUIC DATAGRAM frame.
+sequence of type-length-value tuples that new HTTP Upgrade Tokens (see {{Section
+16.7 of ?HTTP=I-D.ietf-httpbis-semantics}}) can choose to use. It allows
+endpoints to reliably communicate request-related information end-to-end on HTTP
+request streams, even in the presence of HTTP intermediaries. The Capsule
+Protocol can be used to exchange HTTP Datagrams when HTTP is running over a
+transport that does not support the QUIC DATAGRAM frame.
 
 This specification defines the "data stream" of an HTTP request as the
 bidirectional stream of bytes that follow the headers in both directions. In
