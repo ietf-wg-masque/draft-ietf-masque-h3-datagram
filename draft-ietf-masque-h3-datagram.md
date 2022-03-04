@@ -605,10 +605,13 @@ STREAM(44): HEADERS            -------->
 # Acknowledgments {#acks}
 {:numbered="false"}
 
-The DATAGRAM context identifier was previously part of the DATAGRAM frame
+Portions of this document were previously part of the QUIC DATAGRAM frame
 definition itself, the authors would like to acknowledge the authors of that
 document and the members of the IETF MASQUE working group for their suggestions.
 Additionally, the authors would like to thank Martin Thomson for suggesting the
 use of an HTTP/3 SETTINGS parameter. Furthermore, the authors would like to
 thank Ben Schwartz for writing the first proposal that used two layers of
-indirection.
+indirection. The final design in this document came out of the HTTP Datagrams
+Design Team, whose members were Alan Frindell, Alex Chernyakhovsky, Ben
+Schwartz, Eric Rescorla, Marcus Ihlar, Martin Thomson, Mike Bishop, Tommy Pauly,
+Victor Vasiliev, and the authors of this document.
