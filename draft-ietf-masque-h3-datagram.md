@@ -533,12 +533,12 @@ empty.
 Registrations follow the "First Come First Served" policy (see Section 4.4 of
 {{!IANA-POLICY=RFC8126}}) where two registrations MUST NOT have the same Type.
 
-This registry initially contains the following entries:
+This registry initially contains the following entry:
 
 | Capsule Type                 |   Value   | Specification |
 |:-----------------------------|:----------|:--------------|
 | DATAGRAM                     | 0xff37a5  | This Document |
-{: #iana-types-table title="Initial Capsule Types Registry Entries"}
+{: #iana-types-table title="Initial Capsule Types Registry"}
 
 Capsule types with a value of the form 41 * N + 23 for integer values of N are
 reserved to exercise the requirement that unknown capsule types be ignored.
