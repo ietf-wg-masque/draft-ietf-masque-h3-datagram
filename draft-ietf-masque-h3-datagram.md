@@ -537,7 +537,7 @@ This registry initially contains the following entries:
 
 | Capsule Type                 |   Value   | Specification |
 |:-----------------------------|:----------|:--------------|
-| DATAGRAM                     | 0xff37a0  | This Document |
+| DATAGRAM                     | 0xff37a5  | This Document |
 {: #iana-types-table title="Initial Capsule Types Registry Entries"}
 
 Capsule types with a value of the form 41 * N + 23 for integer values of N are
