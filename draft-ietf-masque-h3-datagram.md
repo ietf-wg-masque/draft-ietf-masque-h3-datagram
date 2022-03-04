@@ -129,8 +129,8 @@ received associated datagrams.
 
 If an HTTP/3 datagram is received and its Quarter Stream ID maps to a stream
 that has not yet been created, the receiver SHALL either drop that datagram
-silently or buffer it temporarily while awaiting the creation of the
-corresponding stream.
+silently or buffer it temporarily (on the order of a round trip) while awaiting
+the creation of the corresponding stream.
 
 If an HTTP/3 datagram is received and its Quarter Stream ID maps to a stream
 that cannot be created due to client-initiated bidirectional stream limits, it
