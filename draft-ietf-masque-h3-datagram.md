@@ -551,6 +551,8 @@ values.
 
 # Examples
 
+\[\[RFC editor: please remove this appendix before publication.]]
+
 ## CONNECT-UDP
 
 ~~~
