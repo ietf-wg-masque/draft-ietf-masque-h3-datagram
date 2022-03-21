@@ -549,59 +549,6 @@ values.
 
 --- back
 
-# Examples
-
-\[\[RFC editor: please remove this appendix before publication.]]
-
-## CONNECT-UDP
-
-~~~
-Client                                             Server
-
-STREAM(44): HEADERS             -------->
-  :method = CONNECT
-  :protocol = connect-udp
-  :scheme = https
-  :path = /target.example.org/443/
-  :authority = proxy.example.org:443
-  capsule-protocol = ?1
-
-DATAGRAM                        -------->
-  Quarter Stream ID = 11
-  Payload = Encapsulated UDP Payload
-
-           <--------  STREAM(44): HEADERS
-                        :status = 200
-                        capsule-protocol = ?1
-
-/* Wait for target server to respond to UDP packet. */
-
-           <--------  DATAGRAM
-                        Quarter Stream ID = 11
-                        Payload = Encapsulated UDP Payload
-~~~
-
-
-## WebTransport
-
-~~~
-Client                                             Server
-
-STREAM(44): HEADERS            -------->
-  :method = CONNECT
-  :scheme = https
-  :protocol = webtransport
-  :path = /hello
-  :authority = webtransport.example.org:443
-  origin = https://www.example.org:443
-
-           <--------  STREAM(44): HEADERS
-                        :status = 200
-
-/* Both endpoints can now send WebTransport datagrams. */
-~~~
-
-
 # Acknowledgments {#acks}
 {:numbered="false"}
 
