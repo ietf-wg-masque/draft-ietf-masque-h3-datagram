@@ -535,10 +535,17 @@ Registrations follow the "First Come First Served" policy (see Section 4.4 of
 
 This registry initially contains the following entry:
 
-| Capsule Type                 |   Value   | Specification |
-|:-----------------------------|:----------|:--------------|
-| DATAGRAM                     | 0xff37a5  | This Document |
-{: #iana-types-table title="Initial Capsule Types Registry"}
+Capsule Type:
+
+: DATAGRAM
+
+Value:
+
+: 0xff37a5 (note that this will switch to a lower value before publication)
+
+Reference:
+
+: This document
 
 Capsule types with a value of the form 41 * N + 23 for integer values of N are
 reserved to exercise the requirement that unknown capsule types be ignored.
