@@ -395,8 +395,6 @@ Intermediaries MAY use this header field to allow processing of HTTP Datagrams
 for unknown HTTP Upgrade Tokens; note that this is only possible for HTTP
 Upgrade or Extended CONNECT.
 
-The Capsule-Protocol header field MUST NOT be sent multiple times on a message.
-
 The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
 status code different from 2xx (Successful). This specification does not define
 any parameters for the Capsule-Protocol header field value, but future documents
