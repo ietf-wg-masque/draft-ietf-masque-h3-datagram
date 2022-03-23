@@ -31,11 +31,13 @@ author:
 
 --- abstract
 
-This document describes the HTTP Capsule Protocol, a convention for conveying multiplexed,
-bidirectional datagrams inside a HTTP connection. It is intended for use by HTTP extensions (such
-as the CONNECT method), and is compatible with all versions of HTTP. When the underlying transport
-protocol supports unreliable delivery (such as when the QUICK DATAGRAM extension is available in
+This document describes the HTTP Capsule Protocol, a convention for conveying
+multiplexed, bidirectional datagrams inside a HTTP connection. It is intended
+for use by HTTP extensions (such as the CONNECT method), and is compatible with
+all versions of HTTP. When the underlying transport protocol supports
+unreliable delivery (such as when the QUICK DATAGRAM extension is available in
 HTTP/3), it uses that capability.
+
 
 --- middle
 
