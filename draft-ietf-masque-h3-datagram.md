@@ -1,6 +1,6 @@
 ---
-title: Using Datagrams with HTTP
-abbrev: HTTP Datagrams
+title: The HTTP Capsule Protocol
+abbrev: HTTP Capsule Protocol
 docname: draft-ietf-masque-h3-datagram-latest
 submissiontype: IETF
 category: std
@@ -31,14 +31,11 @@ author:
 
 --- abstract
 
-The QUIC DATAGRAM extension provides application protocols running over QUIC
-with a mechanism to send unreliable data while leveraging the security and
-congestion-control properties of QUIC. However, QUIC DATAGRAM frames do not
-provide a means to demultiplex application contexts. This document describes how
-to use QUIC DATAGRAM frames with HTTP/3 by association with HTTP requests.
-Additionally, this document defines the Capsule Protocol that can convey
-datagrams over prior versions of HTTP.
-
+This document describes the HTTP Capsule Protocol, a convention for conveying multiplexed,
+bidirectional datagrams inside a HTTP connection. It is intended for use by HTTP extensions (such
+as the CONNECT method), and is compatible with all versions of HTTP. When the underlying transport
+protocol supports unreliable delivery (such as when the QUICK DATAGRAM extension is available in
+HTTP/3), it uses that capability.
 
 --- middle
 
