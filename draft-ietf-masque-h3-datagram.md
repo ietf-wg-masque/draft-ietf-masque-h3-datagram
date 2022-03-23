@@ -384,11 +384,15 @@ stream was truncated, this MUST be treated as a malformed or incomplete message.
 ## The Capsule-Protocol Header Field {#hdr}
 
 The "Capsule-Protocol" header field is an Item Structured Field, see {{Section
-3.3 of !STRUCT-FIELD=RFC8941}}; its value MUST be a Boolean.
+3.3 of !STRUCT-FIELD=RFC8941}}; its value MUST be a Boolean; any other value
+type MUST be handled as if the field were not present by recipients. This
+document does not define any parameters for the Capsule-Protocol header
+field value, but future documents might define parameters. Receivers MUST ignore
+unknown parameters.
 
 Endpoints indicate that the Capsule Protocol is in use on a data stream by
-sending a Capsule-Protocol header field with a value of ?1. A Capsule-Protocol
-header field with a value of ?0 has the same semantics as when the header is not
+sending a Capsule-Protocol header field with a true value. A Capsule-Protocol
+header field with a false value has the same semantics as when the header is not
 present.
 
 Intermediaries MAY use this header field to allow processing of HTTP Datagrams
@@ -396,9 +400,7 @@ for unknown HTTP Upgrade Tokens; note that this is only possible for HTTP
 Upgrade or Extended CONNECT.
 
 The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
-status code different from 2xx (Successful). This specification does not define
-any parameters for the Capsule-Protocol header field value, but future documents
-MAY define parameters. Receivers MUST ignore unknown parameters.
+status code outside the 2xx range.
 
 Definitions of new HTTP Upgrade Tokens that use the Capsule Protocol MAY use the
 Capsule-Protocol header field to simplify intermediary processing.
