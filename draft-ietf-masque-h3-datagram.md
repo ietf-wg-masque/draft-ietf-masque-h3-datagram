@@ -53,7 +53,7 @@ Both are intended for use by HTTP extensions, not applications.
 
 HTTP extensions sometimes need to access underlying transport protocol features
 such as unreliable delivery (as offered by {{!DGRAM=I-D.ietf-quic-datagram}})
-to enable desirable features like an unreliable version of the CONNECT method,
+to enable desirable features like an unreliable equivalent to the CONNECT method,
 and unreliable delivery in WebSockets {{?RFC6455}} (or its successors).
 
 In {{datagrams}}, this document describes HTTP Datagrams, a convention for
