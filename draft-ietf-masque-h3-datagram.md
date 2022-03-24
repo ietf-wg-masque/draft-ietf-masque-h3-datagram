@@ -75,9 +75,9 @@ HTTP Datagrams are a convention for conveying bidirectional and potentially
 unreliable datagrams inside an HTTP connection, with multiplexing when
 possible. All HTTP Datagrams are associated with an HTTP request.
 
-When HTTP Datagrams are conveyed on a HTTP/3 connection, the QUIC DATAGRAM
+When HTTP Datagrams are conveyed on an HTTP/3 connection, the QUIC DATAGRAM
 frame can be used to achieve these goals, including unreliable delivery; see
-{{format}}. Negotiation is achieved using a SETTING; see {{setting}}.
+{{format}}. Negotiation is achieved using a setting; see {{setting}}.
 
 When running over HTTP/2, demultiplexing is provided by the HTTP/2 framing
 layer, but unreliable delivery is unavailable. HTTP Datagrams are negotiated
