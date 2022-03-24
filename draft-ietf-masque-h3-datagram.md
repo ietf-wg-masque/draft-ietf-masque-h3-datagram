@@ -81,10 +81,13 @@ coexist on a given QUIC connection. To allow this, the QUIC DATAGRAM frame
 payload starts with an encoded stream identifier that associates the datagram
 with a request stream.
 
-When running over HTTP/2, demultiplexing is provided by the HTTP/2 framing
-layer. When running over HTTP/1, requests are strictly serialized in the
-connection, therefore demultiplexing is not needed.
+When running over HTTP/2, demultiplexing is provided by the HTTP/2 framing layer. 
 
+When running over HTTP/1, upgrading the connection to convay HTTP datagrams
+prevents other uses of the connection and, therefore, multiplexing with
+other requests is not possible. Unreliable delivery is likewise not available.
+HTTP Datagrams are negotiated and conveyed using the Capsule Protocol;
+see {{datagram-capsule}}.
 
 # HTTP/3 Datagram Format {#format}
 
