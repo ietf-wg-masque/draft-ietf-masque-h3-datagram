@@ -352,8 +352,9 @@ Upgrade or Extended CONNECT.
 The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
 status code outside the 2xx range.
 
-Definitions of new HTTP Upgrade Tokens that use the Capsule Protocol MAY use the
-Capsule-Protocol header field to simplify intermediary processing.
+HTTP endpoints SHOULD use the Capsule-Protocol header field to simplify
+intermediary processing. Definitions of new HTTP Upgrade Tokens that use the
+Capsule Protocol MAY alter this recommendation.
 
 
 ## The DATAGRAM Capsule {#datagram-capsule}
