@@ -359,7 +359,7 @@ Capsule-Protocol header field to simplify intermediary processing.
 ## The DATAGRAM Capsule {#datagram-capsule}
 
 This document defines the DATAGRAM capsule type (see {{iana-types}} for the
-value of the capsule type). This capsule allows HTTP Datagram to be sent on a
+value of the capsule type). This capsule allows HTTP Datagrams to be sent on a
 stream using the Capsule Protocol. This is particularly useful when HTTP is
 running over a transport that does not support the QUIC DATAGRAM frame.
 
