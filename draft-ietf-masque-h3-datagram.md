@@ -60,9 +60,9 @@ HTTP. When the underlying transport protocol supports unreliable delivery (such
 as when the QUIC DATAGRAM extension is available in HTTP/3), they can use that
 capability.
 
-It also describes the HTTP Capsule Protocol in {{capsule}}, to allow conveyance
-of HTTP Datagrams when the QUIC DATAGRAM frame is unavailable or undesirable,
-such as when earlier versions of HTTP are in use.
+This document also describes the HTTP Capsule Protocol in {{capsule}}, to allow
+conveyance of HTTP Datagrams when the QUIC DATAGRAM frame is unavailable or
+undesirable, such as when earlier versions of HTTP are in use.
 
 
 ## Conventions and Definitions {#defs}
@@ -113,7 +113,7 @@ HTTP/3 Datagram {
   HTTP Datagram Payload (..),
 }
 ~~~
-{: #h3-datagram-format title="HTTP/3 DATAGRAM Format"}
+{: #h3-datagram-format title="HTTP/3 Datagram Format"}
 
 Quarter Stream ID:
 
@@ -123,8 +123,8 @@ division by four stems from the fact that HTTP requests are sent on
 client-initiated bidirectional streams, and those have stream IDs that are
 divisible by four). The largest legal QUIC stream ID value is 2<sup>62</sup>-1,
 so the largest legal value of Quarter Stream ID is 2<sup>60</sup>-1. Receipt of
-a frame that includes a larger value MUST be treated as an HTTP/3 connection
-error of type H3_DATAGRAM_ERROR.
+an HTTP/3 Datagram that includes a larger value MUST be treated as an HTTP/3
+connection error of type H3_DATAGRAM_ERROR.
 
 HTTP Datagram Payload:
 
@@ -352,9 +352,9 @@ Upgrade or Extended CONNECT.
 The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
 status code outside the 2xx range.
 
-HTTP endpoints SHOULD use the Capsule-Protocol header field to simplify
-intermediary processing. Definitions of new HTTP Upgrade Tokens that use the
-Capsule Protocol MAY alter this recommendation.
+When using the Capsule Protocol, HTTP endpoints SHOULD send the Capsule-Protocol
+header field to simplify intermediary processing. Definitions of new HTTP
+Upgrade Tokens that use the Capsule Protocol MAY alter this recommendation.
 
 
 ## The DATAGRAM Capsule {#datagram-capsule}
@@ -407,19 +407,19 @@ suffering any loss; this can misrepresent the true path properties, defeating
 methods such as DPLPMTUD.
 
 While DATAGRAM capsules can theoretically carry a payload of length
-2<sup>62</sup>-1, most applications will have their own limits on what datagram
-payload sizes are practical. Implementations SHOULD take those limits into
-account when parsing DATAGRAM capsules: if an incoming DATAGRAM capsule has a
-length that is known to be so large as to not be usable, the implementation
-SHOULD discard the capsule without buffering its contents into memory.
+2<sup>62</sup>-1, most HTTP extensions that use HTTP Datagrams will have their
+own limits on what datagram payload sizes are practical. Implementations SHOULD
+take those limits into account when parsing DATAGRAM capsules: if an incoming
+DATAGRAM capsule has a length that is known to be so large as to not be usable,
+the implementation SHOULD discard the capsule without buffering its contents
+into memory.
 
 Note that use of the Capsule Protocol is not required to use HTTP Datagrams. If
-a new HTTP Upgrade Token is only defined over transports that support QUIC
-DATAGRAM frames, they might not need a stream encoding. Additionally,
-definitions of new HTTP Upgrade Tokens can use HTTP Datagrams with their own
-data stream protocol. However, definitions of new HTTP Upgrade Tokens that wish
-to use HTTP Datagrams SHOULD use the Capsule Protocol unless they have a good
-reason not to.
+an HTTP extension that uses HTTP Datagrams is only defined over transports that
+support QUIC DATAGRAM frames, it might not need a stream encoding. Additionally,
+HTTP extensions can use HTTP Datagrams with their own data stream protocol.
+However, new HTTP extensions that wish to use HTTP Datagrams SHOULD use the
+Capsule Protocol unless they have a good reason not to.
 
 
 # Security Considerations {#security}
