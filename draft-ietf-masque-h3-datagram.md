@@ -3,29 +3,46 @@ title: HTTP Datagrams and the Capsule Protocol
 abbrev: HTTP Datagrams
 docname: draft-ietf-masque-h3-datagram-latest
 submissiontype: IETF
-category: std
-wg: MASQUE
-
 ipr: trust200902
-keyword: Internet-Draft
-
+category: std
 stand_alone: yes
 pi: [toc, sortrefs, symrefs]
-
+area: Transport
+wg: MASQUE
+number:
+date:
+consensus:
+venue:
+  group: "MASQUE"
+  type: "Working Group"
+  mail: "masque@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/masque/"
+  github: "ietf-wg-masque/draft-ietf-masque-h3-datagram"
+  latest: "https://ietf-wg-masque.github.io/draft-ietf-masque-h3-datagram/draft-ietf-masque-h3-datagram.html"
+keyword:
+  - quic
+  - http
+  - datagram
+  - fast
+  - tunnels
+  - turtles all the way down
+  - masque
+  - http-ng
 author:
- -
-    ins: "D. Schinazi"
-    name: "David Schinazi"
-    organization: "Google LLC"
-    street: "1600 Amphitheatre Parkway"
-    city: "Mountain View, California 94043"
-    country: "United States of America"
+  -
+    ins: D. Schinazi
+    name: David Schinazi
+    org: Google LLC
+    street: 1600 Amphitheatre Parkway
+    city: Mountain View
+    region: CA
+    code: 94043
+    country: United States of America
     email: dschinazi.ietf@gmail.com
-
- -
-    ins: "L. Pardue"
-    name: "Lucas Pardue"
-    organization: "Cloudflare"
+  -
+    ins: L. Pardue
+    name: Lucas Pardue
+    organization: Cloudflare
     email: lucaspardue.24.7@gmail.com
 
 
@@ -444,15 +461,12 @@ This document will request IANA to register the following entry in the
 "HTTP/3 Settings" registry:
 
 Value:
-
 : 0xffd277 (note that this will switch to a lower value before publication)
 
 Setting Name:
-
 : H3_DATAGRAM
 
 Default:
-
 : 0
 
 Status:
@@ -460,16 +474,14 @@ Status:
 : provisional (permanent if this document is approved)
 
 Specification:
-
 : This Document
 
 Change Controller:
-
 : IETF
 
 Contact:
-
 : HTTP_WG; HTTP working group; ietf-http-wg@w3.org
+{: spacing="compact"}
 
 
 ## HTTP/3 Error Code {#iana-error}
@@ -478,32 +490,26 @@ This document will request IANA to register the following entry in the
 "HTTP/3 Error Codes" registry:
 
 Value:
-
 : 0x4A1268 (note that this will switch to a lower value before publication)
 
 Name:
-
 : H3_DATAGRAM_ERROR
 
 Description:
-
 : Datagram or capsule protocol parse error
 
 Status:
-
 : provisional (permanent if this document is approved)
 
 Specification:
-
 : This Document
 
 Change Controller:
-
 : IETF
 
 Contact:
-
 : HTTP_WG; HTTP working group; ietf-http-wg@w3.org
+{: spacing="compact"}
 
 
 ## HTTP Header Field Name {#iana-hdr}
@@ -512,24 +518,21 @@ This document will request IANA to register the following entry in the "HTTP
 Field Name" registry:
 
 Field Name:
-
 : Capsule-Protocol
 
 Template:
-
 : None
 
 Status:
-
 : provisional (permanent if this document is approved)
 
 Reference:
-
 : This document
 
 Comments:
 
 : None
+{: spacing="compact"}
 
 
 ## Capsule Types {#iana-types}
@@ -539,18 +542,16 @@ Capsule Types" registry governs a 62-bit space. Registrations in this registry
 MUST include the following fields:
 
 Type:
-
 : A name or label for the capsule type.
 
 Value:
-
 : The value of the Capsule Type field (see {{capsule-protocol}}) is a 62-bit
 integer.
 
 Reference:
-
 : An optional reference to a specification for the type. This field MAY be
 empty.
+{: spacing="compact"}
 
 Registrations follow the "First Come First Served" policy (see Section 4.4 of
 {{!IANA-POLICY=RFC8126}}) where two registrations MUST NOT have the same Type.
@@ -558,16 +559,14 @@ Registrations follow the "First Come First Served" policy (see Section 4.4 of
 This registry initially contains the following entry:
 
 Capsule Type:
-
 : DATAGRAM
 
 Value:
-
 : 0xff37a5 (note that this will switch to a lower value before publication)
 
 Reference:
-
 : This document
+{: spacing="compact"}
 
 Capsule types with a value of the form 41 * N + 23 for integer values of N are
 reserved to exercise the requirement that unknown capsule types be ignored.
