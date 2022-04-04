@@ -56,6 +56,7 @@ normative:
     =: I-D.draft-ietf-quic-http
     display: HTTP/3
 
+
 --- abstract
 
 This document describes HTTP Datagrams, a convention for conveying multiplexed,
@@ -75,10 +76,10 @@ not applications.
 # Introduction {#intro}
 
 HTTP extensions sometimes need to access underlying transport protocol features
-such as unreliable delivery (as offered by {{!DGRAM=RFC9221}}) to
-enable desirable features. For example, this could allow introducing an
-unreliable version of the CONNECT method, or adding unreliable delivery to
-WebSockets {{?RFC6455}}.
+such as unreliable delivery (as offered by {{!DGRAM=RFC9221}}) to enable
+desirable features. For example, this could allow introducing an unreliable
+version of the CONNECT method, or adding unreliable delivery to WebSockets
+{{?RFC6455}}.
 
 In {{datagrams}}, this document describes HTTP Datagrams, a convention that
 supports the bidirectional and possibly multiplexed exchange of data inside an
@@ -348,9 +349,8 @@ violation of these requirements MUST treat the HTTP message as malformed.
 When an error occurs in processing the Capsule Protocol, the receiver MUST treat
 the message as malformed or incomplete, according to the underlying transport
 protocol. For HTTP/3, the handling of malformed messages is described in
-{{Section 4.1.3 of H3}}. For HTTP/2, the handling of
-malformed messages is described in {{Section 8.1.1 of
-H2}}. For HTTP/1.1, the handling of incomplete
+{{Section 4.1.3 of H3}}. For HTTP/2, the handling of malformed messages is
+described in {{Section 8.1.1 of H2}}. For HTTP/1.1, the handling of incomplete
 messages is described in {{Section 8 of H1}}.
 
 Each capsule's payload MUST contain exactly the fields identified in its
