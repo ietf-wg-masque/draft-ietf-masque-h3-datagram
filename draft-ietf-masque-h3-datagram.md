@@ -401,7 +401,7 @@ it is allowed to send an HTTP Datagram and how to process them from {{format}}
 also apply to HTTP Datagrams sent and received using the DATAGRAM capsule.
 
 An intermediary can reencode HTTP Datagrams as it forwards them. In other words,
-an intermediary MAY send a DATAGRAM capsule to forward an HTTP Datagram which
+an intermediary MAY send a DATAGRAM capsule to forward an HTTP Datagram that
 was received in a QUIC DATAGRAM frame, and vice versa. Intermediaries MUST NOT
 perform this reencoding unless they have identified the use of the Capsule
 Protocol on the corresponding request stream; see {{capsule-protocol}}.
