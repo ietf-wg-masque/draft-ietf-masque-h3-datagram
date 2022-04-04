@@ -75,13 +75,17 @@ supports the bidirectional and possibly multiplexed exchange of data inside an
 HTTP connection. While HTTP datagrams are associated with HTTP requests, they
 are not part of message content; instead, they are intended for use by HTTP
 extensions (such as the CONNECT method), and are compatible with all versions of
-HTTP. When the underlying transport protocol supports unreliable delivery (such
-as when the QUIC DATAGRAM extension is available in HTTP/3), they can use that
-capability.
+HTTP.
+
+When HTTP is running over a transport protocol that supports unreliable
+delivery (such as when the QUIC DATAGRAM extension is available to HTTP/3), HTTP
+Datagrams can use that capability.
 
 This document also describes the HTTP Capsule Protocol in {{capsule}}, to allow
-conveyance of HTTP Datagrams when the QUIC DATAGRAM frame is unavailable or
-undesirable, such as when earlier versions of HTTP are in use.
+conveyance of HTTP Datagrams using reliable delivery. This addresses HTTP/3
+cases where use of the QUIC DATAGRAM frame is unavailable or undesirable, or
+where the transport protocol only provides reliable delivery, such as with
+HTTP/1 or HTTP/2 over TCP.
 
 
 ## Conventions and Definitions {#defs}
