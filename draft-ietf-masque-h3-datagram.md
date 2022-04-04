@@ -343,10 +343,10 @@ identified fields or a capsule payload that terminates before the end of the
 identified fields MUST be treated as a malformed or incomplete message. In
 particular, redundant length encodings MUST be verified to be self-consistent.
 
-If a stream carrying capsules terminates cleanly (for example, in HTTP/3 this is
-defined as receiving a QUIC STREAM frame with the FIN bit set) and the last
-capsule on the stream was truncated, this MUST be treated as a malformed or
-incomplete message.
+If the receive side of a stream carrying capsules terminates cleanly (for
+example, in HTTP/3 this is defined as receiving a QUIC STREAM frame with the FIN
+bit set) and the last capsule on the stream was truncated, this MUST be treated
+as a malformed or incomplete message.
 
 
 ## The Capsule-Protocol Header Field {#hdr}
