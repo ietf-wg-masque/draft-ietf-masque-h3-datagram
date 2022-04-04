@@ -181,7 +181,8 @@ Implementations of HTTP/3 that support HTTP Datagrams can indicate that to
 their peer by sending the H3_DATAGRAM SETTINGS parameter with a value of 1.
 
 The value of the H3_DATAGRAM SETTINGS parameter MUST be either 0 or 1. A value
-of 0 indicates that HTTP Datagrams are not supported. If the H3_DATAGRAM
+of 0 indicates that HTTP Datagrams are generally supported by the peer but not 
+used by this HTTP connection. If the H3_DATAGRAM
 SETTINGS parameter is received with a value that is neither 0 or 1, the receiver
 MUST terminate the connection with error H3_SETTINGS_ERROR.
 
