@@ -76,7 +76,7 @@ are not part of message content; instead, they are intended for use by HTTP
 extensions (such as the CONNECT method), and are compatible with all versions of
 HTTP.
 
-When HTTP is based on top of a transport protocol that supports unreliable
+When HTTP is running over a transport protocol that supports unreliable
 delivery (such as when the QUIC DATAGRAM extension is available to HTTP/3), HTTP
 Datagrams can use that capability.
 
