@@ -213,7 +213,7 @@ avoid "sticking out"; see {{security}}.
 \[\[RFC editor: please remove this section before publication.]]
 
 Some revisions of this draft specification use a different value (the Identifier
-field of a parameter in the HTTP/3 SETTINGS frame) for the SETTINGS_H3_DATAGRAM
+field of a Setting in the HTTP/3 SETTINGS frame) for the SETTINGS_H3_DATAGRAM
 setting. This allows new draft revisions to make incompatible changes. Multiple
 draft versions MAY be supported by sending multiple values for
 SETTINGS_H3_DATAGRAM. Once SETTINGS have been sent and received, an
