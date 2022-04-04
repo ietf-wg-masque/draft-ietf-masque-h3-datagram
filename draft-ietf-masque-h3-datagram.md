@@ -176,34 +176,34 @@ extensions MAY define how to prioritize datagrams, and MAY define signaling to
 allow communicating prioritization preferences.
 
 
-### The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
+### The SETTINGS_H3_DATAGRAM HTTP/3 Setting {#setting}
 
 Implementations of HTTP/3 that are willing to receive HTTP Datagrams can
-indicate that to their peer by sending the H3_DATAGRAM SETTINGS parameter with a
+indicate that to their peer by sending the SETTINGS_H3_DATAGRAM setting with a
 value of 1.
 
-The value of the H3_DATAGRAM SETTINGS parameter MUST be either 0 or 1. A value
+The value of the SETTINGS_H3_DATAGRAM setting MUST be either 0 or 1. A value
 of 0 indicates that the implementation is not willing to receive HTTP Datagrams.
-If the H3_DATAGRAM SETTINGS parameter is received with a value that is neither 0
+If the SETTINGS_H3_DATAGRAM setting is received with a value that is neither 0
 or 1, the receiver MUST terminate the connection with error H3_SETTINGS_ERROR.
 
-QUIC DATAGRAM frames MUST NOT be sent until the H3_DATAGRAM SETTINGS parameter
+QUIC DATAGRAM frames MUST NOT be sent until the SETTINGS_H3_DATAGRAM setting
 has been both sent and received with a value of 1.
 
-When clients use 0-RTT, they MAY store the value of the server's H3_DATAGRAM
-SETTINGS parameter. Doing so allows the client to send QUIC DATAGRAM frames in
-0-RTT packets. When servers decide to accept 0-RTT data, they MUST send a
-H3_DATAGRAM SETTINGS parameter greater than or equal to the value they sent to
-the client in the connection where they sent them the NewSessionTicket message.
-If a client stores the value of the H3_DATAGRAM SETTINGS parameter with their
-0-RTT state, they MUST validate that the new value of the H3_DATAGRAM SETTINGS
-parameter sent by the server in the handshake is greater than or equal to the
-stored value; if not, the client MUST terminate the connection with error
-H3_SETTINGS_ERROR. In all cases, the maximum permitted value of the H3_DATAGRAM
-SETTINGS parameter is 1.
+When clients use 0-RTT, they MAY store the value of the server's
+SETTINGS_H3_DATAGRAM setting. Doing so allows the client to send QUIC DATAGRAM
+frames in 0-RTT packets. When servers decide to accept 0-RTT data, they MUST
+send a SETTINGS_H3_DATAGRAM setting greater than or equal to the value they sent
+to the client in the connection where they sent them the NewSessionTicket
+message. If a client stores the value of the SETTINGS_H3_DATAGRAM setting with
+their 0-RTT state, they MUST validate that the new value of the
+SETTINGS_H3_DATAGRAM setting sent by the server in the handshake is greater than
+or equal to the stored value; if not, the client MUST terminate the connection
+with error H3_SETTINGS_ERROR. In all cases, the maximum permitted value of the
+SETTINGS_H3_DATAGRAM setting parameter is 1.
 
 It is RECOMMENDED that implementations that support receiving HTTP Datagrams
-using QUIC always send the H3_DATAGRAM SETTINGS parameter with a value of 1,
+using QUIC always send the SETTINGS_H3_DATAGRAM setting with a value of 1,
 even if the application does not intend to use HTTP Datagrams. This helps to
 avoid "sticking out"; see {{security}}.
 
@@ -213,14 +213,14 @@ avoid "sticking out"; see {{security}}.
 \[\[RFC editor: please remove this section before publication.]]
 
 Some revisions of this draft specification use a different value (the Identifier
-field of a Setting in the HTTP/3 SETTINGS frame) for the H3_DATAGRAM Settings
-Parameter. This allows new draft revisions to make incompatible changes.
-Multiple draft versions MAY be supported by sending multiple values for
-H3_DATAGRAM. Once SETTINGS have been sent and received, an implementation that
-supports multiple drafts MUST compute the intersection of the values it has sent
-and received, and then it MUST select and use the most recent draft version from
-the intersection set. This ensures that both peers negotiate the same draft
-version.
+field of a parameter in the HTTP/3 SETTINGS frame) for the SETTINGS_H3_DATAGRAM
+setting. This allows new draft revisions to make incompatible changes. Multiple
+draft versions MAY be supported by sending multiple values for
+SETTINGS_H3_DATAGRAM. Once SETTINGS have been sent and received, an
+implementation that supports multiple drafts MUST compute the intersection of
+the values it has sent and received, and then it MUST select and use the most
+recent draft version from the intersection set. This ensures that both peers
+negotiate the same draft version.
 
 
 ## HTTP Datagrams using Capsules
@@ -447,12 +447,13 @@ Capsule Protocol unless they have a good reason not to.
 
 # Security Considerations {#security}
 
-Since transmitting HTTP Datagrams using QUIC DATAGRAM frames requires sending an
-HTTP/3 Settings parameter, it "sticks out". In other words, probing clients can
-learn whether a server supports HTTP Datagrams over QUIC DATAGRAM frames. As
-some servers might wish to obfuscate the fact that they offer application
-services that use HTTP datagrams, it's best for all implementations that support
-this feature to always send this Settings parameter, see {{setting}}.
+Since transmitting HTTP Datagrams using QUIC DATAGRAM frames requires sending
+the HTTP/3 SETTINGS_H3_DATAGRAM setting, it "sticks out". In other words,
+probing clients can learn whether a server supports HTTP Datagrams over QUIC
+DATAGRAM frames. As some servers might wish to obfuscate the fact that they
+offer application services that use HTTP datagrams, it's best for all
+implementations that support this feature to always send this setting, see
+{{setting}}.
 
 Since use of the Capsule Protocol is restricted to new HTTP Upgrade Tokens, it
 is not accessible from Web Platform APIs (such as those commonly accessed via
@@ -461,7 +462,7 @@ JavaScript in web browsers).
 
 # IANA Considerations {#iana}
 
-## HTTP/3 SETTINGS Parameter {#iana-setting}
+## HTTP/3 Setting {#iana-setting}
 
 This document will request IANA to register the following entry in the
 "HTTP/3 Settings" registry:
@@ -470,7 +471,7 @@ Value:
 : 0xffd277 (note that this will switch to a lower value before publication)
 
 Setting Name:
-: H3_DATAGRAM
+: SETTINGS_H3_DATAGRAM
 
 Default:
 : 0
@@ -590,7 +591,7 @@ Portions of this document were previously part of the QUIC DATAGRAM frame
 definition itself, the authors would like to acknowledge the authors of that
 document and the members of the IETF MASQUE working group for their suggestions.
 Additionally, the authors would like to thank Martin Thomson for suggesting the
-use of an HTTP/3 SETTINGS parameter. Furthermore, the authors would like to
+use of an HTTP/3 setting. Furthermore, the authors would like to
 thank Ben Schwartz for writing the first proposal that used two layers of
 indirection. The final design in this document came out of the HTTP Datagrams
 Design Team, whose members were Alan Frindell, Alex Chernyakhovsky, Ben
