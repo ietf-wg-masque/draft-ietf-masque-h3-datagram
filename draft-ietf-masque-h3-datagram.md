@@ -45,6 +45,16 @@ author:
     organization: Cloudflare
     email: lucaspardue.24.7@gmail.com
 
+normative:
+  H1:
+    =: I-D.draft-ietf-httpbis-messaging
+    display: HTTP/1.1
+  H2:
+    =: I-D.draft-ietf-httpbis-http2bis
+    display: HTTP/2
+  H3:
+    =: I-D.draft-ietf-quic-http
+    display: HTTP/3
 
 --- abstract
 
@@ -65,7 +75,7 @@ not applications.
 # Introduction {#intro}
 
 HTTP extensions sometimes need to access underlying transport protocol features
-such as unreliable delivery (as offered by {{!DGRAM=I-D.ietf-quic-datagram}}) to
+such as unreliable delivery (as offered by {{!DGRAM=RFC9221}}) to
 enable desirable features. For example, this could allow introducing an
 unreliable version of the CONNECT method, or adding unreliable delivery to
 WebSockets {{?RFC6455}}.
@@ -338,10 +348,10 @@ violation of these requirements MUST treat the HTTP message as malformed.
 When an error occurs in processing the Capsule Protocol, the receiver MUST treat
 the message as malformed or incomplete, according to the underlying transport
 protocol. For HTTP/3, the handling of malformed messages is described in
-{{Section 4.1.3 of !H3=I-D.draft-ietf-quic-http}}. For HTTP/2, the handling of
+{{Section 4.1.3 of H3}}. For HTTP/2, the handling of
 malformed messages is described in {{Section 8.1.1 of
-!H2=I-D.draft-ietf-httpbis-http2bis}}. For HTTP/1.1, the handling of incomplete
-messages is described in {{Section 8 of !H1=I-D.draft-ietf-httpbis-messaging}}.
+H2}}. For HTTP/1.1, the handling of incomplete
+messages is described in {{Section 8 of H1}}.
 
 Each capsule's payload MUST contain exactly the fields identified in its
 description. A capsule payload that contains additional bytes after the
