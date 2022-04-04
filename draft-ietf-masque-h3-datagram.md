@@ -65,9 +65,10 @@ not applications.
 # Introduction {#intro}
 
 HTTP extensions sometimes need to access underlying transport protocol features
-such as unreliable delivery (as offered by {{!DGRAM=I-D.ietf-quic-datagram}})
-to enable desirable features like an unreliable version of the CONNECT method,
-and unreliable delivery in WebSockets {{?RFC6455}} (or its successors).
+such as unreliable delivery (as offered by {{!DGRAM=I-D.ietf-quic-datagram}}) to
+enable desirable features. For example, this could allow introducing an
+unreliable version of the CONNECT method, or adding unreliable delivery to
+WebSockets {{?RFC6455}}.
 
 In {{datagrams}}, this document describes HTTP Datagrams, a convention that
 supports the bidirectional and possibly multiplexed exchange of data inside an
