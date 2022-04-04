@@ -106,16 +106,16 @@ and therefore demultiplexing is not available. Unreliable delivery is likewise
 not available. HTTP Datagrams are negotiated and conveyed using the Capsule
 Protocol; see {{datagram-capsule}}.
 
-HTTP Datagrams MUST only be sent with an association to a stream whose HTTP
-semantics explicitly supports HTTP Datagrams. For example, existing HTTP methods
-GET and POST do not define semantics for associated HTTP Datagrams; therefore,
-HTTP Datagrams cannot be sent associated with GET or POST request streams.
+HTTP Datagrams MUST only be sent with an association to an HTTP request that
+explicitly supports them. For example, existing HTTP methods GET and POST do not
+define semantics for associated HTTP Datagrams; therefore, HTTP Datagrams cannot
+be sent associated with GET or POST request streams.
 
-If an HTTP Datagram associated with a method that has no known semantics for
-HTTP Datagrams is received, the receiver MUST abort the corresponding stream; if
-HTTP/3 is in use, the stream MUST be aborted with H3_DATAGRAM_ERROR. HTTP
-extensions can override these requirements by defining a negotiation mechanism
-and semantics for HTTP Datagrams.
+If an HTTP Datagram is received and it is associated with a request that has no
+known semantics for HTTP Datagrams, the receiver MUST terminate the request; if
+HTTP/3 is in use, the request stream MUST be aborted with H3_DATAGRAM_ERROR.
+HTTP extensions can override these requirements by defining a negotiation
+mechanism and semantics for HTTP Datagrams.
 
 
 ## HTTP/3 Datagrams {#format}
