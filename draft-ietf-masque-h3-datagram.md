@@ -177,13 +177,14 @@ allow communicating prioritization preferences.
 
 ### The H3_DATAGRAM HTTP/3 SETTINGS Parameter {#setting}
 
-Implementations of HTTP/3 that support HTTP Datagrams can indicate that to
-their peer by sending the H3_DATAGRAM SETTINGS parameter with a value of 1.
+Implementations of HTTP/3 that are willing to receive HTTP Datagrams can
+indicate that to their peer by sending the H3_DATAGRAM SETTINGS parameter with a
+value of 1.
 
 The value of the H3_DATAGRAM SETTINGS parameter MUST be either 0 or 1. A value
-of 0 indicates that HTTP Datagrams are not supported. If the H3_DATAGRAM
-SETTINGS parameter is received with a value that is neither 0 or 1, the receiver
-MUST terminate the connection with error H3_SETTINGS_ERROR.
+of 0 indicates that the implementation is not willing to receive HTTP Datagrams.
+If the H3_DATAGRAM SETTINGS parameter is received with a value that is neither 0
+or 1, the receiver MUST terminate the connection with error H3_SETTINGS_ERROR.
 
 QUIC DATAGRAM frames MUST NOT be sent until the H3_DATAGRAM SETTINGS parameter
 has been both sent and received with a value of 1.
