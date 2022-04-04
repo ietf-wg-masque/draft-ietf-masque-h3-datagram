@@ -308,10 +308,10 @@ presence of the Capsule-Protocol header field ({{hdr}}) or by understanding the
 chosen HTTP Upgrade token.
 
 Because new protocols or extensions might define new capsule types,
-intermediaries that wish to allow for future extensibility SHOULD forward
+intermediaries MUST forward
 capsules without modification, unless the definition of the Capsule Type in use
 specifies additional intermediary processing. One such Capsule Type is the
-DATAGRAM capsule; see {{datagram-capsule}}. In particular, intermediaries SHOULD
+DATAGRAM capsule; see {{datagram-capsule}}. In particular, intermediaries MUST
 forward Capsules with an unknown Capsule Type without modification.
 
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
