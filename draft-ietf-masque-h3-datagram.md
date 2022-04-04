@@ -56,7 +56,8 @@ extension. When the QUIC DATAGRAM frame is unavailable or undesirable, they can
 be sent using the Capsule Protocol, a more general convention for conveying data
 in HTTP connections.
 
-Both are intended for use by HTTP extensions, not applications.
+HTTP Datagrams and the Capsule protocol are intended for use by HTTP extensions,
+not applications.
 
 
 --- middle
