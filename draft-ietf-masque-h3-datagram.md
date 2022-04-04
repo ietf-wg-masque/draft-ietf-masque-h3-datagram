@@ -155,8 +155,8 @@ H3_DATAGRAM_ERROR.
 HTTP/3 Datagrams MUST NOT be sent unless the corresponding stream's send side is
 open. Once the receive side of a stream is closed, incoming datagrams for this
 stream are no longer expected so related state can be released. State MAY be
-kept for a short time to account for reordering. Once the state is released, the
-received associated datagrams MUST be silently dropped.
+kept for a short time to account for reordering. If a datagram is received
+without associated state, the received datagrams MUST be silently dropped.
 
 If an HTTP/3 datagram is received and its Quarter Stream ID maps to a stream
 that has not yet been created, the receiver SHALL either drop that datagram
