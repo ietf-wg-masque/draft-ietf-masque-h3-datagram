@@ -456,8 +456,10 @@ using the Capsule Protocol. For example, if an HTTP extension that uses HTTP
 Datagrams is only defined over transports that support QUIC DATAGRAM frames, it
 might not need a stream encoding. Additionally, HTTP extensions can use HTTP
 Datagrams with their own data stream protocol. However, new HTTP extensions that
-wish to use HTTP Datagrams SHOULD use the Capsule Protocol unless they have a
-good reason not to.
+wish to use HTTP Datagrams SHOULD use the Capsule Protocol as failing to do so
+will make it harder for the HTTP extension to support versions of HTTP other
+than HTTP/3 and will prevent interoperability with intermediaries that only
+support the Capsule Protocol.
 
 
 # Security Considerations {#security}
