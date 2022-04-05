@@ -194,7 +194,7 @@ allow communicating prioritization preferences.
 ### The SETTINGS_H3_DATAGRAM HTTP/3 Setting {#setting}
 
 Endpoints can indicate to their peer that they are willing to receive HTTP/3
-Datagrams  by sending the SETTINGS_H3_DATAGRAM setting with a
+Datagrams by sending the SETTINGS_H3_DATAGRAM setting with a
 value of 1.
 
 The value of the SETTINGS_H3_DATAGRAM setting MUST be either 0 or 1. A value
