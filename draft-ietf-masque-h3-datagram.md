@@ -241,9 +241,7 @@ negotiate the same draft version.
 ## HTTP Datagrams using Capsules
 
 When HTTP/3 Datagrams are unavailable or undesirable, HTTP Datagrams can be sent
-using the Capsule Protocol, see {{datagram-capsule}}. Capsules can also be used
-to communicate reliable and bidirectional control messages associated with a
-datagram-based protocol even when HTTP/3 Datagrams are in use.
+using the Capsule Protocol, see {{datagram-capsule}}.
 
 
 # Capsules {#capsule}
@@ -260,7 +258,9 @@ can choose to use. It allows endpoints to reliably communicate request-related
 information end-to-end on HTTP request streams, even in the presence of HTTP
 intermediaries. The Capsule Protocol can be used to exchange HTTP Datagrams,
 which is necessary when HTTP is running over a transport that does not support
-the QUIC DATAGRAM frame.
+the QUIC DATAGRAM frame. The Capsule Protocol can also be used to communicate
+reliable and bidirectional control messages associated with a datagram-based
+protocol even when HTTP/3 Datagrams are in use.
 
 
 ## HTTP Data Streams {#data-stream}
