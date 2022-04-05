@@ -82,7 +82,7 @@ version of the CONNECT method, or adding unreliable delivery to WebSockets
 {{?RFC6455}}.
 
 In {{datagrams}}, this document describes HTTP Datagrams, a convention that
-supports the bidirectional and possibly multiplexed exchange of data inside an
+supports bidirectional and optionally multiplexed data exchange inside an
 HTTP connection. While HTTP datagrams are associated with HTTP requests, they
 are not part of message content; instead, they are intended for use by HTTP
 extensions (such as the CONNECT method), and are compatible with all versions of
@@ -193,8 +193,8 @@ allow communicating prioritization preferences.
 
 ### The SETTINGS_H3_DATAGRAM HTTP/3 Setting {#setting}
 
-Implementations of HTTP/3 that are willing to receive HTTP Datagrams can
-indicate that to their peer by sending the SETTINGS_H3_DATAGRAM setting with a
+Implementations that are willing to receive HTTP/3 Datagrams can indicate
+support to their peer by sending the SETTINGS_H3_DATAGRAM setting with a
 value of 1.
 
 The value of the SETTINGS_H3_DATAGRAM setting MUST be either 0 or 1. A value
@@ -217,9 +217,9 @@ or equal to the stored value; if not, the client MUST terminate the connection
 with error H3_SETTINGS_ERROR. In all cases, the maximum permitted value of the
 SETTINGS_H3_DATAGRAM setting parameter is 1.
 
-It is RECOMMENDED that implementations that support receiving HTTP Datagrams
+It is RECOMMENDED that implementations that support receiving HTTP/3 Datagrams
 using QUIC always send the SETTINGS_H3_DATAGRAM setting with a value of 1,
-even if the application does not intend to use HTTP Datagrams. This helps to
+even if the application does not intend to use HTTP/3 Datagrams. This helps to
 avoid "sticking out"; see {{security}}.
 
 
@@ -241,7 +241,9 @@ negotiate the same draft version.
 ## HTTP Datagrams using Capsules
 
 When HTTP/3 Datagrams are unavailable or undesirable, HTTP Datagrams can be sent
-using the Capsule Protocol, see {{datagram-capsule}}.
+using the Capsule Protocol, see {{datagram-capsule}}. Capsules can also be used
+to communicate reliable and bidirectional control messages associated with a
+datagram-based protocol even when HTTP/3 Datagrams are in use.
 
 
 # Capsules {#capsule}
@@ -456,7 +458,7 @@ an HTTP extension that uses HTTP Datagrams is only defined over transports that
 support QUIC DATAGRAM frames, it might not need a stream encoding. Additionally,
 HTTP extensions can use HTTP Datagrams with their own data stream protocol.
 However, new HTTP extensions that wish to use HTTP Datagrams SHOULD use the
-Capsule Protocol unless they have a good reason not to.
+Capsule Protocol in order to promote compatibility and interoperability.
 
 
 # Security Considerations {#security}
