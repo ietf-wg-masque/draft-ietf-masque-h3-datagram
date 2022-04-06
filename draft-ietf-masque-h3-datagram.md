@@ -336,8 +336,14 @@ forward Capsules with an unknown Capsule Type without modification.
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
 drop that Capsule and skip over it to parse the next Capsule.
 
-By virtue of the definition of the data stream, the Capsule Protocol is not in
-use on responses unless the response includes a 2xx (Successful) status code.
+By virtue of the definition of the data stream:
+
+* The Capsule Protocol is not in use unless the response includes a 2xx
+  (Successful) status code.
+
+* When the Capsule Protocol is in use, the associated HTTP request and response
+  do not carry HTTP content. A future extension MAY define a new capsule type to
+  carry HTTP content.
 
 The Capsule Protocol MUST NOT be used with messages that contain Content-Length,
 Content-Type, or Transfer-Encoding header fields. Additionally, HTTP status
@@ -453,12 +459,15 @@ DATAGRAM capsule has a length that is known to be so large as to not be usable,
 the implementation SHOULD discard the capsule without buffering its contents
 into memory.
 
-Note that use of the Capsule Protocol is not required to use HTTP Datagrams. If
-an HTTP extension that uses HTTP Datagrams is only defined over transports that
-support QUIC DATAGRAM frames, it might not need a stream encoding. Additionally,
-HTTP extensions can use HTTP Datagrams with their own data stream protocol.
-However, new HTTP extensions that wish to use HTTP Datagrams SHOULD use the
-Capsule Protocol in order to promote compatibility and interoperability.
+Note that it is possible for an HTTP extension to use HTTP Datagrams without
+using the Capsule Protocol. For example, if an HTTP extension that uses HTTP
+Datagrams is only defined over transports that support QUIC DATAGRAM frames, it
+might not need a stream encoding. Additionally, HTTP extensions can use HTTP
+Datagrams with their own data stream protocol. However, new HTTP extensions that
+wish to use HTTP Datagrams SHOULD use the Capsule Protocol as failing to do so
+will make it harder for the HTTP extension to support versions of HTTP other
+than HTTP/3 and will prevent interoperability with intermediaries that only
+support the Capsule Protocol.
 
 
 # Security Considerations {#security}
