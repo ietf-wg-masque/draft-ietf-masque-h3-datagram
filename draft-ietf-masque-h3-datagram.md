@@ -334,8 +334,14 @@ forward Capsules with an unknown Capsule Type without modification.
 Endpoints which receive a Capsule with an unknown Capsule Type MUST silently
 drop that Capsule and skip over it to parse the next Capsule.
 
-By virtue of the definition of the data stream, the Capsule Protocol is not in
-use on responses unless the response includes a 2xx (Successful) status code.
+By virtue of the definition of the data stream:
+
+* The Capsule Protocol is not in use unless the response includes a 2xx
+  (Successful) status code.
+
+* When the Capsule Protocol is in use, the associated HTTP request and response
+  do not carry HTTP content. A future extension MAY define a new capsule type to
+  carry HTTP content.
 
 The Capsule Protocol MUST NOT be used with messages that contain Content-Length,
 Content-Type, or Transfer-Encoding header fields. Additionally, HTTP status
