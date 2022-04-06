@@ -82,7 +82,7 @@ version of the CONNECT method, or adding unreliable delivery to WebSockets
 {{?RFC6455}}.
 
 In {{datagrams}}, this document describes HTTP Datagrams, a convention that
-supports the bidirectional and possibly multiplexed exchange of data inside an
+supports the bidirectional and optionally multiplexed exchange of data inside an
 HTTP connection. While HTTP datagrams are associated with HTTP requests, they
 are not part of message content; instead, they are intended for use by HTTP
 extensions (such as the CONNECT method), and are compatible with all versions of
@@ -193,8 +193,8 @@ allow communicating prioritization preferences.
 
 ### The SETTINGS_H3_DATAGRAM HTTP/3 Setting {#setting}
 
-Implementations of HTTP/3 that are willing to receive HTTP Datagrams can
-indicate that to their peer by sending the SETTINGS_H3_DATAGRAM setting with a
+Endpoints can indicate to their peer that they are willing to receive HTTP/3
+Datagrams by sending the SETTINGS_H3_DATAGRAM setting with a
 value of 1.
 
 The value of the SETTINGS_H3_DATAGRAM setting MUST be either 0 or 1. A value
@@ -217,9 +217,9 @@ or equal to the stored value; if not, the client MUST terminate the connection
 with error H3_SETTINGS_ERROR. In all cases, the maximum permitted value of the
 SETTINGS_H3_DATAGRAM setting parameter is 1.
 
-It is RECOMMENDED that implementations that support receiving HTTP Datagrams
-using QUIC always send the SETTINGS_H3_DATAGRAM setting with a value of 1,
-even if the application does not intend to use HTTP Datagrams. This helps to
+It is RECOMMENDED that implementations that support receiving HTTP/3 Datagrams
+always send the SETTINGS_H3_DATAGRAM setting with a value of 1,
+even if the application does not intend to use HTTP/3 Datagrams. This helps to
 avoid "sticking out"; see {{security}}.
 
 
@@ -258,7 +258,9 @@ can choose to use. It allows endpoints to reliably communicate request-related
 information end-to-end on HTTP request streams, even in the presence of HTTP
 intermediaries. The Capsule Protocol can be used to exchange HTTP Datagrams,
 which is necessary when HTTP is running over a transport that does not support
-the QUIC DATAGRAM frame.
+the QUIC DATAGRAM frame. The Capsule Protocol can also be used to communicate
+reliable and bidirectional control messages associated with a datagram-based
+protocol even when HTTP/3 Datagrams are in use.
 
 
 ## HTTP Data Streams {#data-stream}
