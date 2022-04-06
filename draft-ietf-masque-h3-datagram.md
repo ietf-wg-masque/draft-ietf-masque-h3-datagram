@@ -457,12 +457,15 @@ DATAGRAM capsule has a length that is known to be so large as to not be usable,
 the implementation SHOULD discard the capsule without buffering its contents
 into memory.
 
-Note that use of the Capsule Protocol is not required to use HTTP Datagrams. If
-an HTTP extension that uses HTTP Datagrams is only defined over transports that
-support QUIC DATAGRAM frames, it might not need a stream encoding. Additionally,
-HTTP extensions can use HTTP Datagrams with their own data stream protocol.
-However, new HTTP extensions that wish to use HTTP Datagrams SHOULD use the
-Capsule Protocol unless they have a good reason not to.
+Note that it is possible for an HTTP extension to use HTTP Datagrams without
+using the Capsule Protocol. For example, if an HTTP extension that uses HTTP
+Datagrams is only defined over transports that support QUIC DATAGRAM frames, it
+might not need a stream encoding. Additionally, HTTP extensions can use HTTP
+Datagrams with their own data stream protocol. However, new HTTP extensions that
+wish to use HTTP Datagrams SHOULD use the Capsule Protocol as failing to do so
+will make it harder for the HTTP extension to support versions of HTTP other
+than HTTP/3 and will prevent interoperability with intermediaries that only
+support the Capsule Protocol.
 
 
 # Security Considerations {#security}
