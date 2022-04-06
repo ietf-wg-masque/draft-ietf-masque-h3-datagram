@@ -336,7 +336,7 @@ drop that Capsule and skip over it to parse the next Capsule.
 
 By virtue of the definition of the data stream:
 
-* The Capsule Protocol is not in use on responses unless the response includes a
+* The Capsule Protocol is not in use unless the response includes a
   2xx (Successful) status code.
 
 * When the Capsule Protocol is in use, the associated HTTP request and response
