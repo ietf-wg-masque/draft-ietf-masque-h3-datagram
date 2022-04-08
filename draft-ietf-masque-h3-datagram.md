@@ -131,9 +131,9 @@ be sent associated with GET or POST request streams.
 
 If an HTTP Datagram is received and it is associated with a request that has no
 known semantics for HTTP Datagrams, the receiver MUST terminate the request; if
-HTTP/3 is in use, the request stream MUST be aborted with H3_DATAGRAM_ERROR.
-HTTP extensions can override these requirements by defining a negotiation
-mechanism and semantics for HTTP Datagrams.
+HTTP/3 is in use, the request stream MUST be aborted with H3_DATAGRAM_ERROR
+(0x33). HTTP extensions can override these requirements by defining a
+negotiation mechanism and semantics for HTTP Datagrams.
 
 
 ## HTTP/3 Datagrams {#format}
@@ -159,7 +159,7 @@ client-initiated bidirectional streams, and those have stream IDs that are
 divisible by four). The largest legal QUIC stream ID value is 2<sup>62</sup>-1,
 so the largest legal value of Quarter Stream ID is 2<sup>60</sup>-1. Receipt of
 an HTTP/3 Datagram that includes a larger value MUST be treated as an HTTP/3
-connection error of type H3_DATAGRAM_ERROR.
+connection error of type H3_DATAGRAM_ERROR (0x33).
 
 HTTP Datagram Payload:
 
@@ -168,7 +168,7 @@ is using HTTP Datagrams. Note that this field can be empty.
 
 Receipt of a QUIC DATAGRAM frame whose payload is too short to allow parsing the
 Quarter Stream ID field MUST be treated as an HTTP/3 connection error of type
-H3_DATAGRAM_ERROR.
+H3_DATAGRAM_ERROR (0x33).
 
 HTTP/3 Datagrams MUST NOT be sent unless the corresponding stream's send side is
 open. If a datagram is received after the corresponding stream's receive side is
@@ -194,7 +194,7 @@ allow communicating prioritization preferences.
 ### The SETTINGS_H3_DATAGRAM HTTP/3 Setting {#setting}
 
 Endpoints can indicate to their peer that they are willing to receive HTTP/3
-Datagrams by sending the SETTINGS_H3_DATAGRAM setting with a
+Datagrams by sending the SETTINGS_H3_DATAGRAM (0x33) setting with a
 value of 1.
 
 The value of the SETTINGS_H3_DATAGRAM setting MUST be either 0 or 1. A value
@@ -402,14 +402,14 @@ Upgrade Tokens that use the Capsule Protocol MAY alter this recommendation.
 
 ## The DATAGRAM Capsule {#datagram-capsule}
 
-This document defines the DATAGRAM capsule type (see {{iana-types}} for the
-value of the capsule type). This capsule allows HTTP Datagrams to be sent on a
-stream using the Capsule Protocol. This is particularly useful when HTTP is
-running over a transport that does not support the QUIC DATAGRAM frame.
+This document defines the DATAGRAM (0x00) capsule type. This capsule allows HTTP
+Datagrams to be sent on a stream using the Capsule Protocol. This is
+particularly useful when HTTP is running over a transport that does not support
+the QUIC DATAGRAM frame.
 
 ~~~
 Datagram Capsule {
-  Type (i) = DATAGRAM,
+  Type (i) = 0x00,
   Length (i),
   HTTP Datagram Payload (..),
 }
@@ -493,7 +493,7 @@ This document will request IANA to register the following entry in the
 "HTTP/3 Settings" registry:
 
 Value:
-: 0xffd277 (note that this will switch to a lower value before publication)
+: 0x33
 
 Setting Name:
 : SETTINGS_H3_DATAGRAM
@@ -522,7 +522,7 @@ This document will request IANA to register the following entry in the
 "HTTP/3 Error Codes" registry:
 
 Value:
-: 0x4A1268 (note that this will switch to a lower value before publication)
+: 0x33
 
 Name:
 : H3_DATAGRAM_ERROR
@@ -582,8 +582,8 @@ between 0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
 Standards Action or IESG Approval as defined in {{Sections 4.9 and 4.10 of
 IANA-POLICY}}.
 
-Capsule types with a value of the form 41 * N + 23 for integer values of N are
-reserved to exercise the requirement that unknown capsule types be ignored.
+Capsule types with a value of the form 0x29 * N + 0x17 for integer values of N
+are reserved to exercise the requirement that unknown capsule types be ignored.
 These capsules have no semantics and can carry arbitrary values. These values
 MUST NOT be assigned by IANA and MUST NOT appear in the listing of assigned
 values.
@@ -591,7 +591,7 @@ values.
 This registry initially contains the following entry:
 
 Value:
-: 0xff37a5 (note that this will switch to the value 0x00 before publication)
+: 0x00
 
 Capsule Type:
 : DATAGRAM
