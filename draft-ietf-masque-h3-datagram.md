@@ -570,41 +570,47 @@ Comments:
 ## Capsule Types {#iana-types}
 
 This document establishes a registry for HTTP capsule type codes. The "HTTP
-Capsule Types" registry governs a 62-bit space. Registrations in this registry
-MUST include the following fields:
+Capsule Types" registry governs a 62-bit space, and operates under the QUIC
+registration policy documented in {{Section 22.1 of QUIC}}. This new registry
+includes the common set of fields listed in {{Section 22.1.1 of QUIC}}. In
+addition to those common fields, all registrations in this registry MUST include
+a "Capsule Type" field which contains a short name or label for the capsule type.
 
-Type:
-: A name or label for the capsule type.
-
-Value:
-: The value of the Capsule Type field (see {{capsule-protocol}}) is a 62-bit
-integer.
-
-Reference:
-: An optional reference to a specification for the type. This field MAY be
-empty.
-{: spacing="compact"}
-
-Registrations follow the "First Come First Served" policy (see Section 4.4 of
-{{!IANA-POLICY=RFC8126}}) where two registrations MUST NOT have the same Type.
-
-This registry initially contains the following entry:
-
-Capsule Type:
-: DATAGRAM
-
-Value:
-: 0xff37a5 (note that this will switch to a lower value before publication)
-
-Reference:
-: This document
-{: spacing="compact"}
+Permanent registrations in this registry are assigned using the Specification
+Required policy ({{Section 4.6 of !IANA-POLICY=RFC8126}}), except for values
+between 0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
+Standards Action or IESG Approval as defined in {{Sections 4.9 and 4.10 of
+IANA-POLICY}}.
 
 Capsule types with a value of the form 41 * N + 23 for integer values of N are
 reserved to exercise the requirement that unknown capsule types be ignored.
 These capsules have no semantics and can carry arbitrary values. These values
 MUST NOT be assigned by IANA and MUST NOT appear in the listing of assigned
 values.
+
+This registry initially contains the following entry:
+
+Value:
+: 0xff37a5 (note that this will switch to the value 0x00 before publication)
+
+Capsule Type:
+: DATAGRAM
+
+Status:
+: permanent
+
+Specification:
+: This document
+
+Change Controller:
+: IETF
+
+Contact:
+: MASQUE Working Group <masque@ietf.org>
+
+Notes:
+: None
+{: spacing="compact"}
 
 
 --- back
