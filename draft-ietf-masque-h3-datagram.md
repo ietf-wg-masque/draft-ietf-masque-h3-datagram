@@ -101,6 +101,14 @@ HTTP/1 or HTTP/2 over TCP.
 
 {::boilerplate bcp14-tagged}
 
+This document uses terminology from {{!QUIC=RFC9000}}.
+
+Where this document defines protocol types, the definition format uses the
+notation from {{Section 1.3 of QUIC}}. Where fields within types are integers,
+they are encoded using the variable-length integer encoding from {{Section 16 of
+QUIC}}. Integer values do not need to be encoded on the minimum number of bytes
+necessary.
+
 
 # HTTP Datagrams {#datagrams}
 
@@ -137,8 +145,7 @@ negotiation mechanism and semantics for HTTP Datagrams.
 ## HTTP/3 Datagrams {#format}
 
 When used with HTTP/3, the Datagram Data field of QUIC DATAGRAM frames uses the
-following format (using the notation from the "Notational Conventions" section
-of {{!QUIC=RFC9000}}):
+following format:
 
 ~~~
 HTTP/3 Datagram {
@@ -287,8 +294,7 @@ prioritization. For example, see {{Section 11 of
 
 Definitions of new HTTP Upgrade Tokens can state that their associated request's
 data stream uses the Capsule Protocol. If they do so, that means that the
-contents of the associated request's data stream uses the following format
-(using the notation from the "Notational Conventions" section of {{QUIC}}):
+contents of the associated request's data stream uses the following format:
 
 ~~~
 Capsule Protocol {
