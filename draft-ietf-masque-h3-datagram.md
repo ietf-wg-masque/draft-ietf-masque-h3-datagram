@@ -138,7 +138,8 @@ negotiation mechanism and semantics for HTTP Datagrams.
 
 When used with HTTP/3, the Datagram Data field of QUIC DATAGRAM frames uses the
 following format (using the notation from the "Notational Conventions" section
-of {{!QUIC=RFC9000}}):
+of {{!QUIC=RFC9000}}). Variable-length integers are encoded in a format defined
+in {{Section 16 of QUIC}}.
 
 ~~~
 HTTP/3 Datagram {
