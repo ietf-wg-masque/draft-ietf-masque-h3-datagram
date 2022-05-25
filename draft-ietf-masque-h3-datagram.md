@@ -269,8 +269,8 @@ message and the final, successful (i.e., 2xx) response message.
 
 In HTTP/1.x, the data stream consists of all bytes on the connection that follow
 the blank line that concludes either the request header section, or the response
-header section. As a result, only a single HTTP request starting the capsule
-protocol can be sent on HTTP/1.x connections.
+header section. As a result, only the last HTTP request on an HTTP/1.x connection
+can start the capsule protocol.
 
 In HTTP/2 and HTTP/3, the data stream of a given HTTP request consists of all
 bytes sent in DATA frames with the corresponding stream ID.
