@@ -73,11 +73,12 @@ not applications.
 
 # Introduction {#intro}
 
-HTTP extensions sometimes need to access underlying transport protocol features
-such as unreliable delivery (as offered by {{!DGRAM=RFC9221}}) to enable
-desirable features. For example, this could allow introducing an unreliable
-version of the CONNECT method, or adding unreliable delivery to WebSockets
-{{?RFC6455}}.
+HTTP extensions (as defined in {{Section 16 of
+!HTTP=I-D.ietf-httpbis-semantics}}) sometimes need to access underlying transport
+protocol features such as unreliable delivery (as offered by {{!DGRAM=RFC9221}})
+to enable desirable features. For example, this could allow introducing an
+unreliable version of the CONNECT method, or adding unreliable delivery to
+WebSockets {{?RFC6455}}.
 
 In {{datagrams}}, this document describes HTTP Datagrams, a convention that
 supports the bidirectional and optionally multiplexed exchange of data inside an
@@ -245,10 +246,10 @@ using the Capsule Protocol, see {{datagram-capsule}}.
 # Capsules {#capsule}
 
 One mechanism to extend HTTP is to introduce new HTTP Upgrade Tokens (see
-{{Section 16.7 of !HTTP=I-D.ietf-httpbis-semantics}}). In HTTP/1.x, these tokens
-are used via the Upgrade mechanism (see {{Section 7.8 of HTTP}}). In HTTP/2 and
-HTTP/3, these tokens are used via the Extended CONNECT mechanism (see
-{{?EXT-CONNECT2=RFC8441}} and {{?EXT-CONNECT3=I-D.ietf-httpbis-h3-websockets}}).
+{{Section 16.7 of HTTP}}). In HTTP/1.x, these tokens are used via the Upgrade
+mechanism (see {{Section 7.8 of HTTP}}). In HTTP/2 and HTTP/3, these tokens are
+used via the Extended CONNECT mechanism (see {{?EXT-CONNECT2=RFC8441}} and
+{{?EXT-CONNECT3=I-D.ietf-httpbis-h3-websockets}}).
 
 This specification introduces the Capsule Protocol. The Capsule Protocol is a
 sequence of type-length-value tuples that definitions of new HTTP Upgrade Tokens
