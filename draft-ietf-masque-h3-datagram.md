@@ -380,8 +380,9 @@ definition of the extension.
 Each capsule's payload MUST contain exactly the fields identified in its
 description. A capsule payload that contains additional bytes after the
 identified fields or a capsule payload that terminates before the end of the
-identified fields MUST be treated as a malformed or incomplete message. In
-particular, redundant length encodings MUST be verified to be self-consistent.
+identified fields MUST be treated as it if were a malformed or incomplete
+message. In particular, redundant length encodings MUST be verified to be
+self-consistent.
 
 If the receive side of a stream carrying capsules is terminated cleanly (for
 example, in HTTP/3 this is defined as receiving a QUIC STREAM frame with the FIN
