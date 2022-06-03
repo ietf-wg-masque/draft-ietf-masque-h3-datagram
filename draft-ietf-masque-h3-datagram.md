@@ -290,8 +290,9 @@ Data streams can be prioritized using any means suited to stream or request
 prioritization. For example, see {{Section 11 of
 ?PRIORITY=I-D.ietf-httpbis-priority}}.
 
-Data streams are subject to the flow control mechanisms of the underlying
-layers (for example, HTTP/2 stream flow control, HTTP/2 connection flow control, and TCP flow control).
+Data streams are subject to the flow control mechanisms of the underlying layers
+(for example, HTTP/2 stream flow control, HTTP/2 connection flow control, and
+TCP flow control).
 
 
 ## The Capsule Protocol {#capsule-protocol}
