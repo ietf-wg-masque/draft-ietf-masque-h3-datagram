@@ -359,9 +359,9 @@ codes 204 (No Content), 205 (Reset Content), and 206 (Partial Content) MUST NOT
 be sent on responses that use the Capsule Protocol. A receiver that observes a
 violation of these requirements MUST treat the HTTP message as malformed.
 
-Receivers of capsules can read them read them from the data stream in a
-streaming fashion. In some implementations, streaming can help to more rapidly
-free up consumed flow control capacity in the underlying layers.
+Receivers of capsules can read them them from the data stream in a streaming
+fashion. In some implementations, streaming can help to more rapidly free up
+consumed flow control capacity in the underlying layers.
 
 
 ## Error Handling
