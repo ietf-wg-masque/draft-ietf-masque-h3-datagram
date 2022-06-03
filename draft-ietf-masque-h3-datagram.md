@@ -374,7 +374,7 @@ permitted; other frame types MUST NOT be sent and MUST be treated as a stream
 error ({{Section 5.4.2 of H2}}) if received. In HTTP/3, only DATA frames are
 permitted; other frame types MUST NOT be sent and MUST be treated as connection
 error of type H3_FRAME_UNEXPECTED ({{Section 8 of H3}}) if received. In both
-cases, extension frame types MAY be used if a specifically permitted by the
+cases, extension frame types MAY be used if specifically permitted by the
 definition of the extension.
 
 Each capsule's payload MUST contain exactly the fields identified in its
