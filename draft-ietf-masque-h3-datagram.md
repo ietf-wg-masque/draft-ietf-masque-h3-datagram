@@ -360,9 +360,10 @@ codes 204 (No Content), 205 (Reset Content), and 206 (Partial Content) MUST NOT
 be sent on responses that use the Capsule Protocol. A receiver that observes a
 violation of these requirements MUST treat the HTTP message as malformed.
 
-Receivers of capsules can read them from the data stream in a streaming fashion.
-In some implementations, streaming can help to more rapidly free up consumed
-flow control capacity in the underlying layers.
+When processing capsules, a receiver might tempted to accumulate the full length
+of the capsule value in the data stream before handling it. This approach can
+consume flow control in underlying layers, which might lead to deadlocks if the
+capsule data exhausts the flow control window.
 
 
 ## Error Handling
@@ -474,10 +475,8 @@ into memory.
 
 Since QUIC DATAGRAM frames are required to fit within a QUIC packet,
 implementations that reencode DATAGRAM capsules into QUIC DATAGRAM frames might
-be tempted to let the capsule data accumulate in the data stream until they have
-received a complete DATAGRAM capsule. This approach can consume flow control in
-underlying layers, which might lead to deadlocks if the capsule data exhausts
-the flow control window.
+be tempted to accumulate the entire capsule before reencoding it. This can cause
+flow control problems; see {{capsule-protocol}}.
 
 Note that it is possible for an HTTP extension to use HTTP Datagrams without
 using the Capsule Protocol. For example, if an HTTP extension that uses HTTP
