@@ -474,9 +474,10 @@ into memory.
 
 Since QUIC DATAGRAM frames are required to fit within a QUIC packet,
 implementations that reencode DATAGRAM capsules into QUIC DATAGRAM frames might
-be tempted to let the capsule data accumulate in the data stream until they have received a complete DATAGRAM capsule. This approach
-can consume flow control in underlying layers, which might lead to deadlocks if
-the capsule data exhausts the flow control window.
+be tempted to let the capsule data accumulate in the data stream until they have
+received a complete DATAGRAM capsule. This approach can consume flow control in
+underlying layers, which might lead to deadlocks if the capsule data exhausts
+the flow control window.
 
 Note that it is possible for an HTTP extension to use HTTP Datagrams without
 using the Capsule Protocol. For example, if an HTTP extension that uses HTTP
