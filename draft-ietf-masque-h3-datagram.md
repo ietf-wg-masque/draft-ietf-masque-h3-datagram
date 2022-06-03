@@ -367,7 +367,7 @@ in {{Section 4.1.3 of H3}}. For HTTP/2, the handling of malformed messages is
 described in {{Section 8.1.1 of H2}}. For HTTP/1.1, the handling of incomplete
 messages is described in {{Section 8 of H1}}.
 
-For HTTP/2 and HTTP/3, once a both endpoints agree to use the Capsule Protocol,
+For HTTP/2 and HTTP/3, once both endpoints agree to use the Capsule Protocol,
 the frame usage requirements of the stream change. In HTTP/2, only DATA or
 stream management frames (RST_STREAM, WINDOW_UPDATE, and PRIORITY) are
 permitted; other frame types MUST NOT be sent and MUST be treated as a stream
