@@ -359,12 +359,23 @@ violation of these requirements MUST treat the HTTP message as malformed.
 
 ## Error Handling
 
-When an error occurs in processing the Capsule Protocol, the receiver MUST treat
-the message as malformed or incomplete, according to the underlying transport
-protocol. For HTTP/3, the handling of malformed messages is described in
-{{Section 4.1.3 of H3}}. For HTTP/2, the handling of malformed messages is
+Unless otherwise stated, Capsule Protocol endpoints are expected to apply the
+same message format rules as the underlying HTTP version. When a receiver
+encounters a processing error, it MUST be treated as if it were a malformed or
+incomplete message. For HTTP/3, the handling of malformed messages is described
+in {{Section 4.1.3 of H3}}. For HTTP/2, the handling of malformed messages is
 described in {{Section 8.1.1 of H2}}. For HTTP/1.1, the handling of incomplete
 messages is described in {{Section 8 of H1}}.
+
+For HTTP/2 and HTTP/3, once a both endpoints agree to use the Capsule Protocol,
+the frame usage requirements of the stream change. In HTTP/2, only DATA or
+stream management frames (RST_STREAM, WINDOW_UPDATE, and PRIORITY) are
+permitted; other frame types MUST NOT be sent and MUST be treated as a stream
+error ({{Section 5.4.2 of H2}}) if received. In HTTP/3, only DATA frames are
+permitted; other frame types MUST NOT be sent and MUST be treated as connection
+error o)f type H3_FRAME_UNEXPECTED ({{Section 8 of H3}}) if received. In both
+cases, extension frame types MAY be used if a specifically permitted by the
+definition of the extension.
 
 Each capsule's payload MUST contain exactly the fields identified in its
 description. A capsule payload that contains additional bytes after the
@@ -375,7 +386,7 @@ particular, redundant length encodings MUST be verified to be self-consistent.
 If the receive side of a stream carrying capsules is terminated cleanly (for
 example, in HTTP/3 this is defined as receiving a QUIC STREAM frame with the FIN
 bit set) and the last capsule on the stream was truncated, this MUST be treated
-as a malformed or incomplete message.
+as if it were a malformed or incomplete message.
 
 
 ## The Capsule-Protocol Header Field {#hdr}
