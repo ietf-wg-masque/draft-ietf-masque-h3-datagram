@@ -354,6 +354,12 @@ By virtue of the definition of the data stream:
   do not carry HTTP content. A future extension MAY define a new capsule type to
   carry HTTP content.
 
+Since the Capsule Protocol only applies to definitions of new HTTP Upgrade
+Tokens, in HTTP/2 and HTTP/3 it can only be used with the CONNECT method.
+Therefore, once both endpoints agree to use the Capsule Protocol, the frame
+usage requirements of the stream change as specified in {{Section 8.5 of H2}}
+and {{Section 4.2 of H3}}.
+
 The Capsule Protocol MUST NOT be used with messages that contain Content-Length,
 Content-Type, or Transfer-Encoding header fields. Additionally, HTTP status
 codes 204 (No Content), 205 (Reset Content), and 206 (Partial Content) MUST NOT
@@ -368,9 +374,9 @@ capsule data exhausts the flow control window.
 
 ## Error Handling
 
-When an error occurs in processing the Capsule Protocol, the receiver MUST treat
-the message as malformed or incomplete, according to the underlying transport
-protocol. For HTTP/3, the handling of malformed messages is described in
+When a receiver encounters an error processing the Capsule Protocol, the
+receiver MUST treat it as if it had received a malformed or incomplete HTTP
+message. For HTTP/3, the handling of malformed messages is described in
 {{Section 4.1.3 of H3}}. For HTTP/2, the handling of malformed messages is
 described in {{Section 8.1.1 of H2}}. For HTTP/1.1, the handling of incomplete
 messages is described in {{Section 8 of H1}}.
@@ -378,13 +384,14 @@ messages is described in {{Section 8 of H1}}.
 Each capsule's payload MUST contain exactly the fields identified in its
 description. A capsule payload that contains additional bytes after the
 identified fields or a capsule payload that terminates before the end of the
-identified fields MUST be treated as a malformed or incomplete message. In
-particular, redundant length encodings MUST be verified to be self-consistent.
+identified fields MUST be treated as it if were a malformed or incomplete
+message. In particular, redundant length encodings MUST be verified to be
+self-consistent.
 
 If the receive side of a stream carrying capsules is terminated cleanly (for
 example, in HTTP/3 this is defined as receiving a QUIC STREAM frame with the FIN
 bit set) and the last capsule on the stream was truncated, this MUST be treated
-as a malformed or incomplete message.
+as if it were a malformed or incomplete message.
 
 
 ## The Capsule-Protocol Header Field {#hdr}
