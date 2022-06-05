@@ -290,6 +290,10 @@ Data streams can be prioritized using any means suited to stream or request
 prioritization. For example, see {{Section 11 of
 ?PRIORITY=I-D.ietf-httpbis-priority}}.
 
+Data streams are subject to the flow control mechanisms of the underlying layers
+(for example, HTTP/2 stream flow control, HTTP/2 connection flow control, and
+TCP flow control).
+
 
 ## The Capsule Protocol {#capsule-protocol}
 
@@ -355,6 +359,11 @@ Content-Type, or Transfer-Encoding header fields. Additionally, HTTP status
 codes 204 (No Content), 205 (Reset Content), and 206 (Partial Content) MUST NOT
 be sent on responses that use the Capsule Protocol. A receiver that observes a
 violation of these requirements MUST treat the HTTP message as malformed.
+
+When processing capsules, a receiver might tempted to accumulate the full length
+of the capsule value in the data stream before handling it. This approach can
+consume flow control in underlying layers, which might lead to deadlocks if the
+capsule data exhausts the flow control window.
 
 
 ## Error Handling
@@ -463,6 +472,11 @@ take those limits into account when parsing DATAGRAM capsules: if an incoming
 DATAGRAM capsule has a length that is known to be so large as to not be usable,
 the implementation SHOULD discard the capsule without buffering its contents
 into memory.
+
+Since QUIC DATAGRAM frames are required to fit within a QUIC packet,
+implementations that reencode DATAGRAM capsules into QUIC DATAGRAM frames might
+be tempted to accumulate the entire capsule before reencoding it. This can cause
+flow control problems; see {{capsule-protocol}}.
 
 Note that it is possible for an HTTP extension to use HTTP Datagrams without
 using the Capsule Protocol. For example, if an HTTP extension that uses HTTP
