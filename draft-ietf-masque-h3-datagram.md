@@ -45,14 +45,15 @@ author:
 
 normative:
   H1:
-    =: I-D.draft-ietf-httpbis-messaging
+    =: RFC9112
     display: HTTP/1.1
   H2:
-    =: I-D.draft-ietf-httpbis-http2bis
+    =: RFC9113
     display: HTTP/2
   H3:
-    =: I-D.draft-ietf-quic-http
+    =: RFC9114
     display: HTTP/3
+
 
 --- abstract
 
@@ -72,12 +73,11 @@ not applications.
 
 # Introduction {#intro}
 
-HTTP extensions (as defined in {{Section 16 of
-!HTTP=I-D.ietf-httpbis-semantics}}) sometimes need to access underlying transport
-protocol features such as unreliable delivery (as offered by {{!DGRAM=RFC9221}})
-to enable desirable features. For example, this could allow introducing an
-unreliable version of the CONNECT method, or adding unreliable delivery to
-WebSockets {{?WEBSOCKET=RFC6455}}.
+HTTP extensions (as defined in {{Section 16 of !HTTP=RFC9110}}) sometimes need
+to access underlying transport protocol features such as unreliable delivery (as
+offered by {{!DGRAM=RFC9221}}) to enable desirable features. For example, this
+could allow introducing an unreliable version of the CONNECT method, or adding
+unreliable delivery to WebSockets {{?WEBSOCKET=RFC6455}}.
 
 In {{datagrams}}, this document describes HTTP Datagrams, a convention that
 supports the bidirectional and optionally multiplexed exchange of data inside an
@@ -286,8 +286,7 @@ The concept of a data stream is particularly relevant for methods such as
 CONNECT where there is no HTTP message content after the headers.
 
 Data streams can be prioritized using any means suited to stream or request
-prioritization. For example, see {{Section 11 of
-?PRIORITY=I-D.ietf-httpbis-priority}}.
+prioritization. For example, see {{Section 11 of ?PRIORITY=RFC9218}}.
 
 Data streams are subject to the flow control mechanisms of the underlying layers
 (for example, HTTP/2 stream flow control, HTTP/2 connection flow control, and
