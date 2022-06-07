@@ -54,7 +54,6 @@ normative:
     =: I-D.draft-ietf-quic-http
     display: HTTP/3
 
-
 --- abstract
 
 This document describes HTTP Datagrams, a convention for conveying multiplexed,
