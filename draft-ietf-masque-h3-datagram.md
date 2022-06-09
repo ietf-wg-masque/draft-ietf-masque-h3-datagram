@@ -255,7 +255,7 @@ One mechanism to extend HTTP is to introduce new HTTP Upgrade Tokens (see
 {{Section 16.7 of HTTP}}). In HTTP/1.x, these tokens are used via the Upgrade
 mechanism (see {{Section 7.8 of HTTP}}). In HTTP/2 and HTTP/3, these tokens are
 used via the Extended CONNECT mechanism (see {{?EXT-CONNECT2=RFC8441}} and
-{{?EXT-CONNECT3=I-D.ietf-httpbis-h3-websockets}}).
+{{?EXT-CONNECT3=RFC9220}}).
 
 This specification introduces the Capsule Protocol. The Capsule Protocol is a
 sequence of type-length-value tuples that definitions of new HTTP Upgrade Tokens
