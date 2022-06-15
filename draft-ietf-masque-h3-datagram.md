@@ -94,7 +94,7 @@ This document also describes the HTTP Capsule Protocol in {{capsule}}, to allow
 conveyance of HTTP Datagrams using reliable delivery. This addresses HTTP/3
 cases where use of the QUIC DATAGRAM frame is unavailable or undesirable, or
 where the transport protocol only provides reliable delivery, such as with
-HTTP/1 or HTTP/2 over TCP.
+HTTP/1.1 or HTTP/2 over TCP.
 
 
 ## Conventions and Definitions {#defs}
@@ -125,7 +125,7 @@ When running over HTTP/2, demultiplexing is provided by the HTTP/2 framing
 layer, but unreliable delivery is unavailable. HTTP Datagrams are negotiated
 and conveyed using the Capsule Protocol; see {{datagram-capsule}}.
 
-When running over HTTP/1, requests are strictly serialized in the connection,
+When running over HTTP/1.x, requests are strictly serialized in the connection,
 and therefore demultiplexing is not available. Unreliable delivery is likewise
 not available. HTTP Datagrams are negotiated and conveyed using the Capsule
 Protocol; see {{datagram-capsule}}.
@@ -377,7 +377,7 @@ When a receiver encounters an error processing the Capsule Protocol, the
 receiver MUST treat it as if it had received a malformed or incomplete HTTP
 message. For HTTP/3, the handling of malformed messages is described in
 {{Section 4.1.3 of H3}}. For HTTP/2, the handling of malformed messages is
-described in {{Section 8.1.1 of H2}}. For HTTP/1.1, the handling of incomplete
+described in {{Section 8.1.1 of H2}}. For HTTP/1.x, the handling of incomplete
 messages is described in {{Section 8 of H1}}.
 
 Each capsule's payload MUST contain exactly the fields identified in its
