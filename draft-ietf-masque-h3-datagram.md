@@ -317,7 +317,8 @@ Capsule {
 
 Capsule Type:
 
-: A variable-length integer indicating the Type of the capsule.
+: A variable-length integer indicating the Type of the capsule. An IANA registry
+is used to manage the assignment of Capsule Types; see {{iana-types}}.
 
 Capsule Length:
 
