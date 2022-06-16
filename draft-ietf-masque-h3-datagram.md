@@ -141,7 +141,7 @@ be sent associated with GET or POST request streams.
 If an HTTP Datagram is received and it is associated with a request that has no
 known semantics for HTTP Datagrams, the receiver MUST terminate the request; if
 HTTP/3 is in use, the request stream MUST be aborted with H3_DATAGRAM_ERROR
-(0x33). HTTP extensions can override these requirements by defining a
+(0x33). HTTP extensions MAY override these requirements by defining a
 negotiation mechanism and semantics for HTTP Datagrams.
 
 
