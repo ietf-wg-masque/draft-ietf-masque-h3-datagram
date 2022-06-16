@@ -81,7 +81,7 @@ unreliable delivery to WebSockets {{?WEBSOCKET=RFC6455}}.
 
 In {{datagrams}}, this document describes HTTP Datagrams, a convention that
 supports the bidirectional and optionally multiplexed exchange of data inside an
-HTTP connection. While HTTP datagrams are associated with HTTP requests, they
+HTTP connection. While HTTP Datagrams are associated with HTTP requests, they
 are not part of message content; instead, they are intended for use by HTTP
 extensions (such as the CONNECT method), and are compatible with all versions of
 HTTP.
@@ -182,19 +182,19 @@ HTTP/3 Datagrams MUST NOT be sent unless the corresponding stream's send side is
 open. If a datagram is received after the corresponding stream's receive side is
 closed, the received datagrams MUST be silently dropped.
 
-If an HTTP/3 datagram is received and its Quarter Stream ID maps to a stream
+If an HTTP/3 Datagram is received and its Quarter Stream ID maps to a stream
 that has not yet been created, the receiver SHALL either drop that datagram
 silently or buffer it temporarily (on the order of a round trip) while awaiting
 the creation of the corresponding stream.
 
-If an HTTP/3 datagram is received and its Quarter Stream ID maps to a stream
+If an HTTP/3 Datagram is received and its Quarter Stream ID maps to a stream
 that cannot be created due to client-initiated bidirectional stream limits, it
 SHOULD be treated as an HTTP/3 connection error of type H3_ID_ERROR. Generating
 an error is not mandatory in this case because HTTP/3 implementations might have
 practical barriers to determining the active stream concurrency limit that is
 applied by the QUIC layer.
 
-Prioritization of HTTP/3 datagrams is not defined in this document. Future
+Prioritization of HTTP/3 Datagrams is not defined in this document. Future
 extensions MAY define how to prioritize datagrams, and MAY define signaling to
 allow communicating prioritization preferences.
 
@@ -507,7 +507,7 @@ Since transmitting HTTP Datagrams using QUIC DATAGRAM frames requires sending
 the HTTP/3 SETTINGS_H3_DATAGRAM setting, it "sticks out". In other words,
 probing clients can learn whether a server supports HTTP Datagrams over QUIC
 DATAGRAM frames. As some servers might wish to obfuscate the fact that they
-offer application services that use HTTP datagrams, it's best for all
+offer application services that use HTTP Datagrams, it's best for all
 implementations that support this feature to always send this setting, see
 {{setting}}.
 
