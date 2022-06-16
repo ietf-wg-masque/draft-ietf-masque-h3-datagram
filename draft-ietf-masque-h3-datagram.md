@@ -512,6 +512,10 @@ Since use of the Capsule Protocol is restricted to new HTTP Upgrade Tokens, it
 is not accessible from Web Platform APIs (such as those commonly accessed via
 JavaScript in web browsers).
 
+Definitions of new HTTP Upgrade Tokens that use the Capsule Protocol need to
+perform an appropriate security analysis that considers the impact of HTTP
+Datagrams and Capsules in the context of their protocol.
+
 
 # IANA Considerations {#iana}
 
