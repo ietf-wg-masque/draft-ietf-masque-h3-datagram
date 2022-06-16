@@ -208,7 +208,7 @@ value of 1.
 The value of the SETTINGS_H3_DATAGRAM setting MUST be either 0 or 1. A value
 of 0 indicates that the implementation is not willing to receive HTTP Datagrams.
 If the SETTINGS_H3_DATAGRAM setting is received with a value that is neither 0
-or 1, the receiver MUST terminate the connection with error H3_SETTINGS_ERROR.
+nor 1, the receiver MUST terminate the connection with error H3_SETTINGS_ERROR.
 
 QUIC DATAGRAM frames MUST NOT be sent until the SETTINGS_H3_DATAGRAM setting
 has been both sent and received with a value of 1.
