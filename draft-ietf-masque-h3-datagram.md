@@ -520,7 +520,8 @@ JavaScript in web browsers).
 ## HTTP/3 Setting {#iana-setting}
 
 This document will request IANA to register the following entry in the
-"HTTP/3 Settings" registry:
+"HTTP/3 Settings" registry maintained at
+<[](https://www.iana.org/assignments/http3-parameters)>:
 
 Value:
 : 0x33
@@ -549,7 +550,8 @@ Contact:
 ## HTTP/3 Error Code {#iana-error}
 
 This document will request IANA to register the following entry in the
-"HTTP/3 Error Codes" registry:
+"HTTP/3 Error Codes" registry maintained at
+<[](https://www.iana.org/assignments/http3-parameters)>:
 
 Value:
 : 0x33
@@ -577,7 +579,8 @@ Contact:
 ## HTTP Header Field Name {#iana-hdr}
 
 This document will request IANA to register the following entry in the "HTTP
-Field Name" registry:
+Field Name" registry maintained at
+<[](https://www.iana.org/assignments/http-fields)>:
 
 Field Name:
 : Capsule-Protocol
