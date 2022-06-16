@@ -275,12 +275,13 @@ protocol even when HTTP/3 Datagrams are in use.
 
 This specification defines the "data stream" of an HTTP request as the
 bidirectional stream of bytes that follows the header section of the request
-message and the final, successful (i.e., 2xx) response message.
+message and the final response message that is either successful (i.e., 2xx) or
+upgraded (i.e., 101).
 
 In HTTP/1.x, the data stream consists of all bytes on the connection that follow
-the blank line that concludes either the request header section, or the response
-header section. As a result, only the last HTTP request on an HTTP/1.x connection
-can start the capsule protocol.
+the blank line that concludes either the request header section, or the final
+response header section. As a result, only the last HTTP request on an HTTP/1.x
+connection can start the capsule protocol.
 
 In HTTP/2 and HTTP/3, the data stream of a given HTTP request consists of all
 bytes sent in DATA frames with the corresponding stream ID.
@@ -350,7 +351,7 @@ drop that Capsule and skip over it to parse the next Capsule.
 By virtue of the definition of the data stream:
 
 * The Capsule Protocol is not in use unless the response includes a 2xx
-  (Successful) status code.
+  (Successful) or 101 (Switching Protocols) status code.
 
 * When the Capsule Protocol is in use, the associated HTTP request and response
   do not carry HTTP content. A future extension MAY define a new capsule type to
@@ -417,7 +418,7 @@ for unknown HTTP Upgrade Tokens; note that this is only possible for HTTP
 Upgrade or Extended CONNECT.
 
 The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
-status code outside the 2xx range.
+status code that is both different from 101 and outside the 2xx range.
 
 When using the Capsule Protocol, HTTP endpoints SHOULD send the Capsule-Protocol
 header field to simplify intermediary processing. Definitions of new HTTP
