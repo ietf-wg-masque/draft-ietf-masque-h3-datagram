@@ -109,6 +109,9 @@ they are encoded using the variable-length integer encoding from {{Section 16 of
 QUIC}}. Integer values do not need to be encoded on the minimum number of bytes
 necessary.
 
+In this document, the term "intermediary" refers to an HTTP intermediary as
+defined in {{Section 3.7 of HTTP}}.
+
 
 # HTTP Datagrams {#datagrams}
 
