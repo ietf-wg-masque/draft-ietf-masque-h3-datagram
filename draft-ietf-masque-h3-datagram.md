@@ -86,15 +86,15 @@ are not part of message content; instead, they are intended for use by HTTP
 extensions (such as the CONNECT method), and are compatible with all versions of
 HTTP.
 
-When HTTP is running over a transport protocol that supports unreliable
-delivery (such as when the QUIC DATAGRAM extension is available to HTTP/3), HTTP
-Datagrams can use that capability.
+When HTTP is running over a transport protocol that supports unreliable delivery
+(such as when the QUIC DATAGRAM extension {{DGRAM}} is available to HTTP/3
+{{H3}}), HTTP Datagrams can use that capability.
 
 This document also describes the HTTP Capsule Protocol in {{capsule}}, to allow
 conveyance of HTTP Datagrams using reliable delivery. This addresses HTTP/3
 cases where use of the QUIC DATAGRAM frame is unavailable or undesirable, or
 where the transport protocol only provides reliable delivery, such as with
-HTTP/1.1 or HTTP/2 over TCP.
+HTTP/1.1 {{H1}} or HTTP/2 {{H2}} over TCP {{!TCP=RFC0793}}.
 
 
 ## Conventions and Definitions {#defs}
