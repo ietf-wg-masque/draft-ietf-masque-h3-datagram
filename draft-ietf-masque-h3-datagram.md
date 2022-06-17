@@ -150,7 +150,7 @@ negotiation mechanism and semantics for HTTP Datagrams.
 When used with HTTP/3, the Datagram Data field of QUIC DATAGRAM frames uses the
 following format:
 
-~~~
+~~~ ascii-art
 HTTP/3 Datagram {
   Quarter Stream ID (i),
   HTTP Datagram Payload (..),
@@ -303,14 +303,14 @@ Definitions of new HTTP Upgrade Tokens can state that their associated request's
 data stream uses the Capsule Protocol. If they do so, that means that the
 contents of the associated request's data stream uses the following format:
 
-~~~
+~~~ ascii-art
 Capsule Protocol {
   Capsule (..) ...,
 }
 ~~~
 {: #capsule-stream-format title="Capsule Protocol Stream Format"}
 
-~~~
+~~~ ascii-art
 Capsule {
   Capsule Type (i),
   Capsule Length (i),
@@ -432,7 +432,7 @@ Datagrams to be sent on a stream using the Capsule Protocol. This is
 particularly useful when HTTP is running over a transport that does not support
 the QUIC DATAGRAM frame.
 
-~~~
+~~~ ascii-art
 Datagram Capsule {
   Type (i) = 0x00,
   Length (i),
