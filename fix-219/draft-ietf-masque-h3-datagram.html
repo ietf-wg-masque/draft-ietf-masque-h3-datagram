@@ -1437,7 +1437,7 @@ upgraded (i.e., 101).<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <p id="section-3.1-2">In HTTP/1.x, the data stream consists of all bytes on the connection that follow
 the blank line that concludes either the request header section or the final
 response header section. As a result, only the last HTTP request on an HTTP/1.x
-connection can start the capsule protocol.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+connection can start the Capsule Protocol.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
 <p id="section-3.1-3">In HTTP/2 and HTTP/3, the data stream of a given HTTP request consists of all
 bytes sent in DATA frames with the corresponding stream ID.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 <p id="section-3.1-4">The concept of a data stream is particularly relevant for methods such as
@@ -1505,7 +1505,7 @@ Capsule Type field.<a href="#section-3.2-4.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-3.2-5">An intermediary can identify the use of the capsule protocol either through the
+<p id="section-3.2-5">An intermediary can identify the use of the Capsule Protocol either through the
 presence of the Capsule-Protocol header field (<a href="#hdr" class="xref">Section 3.4</a>) or by understanding the
 chosen HTTP Upgrade token.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
 <p id="section-3.2-6">Because new protocols or extensions might define new capsule types,
@@ -1768,7 +1768,7 @@ maintained at &lt;<span><a href="https://www.iana.org/assignments/http3-paramete
           <dd class="break"></dd>
 <dt id="section-5.2-2.5">Description:</dt>
           <dd style="margin-left: 1.5em" id="section-5.2-2.6">
-            <p id="section-5.2-2.6.1">Datagram or capsule protocol parse error<a href="#section-5.2-2.6.1" class="pilcrow">¶</a></p>
+            <p id="section-5.2-2.6.1">Datagram or Capsule Protocol parse error<a href="#section-5.2-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-5.2-2.7">Status:</dt>
