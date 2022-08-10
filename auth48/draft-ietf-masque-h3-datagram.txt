@@ -3,7 +3,7 @@
 
 
 Internet Engineering Task Force (IETF)                       D. Schinazi
-Request for Comments: 9298                                    Google LLC
+Request for Comments: 9297                                    Google LLC
 Category: Standards Track                                      L. Pardue
 ISSN: 2070-1721                                               Cloudflare
                                                              August 2022
@@ -38,7 +38,7 @@ Status of This Memo
 
    Information about the current status of this document, any errata,
    and how to provide feedback on it may be obtained at
-   https://www.rfc-editor.org/info/rfc9298.
+   https://www.rfc-editor.org/info/rfc9297.
 
 Copyright Notice
 
@@ -539,7 +539,7 @@ Table of Contents
    Setting Name:  SETTINGS_H3_DATAGRAM
    Default:  0
    Status:  permanent
-   Specification:  RFC 9298
+   Specification:  RFC 9297
    Change Controller:  IETF
    Contact:  HTTP_WG; HTTP working group; ietf-http-wg@w3.org
 
@@ -553,7 +553,7 @@ Table of Contents
    Name:  H3_DATAGRAM_ERROR
    Description:  Datagram or capsule protocol parse error
    Status:  permanent
-   Specification:  RFC 9298
+   Specification:  RFC 9297
    Change Controller:  IETF
    Contact:  HTTP_WG; HTTP working group; ietf-http-wg@w3.org
 
@@ -566,7 +566,7 @@ Table of Contents
    Field Name:  Capsule-Protocol
    Template:  None
    Status:  permanent
-   Reference:  RFC 9298
+   Reference:  RFC 9297
    Comments:  None
 
 5.4.  Capsule Types
@@ -596,7 +596,7 @@ Table of Contents
    Value:  0x00
    Capsule Type:  DATAGRAM
    Status:  permanent
-   Specification:  RFC 9298
+   Specification:  RFC 9297
    Change Controller:  IETF
    Contact:  MASQUE Working Group masque@ietf.org
       (mailto:masque@ietf.org)
