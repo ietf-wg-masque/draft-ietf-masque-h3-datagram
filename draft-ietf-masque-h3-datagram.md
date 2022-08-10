@@ -326,7 +326,7 @@ An intermediary can identify the use of the Capsule Protocol either through the
 presence of the Capsule-Protocol header field ({{hdr}}) or by understanding the
 chosen HTTP Upgrade token.
 
-Because new protocols or extensions might define new capsule types,
+Because new protocols or extensions might define new Capsule Types,
 intermediaries that wish to allow for future extensibility SHOULD forward
 capsules without modification unless the definition of the Capsule Type in use
 specifies additional intermediary processing. One such Capsule Type is the
@@ -342,7 +342,7 @@ By virtue of the definition of the data stream:
   (Successful) or 101 (Switching Protocols) status code.
 
 * When the Capsule Protocol is in use, the associated HTTP request and response
-  do not carry HTTP content. A future extension MAY define a new capsule type to
+  do not carry HTTP content. A future extension MAY define a new Capsule Type to
   carry HTTP content.
 
 The Capsule Protocol only applies to definitions of new HTTP upgrade tokens;
@@ -415,7 +415,7 @@ upgrade tokens that use the Capsule Protocol MAY alter this recommendation.
 
 ## The DATAGRAM Capsule {#datagram-capsule}
 
-This document defines the DATAGRAM (0x00) capsule type. This capsule allows HTTP
+This document defines the DATAGRAM (0x00) Capsule Type. This capsule allows HTTP
 Datagrams to be sent on a stream using the Capsule Protocol. This is
 particularly useful when HTTP is running over a transport that does not support
 the QUIC DATAGRAM frame.
@@ -597,12 +597,12 @@ Comments:
 
 ## Capsule Types {#iana-types}
 
-This document establishes a registry for HTTP capsule type codes. The "HTTP
+This document establishes a registry for HTTP Capsule Type codes. The "HTTP
 Capsule Types" registry governs a 62-bit space and operates under the QUIC
 registration policy documented in {{Section 22.1 of QUIC}}. This new registry
 includes the common set of fields listed in {{Section 22.1.1 of QUIC}}. In
 addition to those common fields, all registrations in this registry MUST include
-a "Capsule Type" field that contains a short name or label for the capsule type.
+a "Capsule Type" field that contains a short name or label for the Capsule Type.
 
 Permanent registrations in this registry are assigned using the Specification
 Required policy ({{Section 4.6 of !IANA-POLICY=RFC8126}}), except for values
@@ -611,7 +611,7 @@ Standards Action or IESG Approval as defined in {{Sections 4.9 and 4.10 of
 IANA-POLICY}}.
 
 Capsule types with a value of the form 0x29 * N + 0x17 for integer values of N
-are reserved to exercise the requirement that unknown capsule types be ignored.
+are reserved to exercise the requirement that unknown Capsule Types be ignored.
 These capsules have no semantics and can carry arbitrary values. These values
 MUST NOT be assigned by IANA and MUST NOT appear in the listing of assigned
 values.
