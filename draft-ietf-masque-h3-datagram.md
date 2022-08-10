@@ -121,7 +121,7 @@ unreliable datagrams inside an HTTP connection with multiplexing when
 possible. All HTTP Datagrams are associated with an HTTP request.
 
 When HTTP Datagrams are conveyed on an HTTP/3 connection, the QUIC DATAGRAM
-frame can be used to achieve these goals, including unreliable delivery; see
+frame can be used to provide demultiplexing and unreliable delivery; see
 {{format}}. Negotiating the use of QUIC DATAGRAM frames for HTTP Datagrams is
 achieved via the exchange of HTTP/3 settings; see {{setting}}.
 
