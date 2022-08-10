@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="en" class="RFC">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>RFC 9297: HTTP Datagrams and the Capsule Protocol</title>
+<meta content="David Schinazi" name="author">
+<meta content="Lucas Pardue" name="author">
+<meta content="
+       This document describes HTTP Datagrams, a convention for conveying multiplexed,
+potentially unreliable datagrams inside an HTTP connection. 
+       In HTTP/3, HTTP Datagrams can be sent unreliably using the QUIC DATAGRAM
+extension. When the QUIC DATAGRAM frame is unavailable or undesirable, HTTP
+Datagrams can be sent using the Capsule Protocol, which is a more general
+convention for conveying data in HTTP connections. 
+       HTTP Datagrams and the Capsule Protocol are intended for use by HTTP extensions,
+not applications. 
+    " name="description">
+<meta content="xml2rfc 3.13.1" name="generator">
+<meta content="quic" name="keyword">
+<meta content="http" name="keyword">
+<meta content="datagram" name="keyword">
+<meta content="fast" name="keyword">
+<meta content="tunnels" name="keyword">
+<meta content="turtles all the way down" name="keyword">
+<meta content="masque" name="keyword">
+<meta content="http-ng" name="keyword">
+<meta content="9297" name="rfc.number">
+<!-- Generator version information:
+  xml2rfc 3.13.1
+    Python 3.10.5
+    appdirs 1.4.4
+    ConfigArgParse 1.5.3
+    google-i18n-address 2.5.2
+    html5lib 1.1
+    intervaltree 3.1.0
+    Jinja2 3.1.2
+    kitchen 1.2.6
+    lxml 4.9.1
+    MarkupSafe 2.1.1
+    pycountry 22.3.5
+    pyflakes 2.4.0
+    PyYAML 6.0
+    requests 2.27.1
+    setuptools 59.4.0
+    six 1.16.0
+-->
+<link href="draft-ietf-masque-h3-datagram.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabin Condensed", sans-serif;
+  font-weight: 600;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+}
+:is(ol, ul) :is(ol, ul) {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl > dd {
+  margin-bottom: .8em;
+  min-height: 1.3em;
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+dd.break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href].selfRef {
+  color: var(--text-color);
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    overflow-x: auto;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+}
+a.pilcrow[href] { color: var(--pilcrow-weak); }
+a.pilcrow[href]:hover { text-decoration: none; }
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: 14.5px;
+}
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 8em;
+}
+#identifiers dt {
+  width: var(--identifier-width);
+  margin: 0;
+  clear: left;
+  float: left;
+  text-align: right;
+}
+#identifiers dd {
+  margin: 0 0 0 calc(1em + var(--identifier-width));
+  min-width: 5em;
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+#toc nav ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#toc nav li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+#toc a.xref {
+  white-space: normal;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dt:target::before {
+  content: "⇒";
+  width: 15px;
+  margin: 0 10px 0 -25px;
+}
+.references dd {
+  margin-left: 8em;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc.active {
+      opacity: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 8px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active nav {
+    display: block;
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin-top: 2px;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #toc nav > ul  {
+    margin-bottom: 2em;
+  }
+  #toc ul {
+    margin: 0 0 0 4px;
+    font-size: var(--small-font-size);
+  }
+  #toc ul :is(p, li) {
+    margin: 2px 0;
+    line-height: 22px;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Changes introduced to fix issues found during implementation */
+
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin: 8px 0.5em 0;
+}
+
+/* Fix the dl styling to match the RFC 7992 attributes */
+dl > dt,
+dl.dlParallel > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+
+/* Provide styling for table cell text alignment */
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 20em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  dd {
+    page-break-before: avoid;
+  }
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([stroke="fill"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+<link href="https://dx.doi.org/10.17487/rfc9297" rel="alternate">
+  <link href="urn:issn:2070-1721" rel="alternate">
+  <link href="https://datatracker.ietf.org/doc/draft-ietf-masque-h3-datagram-latest" rel="prev">
+  </head>
+<body>
+<table class="ears">
+<thead><tr>
+<td class="left">RFC 9297</td>
+<td class="center">HTTP Datagrams</td>
+<td class="right">August 2022</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Schinazi &amp; Pardue</td>
+<td class="center">Standards Track</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-stream">Stream:</dt>
+<dd class="stream">Internet Engineering Task Force (IETF)</dd>
+<dt class="label-rfc">RFC:</dt>
+<dd class="rfc"><a href="https://www.rfc-editor.org/rfc/rfc9297" class="eref">9297</a></dd>
+<dt class="label-category">Category:</dt>
+<dd class="category">Standards Track</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2022-08" class="published">August 2022</time>
+    </dd>
+<dt class="label-issn">ISSN:</dt>
+<dd class="issn">2070-1721</dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">D. Schinazi</div>
+<div class="org">Google LLC</div>
+</div>
+<div class="author">
+      <div class="author-name">L. Pardue</div>
+<div class="org">Cloudflare</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="rfcnum">RFC 9297</h1>
+<h1 id="title">HTTP Datagrams and the Capsule Protocol</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document describes HTTP Datagrams, a convention for conveying multiplexed,
+potentially unreliable datagrams inside an HTTP connection.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">In HTTP/3, HTTP Datagrams can be sent unreliably using the QUIC DATAGRAM
+extension. When the QUIC DATAGRAM frame is unavailable or undesirable, HTTP
+Datagrams can be sent using the Capsule Protocol, which is a more general
+convention for conveying data in HTTP connections.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-3">HTTP Datagrams and the Capsule Protocol are intended for use by HTTP extensions,
+not applications.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+            This is an Internet Standards Track document.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+            This document is a product of the Internet Engineering Task Force
+            (IETF).  It represents the consensus of the IETF community.  It has
+            received public review and has been approved for publication by
+            the Internet Engineering Steering Group (IESG).  Further
+            information on Internet Standards is available in Section 2 of 
+            RFC 7841.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+            Information about the current status of this document, any
+            errata, and how to provide feedback on it may be obtained at
+            <span><a href="https://www.rfc-editor.org/info/rfc9297">https://www.rfc-editor.org/info/rfc9297</a></span>.<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2022 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction" class="xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="xref">1.1</a>.  <a href="#name-conventions-and-definitions" class="xref">Conventions and Definitions</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>.  <a href="#name-http-datagrams" class="xref">HTTP Datagrams</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-http-3-datagrams" class="xref">HTTP/3 Datagrams</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1.2.1">
+                    <p id="section-toc.1-1.2.2.1.2.1.1" class="keepWithNext"><a href="#section-2.1.1" class="xref">2.1.1</a>.  <a href="#name-the-settings_h3_datagram-ht" class="xref">The SETTINGS_H3_DATAGRAM HTTP/3 Setting</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="xref">2.2</a>.  <a href="#name-http-datagrams-using-capsul" class="xref">HTTP Datagrams Using Capsules</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-capsules" class="xref">Capsules</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-http-data-streams" class="xref">HTTP Data Streams</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-the-capsule-protocol" class="xref">The Capsule Protocol</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="xref">3.3</a>.  <a href="#name-error-handling" class="xref">Error Handling</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="xref">3.4</a>.  <a href="#name-the-capsule-protocol-header" class="xref">The Capsule-Protocol Header Field</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="xref">3.5</a>.  <a href="#name-the-datagram-capsule" class="xref">The DATAGRAM Capsule</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-security-considerations" class="xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-iana-considerations" class="xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-http-3-setting" class="xref">HTTP/3 Setting</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-http-3-error-code" class="xref">HTTP/3 Error Code</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="xref">5.3</a>.  <a href="#name-http-header-field-name" class="xref">HTTP Header Field Name</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="xref">5.4</a>.  <a href="#name-capsule-types" class="xref">Capsule Types</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-references" class="xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="xref">6.1</a>.  <a href="#name-normative-references" class="xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="xref">6.2</a>.  <a href="#name-informative-references" class="xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="xref"></a><a href="#name-acknowledgments" class="xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-addresses" class="xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="intro">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">HTTP extensions (as defined in <span><a href="https://rfc-editor.org/rfc/rfc9110#section-16" class="relref">Section 16</a> of [<a href="#HTTP" class="xref">HTTP</a>]</span>) sometimes need
+to access underlying transport protocol features such as unreliable delivery (as
+offered by <span>[<a href="#DGRAM" class="xref">DGRAM</a>]</span>) to enable desirable features. For example, this
+could allow for the introduction of an unreliable version of the CONNECT method
+and the addition of unreliable delivery to WebSockets <span>[<a href="#WEBSOCKET" class="xref">WEBSOCKET</a>]</span>.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">In <a href="#datagrams" class="xref">Section 2</a>, this document describes HTTP Datagrams: a convention that
+supports the bidirectional and optionally multiplexed exchange of data inside an
+HTTP connection. While HTTP Datagrams are associated with HTTP requests, they
+are not a part of message content. Instead, they are intended for use by HTTP
+extensions (such as the CONNECT method) and are compatible with all versions of
+HTTP.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">When HTTP is running over a transport protocol that supports unreliable delivery
+(such as when the QUIC DATAGRAM extension <span>[<a href="#DGRAM" class="xref">DGRAM</a>]</span> is available to HTTP/3
+<span>[<a href="#H3" class="xref">HTTP/3</a>]</span>), HTTP Datagrams can use that capability.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">In <a href="#capsule" class="xref">Section 3</a>, this document describes the HTTP Capsule Protocol, which allows
+the conveyance of HTTP Datagrams using reliable delivery. This addresses HTTP/3
+cases where use of the QUIC DATAGRAM frame is unavailable or undesirable or
+where the transport protocol only provides reliable delivery, such as with
+HTTP/1.1 <span>[<a href="#H1" class="xref">HTTP/1.1</a>]</span> or HTTP/2 <span>[<a href="#H2" class="xref">HTTP/2</a>]</span> over TCP <span>[<a href="#TCP" class="xref">TCP</a>]</span>.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<div id="defs">
+<section id="section-1.1">
+        <h3 id="name-conventions-and-definitions">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+        </h3>
+<p id="section-1.1-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">This document uses terminology from <span>[<a href="#QUIC" class="xref">QUIC</a>]</span>.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+<p id="section-1.1-3">Where this document defines protocol types, the definition format uses the
+notation from <span><a href="https://rfc-editor.org/rfc/rfc9000#section-1.3" class="relref">Section 1.3</a> of [<a href="#QUIC" class="xref">QUIC</a>]</span>. Where fields within types are integers,
+they are encoded using the variable-length integer encoding from <span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#QUIC" class="xref">QUIC</a>]</span>. Integer values do not need to be encoded on the minimum number of bytes
+necessary.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+<p id="section-1.1-4">In this document, the term "intermediary" refers to an HTTP intermediary as
+defined in <span><a href="https://rfc-editor.org/rfc/rfc9110#section-3.7" class="relref">Section 3.7</a> of [<a href="#HTTP" class="xref">HTTP</a>]</span>.<a href="#section-1.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="datagrams">
+<section id="section-2">
+      <h2 id="name-http-datagrams">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-http-datagrams" class="section-name selfRef">HTTP Datagrams</a>
+      </h2>
+<p id="section-2-1">HTTP Datagrams are a convention for conveying bidirectional and potentially
+unreliable datagrams inside an HTTP connection with multiplexing when
+possible. All HTTP Datagrams are associated with an HTTP request.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">When HTTP Datagrams are conveyed on an HTTP/3 connection, the QUIC DATAGRAM
+frame can be used to achieve these goals, including unreliable delivery; see
+<a href="#format" class="xref">Section 2.1</a>. Negotiating the use of QUIC DATAGRAM frames for HTTP Datagrams is
+achieved via the exchange of HTTP/3 settings; see <a href="#setting" class="xref">Section 2.1.1</a>.<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-3">When running over HTTP/2, demultiplexing is provided by the HTTP/2 framing
+layer, but unreliable delivery is unavailable. HTTP Datagrams are negotiated
+and conveyed using the Capsule Protocol; see <a href="#datagram-capsule" class="xref">Section 3.5</a>.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-4">When running over HTTP/1.x, requests are strictly serialized in the connection;
+therefore, demultiplexing is not available. Unreliable delivery is likewise not
+available. HTTP Datagrams are negotiated and conveyed using the Capsule
+Protocol; see <a href="#datagram-capsule" class="xref">Section 3.5</a>.<a href="#section-2-4" class="pilcrow">¶</a></p>
+<p id="section-2-5">HTTP Datagrams <span class="bcp14">MUST</span> only be sent with an association to an HTTP request that
+explicitly supports them. For example, existing HTTP methods GET and POST do not
+define semantics for associated HTTP Datagrams; therefore, HTTP Datagrams
+associated with GET or POST request streams cannot be sent.<a href="#section-2-5" class="pilcrow">¶</a></p>
+<p id="section-2-6">If an HTTP Datagram is received and it is associated with a request that has no
+known semantics for HTTP Datagrams, the receiver <span class="bcp14">MUST</span> terminate the request. If
+HTTP/3 is in use, the request stream <span class="bcp14">MUST</span> be aborted with H3_DATAGRAM_ERROR
+(0x33). HTTP extensions <span class="bcp14">MAY</span> override these requirements by defining a
+negotiation mechanism and semantics for HTTP Datagrams.<a href="#section-2-6" class="pilcrow">¶</a></p>
+<div id="format">
+<section id="section-2.1">
+        <h3 id="name-http-3-datagrams">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-http-3-datagrams" class="section-name selfRef">HTTP/3 Datagrams</a>
+        </h3>
+<p id="section-2.1-1">When used with HTTP/3, the Datagram Data field of QUIC DATAGRAM frames uses the
+following format:<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<span id="name-http-3-datagram-format"></span><div id="h3-datagram-format">
+<figure id="figure-1">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-2.1-2.1">
+<pre>
+HTTP/3 Datagram {
+  Quarter Stream ID (i),
+  HTTP Datagram Payload (..),
+}
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-http-3-datagram-format" class="selfRef">HTTP/3 Datagram Format</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-2.1-3">
+          <dt id="section-2.1-3.1">Quarter Stream ID:</dt>
+          <dd style="margin-left: 1.5em" id="section-2.1-3.2">
+            <p id="section-2.1-3.2.1">A variable-length integer that contains the value of the client-initiated
+bidirectional stream that this datagram is associated with divided by four (the
+division by four stems from the fact that HTTP requests are sent on
+client-initiated bidirectional streams, which have stream IDs that are divisible
+by four). The largest legal QUIC stream ID value is 2<sup>62</sup>-1, so the
+largest legal value of Quarter Stream ID is 2<sup>60</sup>-1. Receipt of an
+HTTP/3 Datagram that includes a larger value <span class="bcp14">MUST</span> be treated as an HTTP/3
+connection error of type H3_DATAGRAM_ERROR (0x33).<a href="#section-2.1-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-2.1-3.3">HTTP Datagram Payload:</dt>
+          <dd style="margin-left: 1.5em" id="section-2.1-3.4">
+            <p id="section-2.1-3.4.1">The payload of the datagram, whose semantics are defined by the extension that
+is using HTTP Datagrams. Note that this field can be empty.<a href="#section-2.1-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-2.1-4">Receipt of a QUIC DATAGRAM frame whose payload is too short to allow parsing the
+Quarter Stream ID field <span class="bcp14">MUST</span> be treated as an HTTP/3 connection error of type
+H3_DATAGRAM_ERROR (0x33).<a href="#section-2.1-4" class="pilcrow">¶</a></p>
+<p id="section-2.1-5">HTTP/3 Datagrams <span class="bcp14">MUST NOT</span> be sent unless the corresponding stream's send side is
+open. If a datagram is received after the corresponding stream's receive side is
+closed, the received datagrams <span class="bcp14">MUST</span> be silently dropped.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
+<p id="section-2.1-6">If an HTTP/3 Datagram is received and its Quarter Stream ID maps to a stream
+that has not yet been created, the receiver <span class="bcp14">SHALL</span> either drop that datagram
+silently or buffer it temporarily (on the order of a round trip) while awaiting
+the creation of the corresponding stream.<a href="#section-2.1-6" class="pilcrow">¶</a></p>
+<p id="section-2.1-7">If an HTTP/3 Datagram is received and its Quarter Stream ID maps to a stream
+that cannot be created due to client-initiated bidirectional stream limits, it
+<span class="bcp14">SHOULD</span> be treated as an HTTP/3 connection error of type H3_ID_ERROR. Generating
+an error is not mandatory in this case because HTTP/3 implementations might have
+practical barriers to determining the active stream concurrency limit that is
+applied by the QUIC layer.<a href="#section-2.1-7" class="pilcrow">¶</a></p>
+<p id="section-2.1-8">Prioritization of HTTP/3 Datagrams is not defined in this document. Future
+extensions <span class="bcp14">MAY</span> define how to prioritize datagrams and <span class="bcp14">MAY</span> define signaling to
+allow communicating prioritization preferences.<a href="#section-2.1-8" class="pilcrow">¶</a></p>
+<div id="setting">
+<section id="section-2.1.1">
+          <h4 id="name-the-settings_h3_datagram-ht">
+<a href="#section-2.1.1" class="section-number selfRef">2.1.1. </a><a href="#name-the-settings_h3_datagram-ht" class="section-name selfRef">The SETTINGS_H3_DATAGRAM HTTP/3 Setting</a>
+          </h4>
+<p id="section-2.1.1-1">An endpoint can indicate to its peer that it is willing to receive HTTP/3
+Datagrams by sending the SETTINGS_H3_DATAGRAM (0x33) setting with a value of 1.<a href="#section-2.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.1.1-2">The value of the SETTINGS_H3_DATAGRAM setting <span class="bcp14">MUST</span> be either 0 or 1. A value
+of 0 indicates that the implementation is not willing to receive HTTP Datagrams.
+If the SETTINGS_H3_DATAGRAM setting is received with a value that is neither 0
+nor 1, the receiver <span class="bcp14">MUST</span> terminate the connection with error H3_SETTINGS_ERROR.<a href="#section-2.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.1.1-3">QUIC DATAGRAM frames <span class="bcp14">MUST NOT</span> be sent until the SETTINGS_H3_DATAGRAM setting
+has been both sent and received with a value of 1.<a href="#section-2.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-2.1.1-4">When clients use 0-RTT, they <span class="bcp14">MAY</span> store the value of the server's
+SETTINGS_H3_DATAGRAM setting. Doing so allows the client to send QUIC DATAGRAM
+frames in 0-RTT packets. When servers decide to accept 0-RTT data, they <span class="bcp14">MUST</span>
+send a SETTINGS_H3_DATAGRAM setting greater than or equal to the value they sent
+to the client in the connection where they sent them the NewSessionTicket
+message. If a client stores the value of the SETTINGS_H3_DATAGRAM setting with
+their 0-RTT state, they <span class="bcp14">MUST</span> validate that the new value of the
+SETTINGS_H3_DATAGRAM setting sent by the server in the handshake is greater than
+or equal to the stored value; if not, the client <span class="bcp14">MUST</span> terminate the connection
+with error H3_SETTINGS_ERROR. In all cases, the maximum permitted value of the
+SETTINGS_H3_DATAGRAM setting parameter is 1.<a href="#section-2.1.1-4" class="pilcrow">¶</a></p>
+<p id="section-2.1.1-5">It is <span class="bcp14">RECOMMENDED</span> that implementations that support receiving HTTP/3 Datagrams
+always send the SETTINGS_H3_DATAGRAM setting with a value of 1,
+even if the application does not intend to use HTTP/3 Datagrams. This helps to
+avoid "sticking out"; see <a href="#security" class="xref">Section 4</a>.<a href="#section-2.1.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="http-datagrams-using-capsules">
+<section id="section-2.2">
+        <h3 id="name-http-datagrams-using-capsul">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-http-datagrams-using-capsul" class="section-name selfRef">HTTP Datagrams Using Capsules</a>
+        </h3>
+<p id="section-2.2-1">When HTTP/3 Datagrams are unavailable or undesirable, HTTP Datagrams can be sent
+using the Capsule Protocol; see <a href="#datagram-capsule" class="xref">Section 3.5</a>.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="capsule">
+<section id="section-3">
+      <h2 id="name-capsules">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-capsules" class="section-name selfRef">Capsules</a>
+      </h2>
+<p id="section-3-1">One mechanism to extend HTTP is to introduce new HTTP Upgrade Tokens; see
+<span><a href="https://rfc-editor.org/rfc/rfc9110#section-16.7" class="relref">Section 16.7</a> of [<a href="#HTTP" class="xref">HTTP</a>]</span>. In HTTP/1.x, these tokens are used via the Upgrade
+mechanism; see <span><a href="https://rfc-editor.org/rfc/rfc9110#section-7.8" class="relref">Section 7.8</a> of [<a href="#HTTP" class="xref">HTTP</a>]</span>. In HTTP/2 and HTTP/3, these tokens are
+used via the Extended CONNECT mechanism; see <span>[<a href="#EXT-CONNECT2" class="xref">EXT-CONNECT2</a>]</span> and
+<span>[<a href="#EXT-CONNECT3" class="xref">EXT-CONNECT3</a>]</span>.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">This specification introduces the Capsule Protocol. The Capsule Protocol is a
+sequence of type-length-value tuples that definitions of new HTTP Upgrade Tokens
+can choose to use. It allows endpoints to reliably communicate request-related
+information end-to-end on HTTP request streams, even in the presence of HTTP
+intermediaries. The Capsule Protocol can be used to exchange HTTP Datagrams,
+which is necessary when HTTP is running over a transport that does not support
+the QUIC DATAGRAM frame. The Capsule Protocol can also be used to communicate
+reliable and bidirectional control messages associated with a datagram-based
+protocol even when HTTP/3 Datagrams are in use.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<div id="data-stream">
+<section id="section-3.1">
+        <h3 id="name-http-data-streams">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-http-data-streams" class="section-name selfRef">HTTP Data Streams</a>
+        </h3>
+<p id="section-3.1-1">This specification defines the "data stream" of an HTTP request as the
+bidirectional stream of bytes that follows the header section of the request
+message and the final response message that is either successful (i.e., 2xx) or
+upgraded (i.e., 101).<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">In HTTP/1.x, the data stream consists of all bytes on the connection that follow
+the blank line that concludes either the request header section or the final
+response header section. As a result, only the last HTTP request on an HTTP/1.x
+connection can start the capsule protocol.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">In HTTP/2 and HTTP/3, the data stream of a given HTTP request consists of all
+bytes sent in DATA frames with the corresponding stream ID.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">The concept of a data stream is particularly relevant for methods such as
+CONNECT, where there is no HTTP message content after the headers.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.1-5">Data streams can be prioritized using any means suited to stream or request
+prioritization. For example, see <span><a href="https://rfc-editor.org/rfc/rfc9218#section-11" class="relref">Section 11</a> of [<a href="#PRIORITY" class="xref">PRIORITY</a>]</span>.<a href="#section-3.1-5" class="pilcrow">¶</a></p>
+<p id="section-3.1-6">Data streams are subject to the flow control mechanisms of the underlying
+layers. Examples include HTTP/2 stream flow control, HTTP/2 connection flow
+control, and TCP flow control.<a href="#section-3.1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="capsule-protocol">
+<section id="section-3.2">
+        <h3 id="name-the-capsule-protocol">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-the-capsule-protocol" class="section-name selfRef">The Capsule Protocol</a>
+        </h3>
+<p id="section-3.2-1">Definitions of new HTTP Upgrade Tokens can state that their associated request's
+data stream uses the Capsule Protocol. If they do so, the contents of the
+associated request's data stream uses the following format:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<span id="name-capsule-protocol-stream-for"></span><div id="capsule-stream-format">
+<figure id="figure-2">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-3.2-2.1">
+<pre>
+Capsule Protocol {
+  Capsule (..) ...,
+}
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-capsule-protocol-stream-for" class="selfRef">Capsule Protocol Stream Format</a>
+          </figcaption></figure>
+</div>
+<span id="name-capsule-format"></span><div id="capsule-format">
+<figure id="figure-3">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-3.2-3.1">
+<pre>
+Capsule {
+  Capsule Type (i),
+  Capsule Length (i),
+  Capsule Value (..),
+}
+</pre>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-capsule-format" class="selfRef">Capsule Format</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-3.2-4">
+          <dt id="section-3.2-4.1">Capsule Type:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-4.2">
+            <p id="section-3.2-4.2.1">A variable-length integer indicating the Type of the capsule. An IANA registry
+is used to manage the assignment of Capsule Types; see <a href="#iana-types" class="xref">Section 5.4</a>.<a href="#section-3.2-4.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.2-4.3">Capsule Length:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-4.4">
+            <p id="section-3.2-4.4.1">The length in bytes of the Capsule Value field following this field, encoded
+as a variable-length integer. Note that this field can have a value of zero.<a href="#section-3.2-4.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.2-4.5">Capsule Value:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-4.6">
+            <p id="section-3.2-4.6.1">The payload of this capsule. Its semantics are determined by the value of the
+Capsule Type field.<a href="#section-3.2-4.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-3.2-5">An intermediary can identify the use of the capsule protocol either through the
+presence of the Capsule-Protocol header field (<a href="#hdr" class="xref">Section 3.4</a>) or by understanding the
+chosen HTTP Upgrade token.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
+<p id="section-3.2-6">Because new protocols or extensions might define new capsule types,
+intermediaries that wish to allow for future extensibility <span class="bcp14">SHOULD</span> forward
+capsules without modification unless the definition of the Capsule Type in use
+specifies additional intermediary processing. One such Capsule Type is the
+DATAGRAM capsule; see <a href="#datagram-capsule" class="xref">Section 3.5</a>. In particular, intermediaries <span class="bcp14">SHOULD</span>
+forward Capsules with an unknown Capsule Type without modification.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.2-7">Endpoints that receive a Capsule with an unknown Capsule Type <span class="bcp14">MUST</span> silently
+drop that Capsule and skip over it to parse the next Capsule.<a href="#section-3.2-7" class="pilcrow">¶</a></p>
+<p id="section-3.2-8">By virtue of the definition of the data stream:<a href="#section-3.2-8" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-9.1">The Capsule Protocol is not in use unless the response includes a 2xx
+(Successful) or 101 (Switching Protocols) status code.<a href="#section-3.2-9.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.2-9.2">When the Capsule Protocol is in use, the associated HTTP request and response
+do not carry HTTP content. A future extension <span class="bcp14">MAY</span> define a new capsule type to
+carry HTTP content.<a href="#section-3.2-9.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-3.2-10">The Capsule Protocol only applies to definitions of new HTTP Upgrade Tokens;
+thus, in HTTP/2 and HTTP/3, it can only be used with the CONNECT method.
+Therefore, once both endpoints agree to use the Capsule Protocol, the frame
+usage requirements of the stream change as specified in <span><a href="https://rfc-editor.org/rfc/rfc9113#section-8.5" class="relref">Section 8.5</a> of [<a href="#H2" class="xref">HTTP/2</a>]</span>
+and <span><a href="https://rfc-editor.org/rfc/rfc9114#section-4.2" class="relref">Section 4.2</a> of [<a href="#H3" class="xref">HTTP/3</a>]</span>.<a href="#section-3.2-10" class="pilcrow">¶</a></p>
+<p id="section-3.2-11">The Capsule Protocol <span class="bcp14">MUST NOT</span> be used with messages that contain Content-Length,
+Content-Type, or Transfer-Encoding header fields. Additionally, HTTP status
+codes 204 (No Content), 205 (Reset Content), and 206 (Partial Content) <span class="bcp14">MUST NOT</span>
+be sent on responses that use the Capsule Protocol. A receiver that observes a
+violation of these requirements <span class="bcp14">MUST</span> treat the HTTP message as malformed.<a href="#section-3.2-11" class="pilcrow">¶</a></p>
+<p id="section-3.2-12">When processing capsules, a receiver might be tempted to accumulate the full
+length of the capsule value in the data stream before handling it. This approach
+<span class="bcp14">SHOULD</span> be avoided because it can consume flow control in underlying layers, and
+that might lead to deadlocks if the capsule data exhausts the flow control
+window.<a href="#section-3.2-12" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="error-handling">
+<section id="section-3.3">
+        <h3 id="name-error-handling">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-error-handling" class="section-name selfRef">Error Handling</a>
+        </h3>
+<p id="section-3.3-1">When a receiver encounters an error processing the Capsule Protocol, the
+receiver <span class="bcp14">MUST</span> treat it as if it had received a malformed or incomplete HTTP
+message. For HTTP/3, the handling of malformed messages is described in
+<span><a href="https://rfc-editor.org/rfc/rfc9114#section-4.1.3" class="relref">Section 4.1.3</a> of [<a href="#H3" class="xref">HTTP/3</a>]</span>. For HTTP/2, the handling of malformed messages is
+described in <span><a href="https://rfc-editor.org/rfc/rfc9113#section-8.1.1" class="relref">Section 8.1.1</a> of [<a href="#H2" class="xref">HTTP/2</a>]</span>. For HTTP/1.x, the handling of incomplete
+messages is described in <span><a href="https://rfc-editor.org/rfc/rfc9112#section-8" class="relref">Section 8</a> of [<a href="#H1" class="xref">HTTP/1.1</a>]</span>.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">Each capsule's payload <span class="bcp14">MUST</span> contain exactly the fields identified in its
+description. A capsule payload that contains additional bytes after the
+identified fields or a capsule payload that terminates before the end of the
+identified fields <span class="bcp14">MUST</span> be treated as it if were a malformed or incomplete
+message. In particular, redundant length encodings <span class="bcp14">MUST</span> be verified to be
+self-consistent.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.3-3">If the receive side of a stream carrying capsules is terminated cleanly (for
+example, in HTTP/3 this is defined as receiving a QUIC STREAM frame with the FIN
+bit set) and the last capsule on the stream was truncated, this <span class="bcp14">MUST</span> be treated
+as if it were a malformed or incomplete message.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="hdr">
+<section id="section-3.4">
+        <h3 id="name-the-capsule-protocol-header">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-the-capsule-protocol-header" class="section-name selfRef">The Capsule-Protocol Header Field</a>
+        </h3>
+<p id="section-3.4-1">The "Capsule-Protocol" header field is an Item Structured Field; see <span><a href="https://rfc-editor.org/rfc/rfc8941#section-3.3" class="relref">Section 3.3</a> of [<a href="#STRUCT-FIELD" class="xref">STRUCT-FIELD</a>]</span>. Its value <span class="bcp14">MUST</span> be a Boolean; any other value
+type <span class="bcp14">MUST</span> be handled as if the field were not present by recipients (for
+example, if this field is included multiple times, its type will become a List
+and the field will be ignored). This document does not define any parameters for
+the Capsule-Protocol header field value, but future documents might define
+parameters. Receivers <span class="bcp14">MUST</span> ignore unknown parameters.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">Endpoints indicate that the Capsule Protocol is in use on a data stream by
+sending a Capsule-Protocol header field with a true value. A Capsule-Protocol
+header field with a false value has the same semantics as when the header is not
+present.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+<p id="section-3.4-3">Intermediaries <span class="bcp14">MAY</span> use this header field to allow processing of HTTP Datagrams
+for unknown HTTP Upgrade Tokens. Note that this is only possible for HTTP
+Upgrade or Extended CONNECT.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
+<p id="section-3.4-4">The Capsule-Protocol header field <span class="bcp14">MUST NOT</span> be used on HTTP responses with a
+status code that is both different from 101 (Switching Protocols) and outside
+the 2xx (Successful) range.<a href="#section-3.4-4" class="pilcrow">¶</a></p>
+<p id="section-3.4-5">When using the Capsule Protocol, HTTP endpoints <span class="bcp14">SHOULD</span> send the Capsule-Protocol
+header field to simplify intermediary processing. Definitions of new HTTP
+Upgrade Tokens that use the Capsule Protocol <span class="bcp14">MAY</span> alter this recommendation.<a href="#section-3.4-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="datagram-capsule">
+<section id="section-3.5">
+        <h3 id="name-the-datagram-capsule">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-the-datagram-capsule" class="section-name selfRef">The DATAGRAM Capsule</a>
+        </h3>
+<p id="section-3.5-1">This document defines the DATAGRAM (0x00) capsule type. This capsule allows HTTP
+Datagrams to be sent on a stream using the Capsule Protocol. This is
+particularly useful when HTTP is running over a transport that does not support
+the QUIC DATAGRAM frame.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+<span id="name-datagram-capsule-format"></span><div id="datagram-capsule-format">
+<figure id="figure-4">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-3.5-2.1">
+<pre>
+Datagram Capsule {
+  Type (i) = 0x00,
+  Length (i),
+  HTTP Datagram Payload (..),
+}
+</pre>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-datagram-capsule-format" class="selfRef">DATAGRAM Capsule Format</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-3.5-3">
+          <dt id="section-3.5-3.1">HTTP Datagram Payload:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.5-3.2">
+            <p id="section-3.5-3.2.1">The payload of the datagram, whose semantics are defined by the extension that
+is using HTTP Datagrams. Note that this field can be empty.<a href="#section-3.5-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-3.5-4">HTTP Datagrams sent using the DATAGRAM capsule have the same semantics as those
+sent in QUIC DATAGRAM frames. In particular, the restrictions on when it is
+allowed to send an HTTP Datagram and how to process them (from <a href="#format" class="xref">Section 2.1</a>) also
+apply to HTTP Datagrams sent and received using the DATAGRAM capsule.<a href="#section-3.5-4" class="pilcrow">¶</a></p>
+<p id="section-3.5-5">An intermediary can re-encode HTTP Datagrams as it forwards them. In other
+words, an intermediary <span class="bcp14">MAY</span> send a DATAGRAM capsule to forward an HTTP Datagram
+that was received in a QUIC DATAGRAM frame and vice versa. Intermediaries <span class="bcp14">MUST NOT</span> perform this re-encoding unless they have identified the use of the Capsule
+Protocol on the corresponding request stream; see <a href="#capsule-protocol" class="xref">Section 3.2</a>.<a href="#section-3.5-5" class="pilcrow">¶</a></p>
+<p id="section-3.5-6">Note that while DATAGRAM capsules that are sent on a stream are reliably
+delivered in order, intermediaries can re-encode DATAGRAM capsules into QUIC
+DATAGRAM frames when forwarding messages, which could result in loss or
+reordering.<a href="#section-3.5-6" class="pilcrow">¶</a></p>
+<p id="section-3.5-7">If an intermediary receives an HTTP Datagram in a QUIC DATAGRAM frame and is
+forwarding it on a connection that supports QUIC DATAGRAM frames, the
+intermediary <span class="bcp14">SHOULD NOT</span> convert that HTTP Datagram to a DATAGRAM capsule. If the
+HTTP Datagram is too large to fit in a DATAGRAM frame (for example, because the
+Path MTU (PMTU) of that QUIC connection is too low or if the maximum UDP payload
+size advertised on that connection is too low), the intermediary <span class="bcp14">SHOULD</span> drop the
+HTTP Datagram instead of converting it to a DATAGRAM capsule. This preserves the
+end-to-end unreliability characteristic that methods such as Datagram
+Packetization Layer PMTU Discovery (DPLPMTUD) depend on <span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.
+An intermediary that converts QUIC DATAGRAM frames to DATAGRAM capsules allows
+HTTP Datagrams to be arbitrarily large without suffering any loss. This can
+misrepresent the true path properties, defeating methods such as DPLPMTUD.<a href="#section-3.5-7" class="pilcrow">¶</a></p>
+<p id="section-3.5-8">While DATAGRAM capsules can theoretically carry a payload of length
+2<sup>62</sup>-1, most HTTP extensions that use HTTP Datagrams will have their
+own limits on what datagram payload sizes are practical. Implementations <span class="bcp14">SHOULD</span>
+take those limits into account when parsing DATAGRAM capsules. If an incoming
+DATAGRAM capsule has a length that is known to be so large as to not be usable,
+the implementation <span class="bcp14">SHOULD</span> discard the capsule without buffering its contents
+into memory.<a href="#section-3.5-8" class="pilcrow">¶</a></p>
+<p id="section-3.5-9">Since QUIC DATAGRAM frames are required to fit within a QUIC packet,
+implementations that re-encode DATAGRAM capsules into QUIC DATAGRAM frames might
+be tempted to accumulate the entire capsule in the stream before re-encoding it.
+This <span class="bcp14">SHOULD</span> be avoided, because it can cause flow control problems; see
+<a href="#capsule-protocol" class="xref">Section 3.2</a>.<a href="#section-3.5-9" class="pilcrow">¶</a></p>
+<p id="section-3.5-10">Note that it is possible for an HTTP extension to use HTTP Datagrams without
+using the Capsule Protocol. For example, if an HTTP extension that uses HTTP
+Datagrams is only defined over transports that support QUIC DATAGRAM frames, it
+might not need a stream encoding. Additionally, HTTP extensions can use HTTP
+Datagrams with their own data stream protocol. However, new HTTP extensions that
+wish to use HTTP Datagrams <span class="bcp14">SHOULD</span> use the Capsule Protocol, as failing to do so
+will make it harder for the HTTP extension to support versions of HTTP other
+than HTTP/3 and will prevent interoperability with intermediaries that only
+support the Capsule Protocol.<a href="#section-3.5-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security">
+<section id="section-4">
+      <h2 id="name-security-considerations">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-4-1">Since transmitting HTTP Datagrams using QUIC DATAGRAM frames requires sending
+the HTTP/3 SETTINGS_H3_DATAGRAM setting, it "sticks out". In other words,
+probing clients can learn whether a server supports HTTP Datagrams over QUIC
+DATAGRAM frames. As some servers might wish to obfuscate the fact that they
+offer application services that use HTTP Datagrams, it's best for all
+implementations that support this feature to always send this setting; see
+<a href="#setting" class="xref">Section 2.1.1</a>.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">Since use of the Capsule Protocol is restricted to new HTTP Upgrade Tokens, it
+is not accessible from Web Platform APIs (such as those commonly accessed via
+JavaScript in web browsers).<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">Definitions of new HTTP Upgrade Tokens that use the Capsule Protocol need to
+perform a security analysis that considers the impact of HTTP Datagrams and
+Capsules in the context of their protocol.<a href="#section-4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana">
+<section id="section-5">
+      <h2 id="name-iana-considerations">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<div id="iana-setting">
+<section id="section-5.1">
+        <h3 id="name-http-3-setting">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-http-3-setting" class="section-name selfRef">HTTP/3 Setting</a>
+        </h3>
+<p id="section-5.1-1">IANA has registered the following entry in the "HTTP/3 Settings" registry
+maintained at &lt;<span><a href="https://www.iana.org/assignments/http3-parameters">https://www.iana.org/assignments/http3-parameters</a></span>&gt;:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlCompact dlParallel" id="section-5.1-2">
+          <dt id="section-5.1-2.1">Value:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.2">
+            <p id="section-5.1-2.2.1">0x33<a href="#section-5.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.3">Setting Name:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.4">
+            <p id="section-5.1-2.4.1">SETTINGS_H3_DATAGRAM<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.5">Default:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.6">
+            <p id="section-5.1-2.6.1">0<a href="#section-5.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.7">Status:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.8">
+            <p id="section-5.1-2.8.1">permanent<a href="#section-5.1-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.9">Reference:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.10">
+            <p id="section-5.1-2.10.1">RFC 9297<a href="#section-5.1-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.11">Change Controller:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.12">
+            <p id="section-5.1-2.12.1">IETF<a href="#section-5.1-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.13">Contact:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.14">
+            <p id="section-5.1-2.14.1">HTTP_WG; HTTP working group; ietf-http-wg@w3.org<a href="#section-5.1-2.14.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="iana-error">
+<section id="section-5.2">
+        <h3 id="name-http-3-error-code">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-http-3-error-code" class="section-name selfRef">HTTP/3 Error Code</a>
+        </h3>
+<p id="section-5.2-1">IANA has registered the following entry in the "HTTP/3 Error Codes" registry
+maintained at &lt;<span><a href="https://www.iana.org/assignments/http3-parameters">https://www.iana.org/assignments/http3-parameters</a></span>&gt;:<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlCompact dlParallel" id="section-5.2-2">
+          <dt id="section-5.2-2.1">Value:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-2.2">
+            <p id="section-5.2-2.2.1">0x33<a href="#section-5.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-2.3">Name:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-2.4">
+            <p id="section-5.2-2.4.1">H3_DATAGRAM_ERROR<a href="#section-5.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-2.5">Description:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-2.6">
+            <p id="section-5.2-2.6.1">Datagram or capsule protocol parse error<a href="#section-5.2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-2.7">Status:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-2.8">
+            <p id="section-5.2-2.8.1">permanent<a href="#section-5.2-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-2.9">Reference:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-2.10">
+            <p id="section-5.2-2.10.1">RFC 9297<a href="#section-5.2-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-2.11">Change Controller:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-2.12">
+            <p id="section-5.2-2.12.1">IETF<a href="#section-5.2-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-2.13">Contact:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-2.14">
+            <p id="section-5.2-2.14.1">HTTP_WG; HTTP working group; ietf-http-wg@w3.org<a href="#section-5.2-2.14.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="iana-hdr">
+<section id="section-5.3">
+        <h3 id="name-http-header-field-name">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-http-header-field-name" class="section-name selfRef">HTTP Header Field Name</a>
+        </h3>
+<p id="section-5.3-1">IANA has registered the following entry in the "Hypertext Transfer Protocol
+(HTTP) Field Name Registry" maintained at
+&lt;<span><a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a></span>&gt;:<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlCompact dlParallel" id="section-5.3-2">
+          <dt id="section-5.3-2.1">Field Name:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-2.2">
+            <p id="section-5.3-2.2.1">Capsule-Protocol<a href="#section-5.3-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.3-2.3">Template:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-2.4">
+            <p id="section-5.3-2.4.1">None<a href="#section-5.3-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.3-2.5">Status:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-2.6">
+            <p id="section-5.3-2.6.1">permanent<a href="#section-5.3-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.3-2.7">Reference:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-2.8">
+            <p id="section-5.3-2.8.1">RFC 9297<a href="#section-5.3-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.3-2.9">Comments:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-2.10">
+            <p id="section-5.3-2.10.1">None<a href="#section-5.3-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="iana-types">
+<section id="section-5.4">
+        <h3 id="name-capsule-types">
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-capsule-types" class="section-name selfRef">Capsule Types</a>
+        </h3>
+<p id="section-5.4-1">This document establishes a registry for HTTP capsule type codes. The "HTTP
+Capsule Types" registry governs a 62-bit space and operates under the QUIC
+registration policy documented in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.1" class="relref">Section 22.1</a> of [<a href="#QUIC" class="xref">QUIC</a>]</span>. This new registry
+includes the common set of fields listed in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.1.1" class="relref">Section 22.1.1</a> of [<a href="#QUIC" class="xref">QUIC</a>]</span>. In
+addition to those common fields, all registrations in this registry <span class="bcp14">MUST</span> include
+a "Capsule Type" field that contains a short name or label for the capsule type.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<p id="section-5.4-2">Permanent registrations in this registry are assigned using the Specification
+Required policy (<span><a href="https://rfc-editor.org/rfc/rfc8126#section-4.6" class="relref">Section 4.6</a> of [<a href="#IANA-POLICY" class="xref">IANA-POLICY</a>]</span>), except for values
+between 0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
+Standards Action or IESG Approval as defined in Sections <a href="https://rfc-editor.org/rfc/rfc8126#section-4.9" class="relref">4.9</a> and <a href="https://rfc-editor.org/rfc/rfc8126#section-4.10" class="relref">4.10</a> of <span>[<a href="#IANA-POLICY" class="xref">IANA-POLICY</a>]</span>.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
+<p id="section-5.4-3">Capsule types with a value of the form 0x29 * N + 0x17 for integer values of N
+are reserved to exercise the requirement that unknown capsule types be ignored.
+These capsules have no semantics and can carry arbitrary values. These values
+<span class="bcp14">MUST NOT</span> be assigned by IANA and <span class="bcp14">MUST NOT</span> appear in the listing of assigned
+values.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
+<p id="section-5.4-4">This registry initially contains the following entry:<a href="#section-5.4-4" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlCompact dlParallel" id="section-5.4-5">
+          <dt id="section-5.4-5.1">Value:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-5.2">
+            <p id="section-5.4-5.2.1">0x00<a href="#section-5.4-5.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.4-5.3">Capsule Type:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-5.4">
+            <p id="section-5.4-5.4.1">DATAGRAM<a href="#section-5.4-5.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.4-5.5">Status:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-5.6">
+            <p id="section-5.4-5.6.1">permanent<a href="#section-5.4-5.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.4-5.7">Reference:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-5.8">
+            <p id="section-5.4-5.8.1">RFC 9297<a href="#section-5.4-5.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.4-5.9">Change Controller:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-5.10">
+            <p id="section-5.4-5.10.1">IETF<a href="#section-5.4-5.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.4-5.11">Contact:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-5.12">
+            <p id="section-5.4-5.12.1">MASQUE Working Group <a href="mailto:masque@ietf.org">masque@ietf.org</a><a href="#section-5.4-5.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.4-5.13">Notes:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-5.14">
+            <p id="section-5.4-5.14.1">None<a href="#section-5.4-5.14.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<section id="section-6">
+      <h2 id="name-references">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<section id="section-6.1">
+        <h3 id="name-normative-references">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="DGRAM">[DGRAM]</dt>
+        <dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Kinnear, E.</span>, and <span class="refAuthor">D. Schinazi</span>, <span class="refTitle">"An Unreliable Datagram Extension to QUIC"</span>, <span class="seriesInfo">RFC 9221</span>, <span class="seriesInfo">DOI 10.17487/RFC9221</span>, <time datetime="2022-03" class="refDate">March 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9221">https://www.rfc-editor.org/rfc/rfc9221</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="HTTP">[HTTP]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="H1">[HTTP/1.1]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP/1.1"</span>, <span class="seriesInfo">STD 99</span>, <span class="seriesInfo">RFC 9112</span>, <span class="seriesInfo">DOI 10.17487/RFC9112</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9112">https://www.rfc-editor.org/rfc/rfc9112</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="H2">[HTTP/2]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M., Ed.</span> and <span class="refAuthor">C. Benfield, Ed.</span>, <span class="refTitle">"HTTP/2"</span>, <span class="seriesInfo">RFC 9113</span>, <span class="seriesInfo">DOI 10.17487/RFC9113</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9113">https://www.rfc-editor.org/rfc/rfc9113</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="H3">[HTTP/3]</dt>
+        <dd>
+<span class="refAuthor">Bishop, M., Ed.</span>, <span class="refTitle">"HTTP/3"</span>, <span class="seriesInfo">RFC 9114</span>, <span class="seriesInfo">DOI 10.17487/RFC9114</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9114">https://www.rfc-editor.org/rfc/rfc9114</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IANA-POLICY">[IANA-POLICY]</dt>
+        <dd>
+<span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Leiba, B.</span>, and <span class="refAuthor">T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8126">https://www.rfc-editor.org/rfc/rfc8126</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="QUIC">[QUIC]</dt>
+        <dd>
+<span class="refAuthor">Iyengar, J., Ed.</span> and <span class="refAuthor">M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="seriesInfo">RFC 9000</span>, <span class="seriesInfo">DOI 10.17487/RFC9000</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="STRUCT-FIELD">[STRUCT-FIELD]</dt>
+        <dd>
+<span class="refAuthor">Nottingham, M.</span> and <span class="refAuthor">P-H. Kamp</span>, <span class="refTitle">"Structured Field Values for HTTP"</span>, <span class="seriesInfo">RFC 8941</span>, <span class="seriesInfo">DOI 10.17487/RFC8941</span>, <time datetime="2021-02" class="refDate">February 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8941">https://www.rfc-editor.org/rfc/rfc8941</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TCP">[TCP]</dt>
+      <dd>
+<span class="refAuthor">Postel, J.</span>, <span class="refTitle">"Transmission Control Protocol"</span>, <span class="seriesInfo">STD 7</span>, <span class="seriesInfo">RFC 793</span>, <span class="seriesInfo">DOI 10.17487/RFC0793</span>, <time datetime="1981-09" class="refDate">September 1981</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc793">https://www.rfc-editor.org/rfc/rfc793</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<section id="section-6.2">
+        <h3 id="name-informative-references">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="DPLPMTUD">[DPLPMTUD]</dt>
+        <dd>
+<span class="refAuthor">Fairhurst, G.</span>, <span class="refAuthor">Jones, T.</span>, <span class="refAuthor">Tüxen, M.</span>, <span class="refAuthor">Rüngeler, I.</span>, and <span class="refAuthor">T. Völker</span>, <span class="refTitle">"Packetization Layer Path MTU Discovery for Datagram Transports"</span>, <span class="seriesInfo">RFC 8899</span>, <span class="seriesInfo">DOI 10.17487/RFC8899</span>, <time datetime="2020-09" class="refDate">September 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8899">https://www.rfc-editor.org/rfc/rfc8899</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="EXT-CONNECT2">[EXT-CONNECT2]</dt>
+        <dd>
+<span class="refAuthor">McManus, P.</span>, <span class="refTitle">"Bootstrapping WebSockets with HTTP/2"</span>, <span class="seriesInfo">RFC 8441</span>, <span class="seriesInfo">DOI 10.17487/RFC8441</span>, <time datetime="2018-09" class="refDate">September 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8441">https://www.rfc-editor.org/rfc/rfc8441</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="EXT-CONNECT3">[EXT-CONNECT3]</dt>
+        <dd>
+<span class="refAuthor">Hamilton, R.</span>, <span class="refTitle">"Bootstrapping WebSockets with HTTP/3"</span>, <span class="seriesInfo">RFC 9220</span>, <span class="seriesInfo">DOI 10.17487/RFC9220</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9220">https://www.rfc-editor.org/rfc/rfc9220</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="PRIORITY">[PRIORITY]</dt>
+        <dd>
+<span class="refAuthor">Oku, K.</span> and <span class="refAuthor">L. Pardue</span>, <span class="refTitle">"Extensible Prioritization Scheme for HTTP"</span>, <span class="seriesInfo">RFC 9218</span>, <span class="seriesInfo">DOI 10.17487/RFC9218</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9218">https://www.rfc-editor.org/rfc/rfc9218</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="WEBSOCKET">[WEBSOCKET]</dt>
+      <dd>
+<span class="refAuthor">Fette, I.</span> and <span class="refAuthor">A. Melnikov</span>, <span class="refTitle">"The WebSocket Protocol"</span>, <span class="seriesInfo">RFC 6455</span>, <span class="seriesInfo">DOI 10.17487/RFC6455</span>, <time datetime="2011-12" class="refDate">December 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6455">https://www.rfc-editor.org/rfc/rfc6455</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</section>
+<div id="acks">
+<section id="appendix-A">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-A-1">Portions of this document were previously part of the QUIC DATAGRAM frame
+definition itself; the authors would like to acknowledge the authors of that
+document and the members of the IETF MASQUE working group for their suggestions.
+Additionally, the authors would like to thank Martin Thomson for suggesting the
+use of an HTTP/3 setting. Furthermore, the authors would like to
+thank Ben Schwartz for writing the first proposal that used two layers of
+indirection. The final design in this document came out of the HTTP Datagrams
+Design Team, whose members were Alan Frindell, Alex Chernyakhovsky, Ben
+Schwartz, Eric Rescorla, Marcus Ihlar, Martin Thomson, Mike Bishop, Tommy Pauly,
+Victor Vasiliev, and the authors of this document. The authors thank Mark
+Nottingham and Philipp Tiesel for their helpful comments.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">David Schinazi</span></div>
+<div dir="auto" class="left"><span class="org">Google LLC</span></div>
+<div dir="auto" class="left"><span class="street-address">1600 Amphitheatre Parkway</span></div>
+<div dir="auto" class="left">
+<span class="locality">Mountain View</span>, <span class="region">CA</span> <span class="postal-code">94043</span>
+</div>
+<div dir="auto" class="left"><span class="country-name">United States of America</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:dschinazi.ietf@gmail.com" class="email">dschinazi.ietf@gmail.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Lucas Pardue</span></div>
+<div dir="auto" class="left"><span class="org">Cloudflare</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:lucaspardue.24.7@gmail.com" class="email">lucaspardue.24.7@gmail.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
