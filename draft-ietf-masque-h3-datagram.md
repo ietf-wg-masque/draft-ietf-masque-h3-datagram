@@ -403,7 +403,8 @@ for unknown HTTP Upgrade Tokens. Note that this is only possible for HTTP
 Upgrade or Extended CONNECT.
 
 The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
-status code that is both different from 101 and outside the 2xx range.
+status code that is both different from 101 (Switching Protocols) and outside
+the 2xx (Successful) range.
 
 When using the Capsule Protocol, HTTP endpoints SHOULD send the Capsule-Protocol
 header field to simplify intermediary processing. Definitions of new HTTP
