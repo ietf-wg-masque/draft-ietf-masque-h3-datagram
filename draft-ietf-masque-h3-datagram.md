@@ -190,9 +190,8 @@ the creation of the corresponding stream.
 If an HTTP/3 Datagram is received and its Quarter Stream ID maps to a stream
 that cannot be created due to client-initiated bidirectional stream limits, it
 SHOULD be treated as an HTTP/3 connection error of type H3_ID_ERROR. Generating
-an error is not mandatory in this case because HTTP/3 implementations might have
-practical barriers to determining the active stream concurrency limit that is
-applied by the QUIC layer.
+an error is not mandatory because the QUIC stream limit might be unknown to the
+HTTP/3 layer.
 
 Prioritization of HTTP/3 Datagrams is not defined in this document. Future
 extensions MAY define how to prioritize datagrams and MAY define signaling to
