@@ -309,7 +309,7 @@ Capsule {
 
 Capsule Type:
 
-: A variable-length integer indicating the Type of the capsule. An IANA registry
+: A variable-length integer indicating the Type of the Capsule. An IANA registry
 is used to manage the assignment of Capsule Types; see {{iana-types}}.
 
 Capsule Length:
@@ -319,7 +319,7 @@ as a variable-length integer. Note that this field can have a value of zero.
 
 Capsule Value:
 
-: The payload of this capsule. Its semantics are determined by the value of the
+: The payload of this Capsule. Its semantics are determined by the value of the
 Capsule Type field.
 
 An intermediary can identify the use of the Capsule Protocol either through the
@@ -328,9 +328,9 @@ chosen HTTP Upgrade token.
 
 Because new protocols or extensions might define new Capsule Types,
 intermediaries that wish to allow for future extensibility SHOULD forward
-capsules without modification unless the definition of the Capsule Type in use
+Capsules without modification unless the definition of the Capsule Type in use
 specifies additional intermediary processing. One such Capsule Type is the
-DATAGRAM capsule; see {{datagram-capsule}}. In particular, intermediaries SHOULD
+DATAGRAM Capsule; see {{datagram-capsule}}. In particular, intermediaries SHOULD
 forward Capsules with an unknown Capsule Type without modification.
 
 Endpoints that receive a Capsule with an unknown Capsule Type MUST silently
@@ -357,10 +357,10 @@ codes 204 (No Content), 205 (Reset Content), and 206 (Partial Content) MUST NOT
 be sent on responses that use the Capsule Protocol. A receiver that observes a
 violation of these requirements MUST treat the HTTP message as malformed.
 
-When processing capsules, a receiver might be tempted to accumulate the full
-length of the capsule value in the data stream before handling it. This approach
+When processing Capsules, a receiver might be tempted to accumulate the full
+length of the Capsule value in the data stream before handling it. This approach
 SHOULD be avoided because it can consume flow control in underlying layers, and
-that might lead to deadlocks if the capsule data exhausts the flow control
+that might lead to deadlocks if the Capsule data exhausts the flow control
 window.
 
 
@@ -373,16 +373,16 @@ message. For HTTP/3, the handling of malformed messages is described in
 described in {{Section 8.1.1 of H2}}. For HTTP/1.x, the handling of incomplete
 messages is described in {{Section 8 of H1}}.
 
-Each capsule's payload MUST contain exactly the fields identified in its
-description. A capsule payload that contains additional bytes after the
-identified fields or a capsule payload that terminates before the end of the
+Each Capsule's payload MUST contain exactly the fields identified in its
+description. A Capsule payload that contains additional bytes after the
+identified fields or a Capsule payload that terminates before the end of the
 identified fields MUST be treated as it if were a malformed or incomplete
 message. In particular, redundant length encodings MUST be verified to be
 self-consistent.
 
-If the receive side of a stream carrying capsules is terminated cleanly (for
+If the receive side of a stream carrying Capsules is terminated cleanly (for
 example, in HTTP/3 this is defined as receiving a QUIC STREAM frame with the FIN
-bit set) and the last capsule on the stream was truncated, this MUST be treated
+bit set) and the last Capsule on the stream was truncated, this MUST be treated
 as if it were a malformed or incomplete message.
 
 
@@ -415,7 +415,7 @@ upgrade tokens that use the Capsule Protocol MAY alter this recommendation.
 
 ## The DATAGRAM Capsule {#datagram-capsule}
 
-This document defines the DATAGRAM (0x00) Capsule Type. This capsule allows HTTP
+This document defines the DATAGRAM (0x00) Capsule Type. This Capsule allows HTTP
 Datagrams to be sent on a stream using the Capsule Protocol. This is
 particularly useful when HTTP is running over a transport that does not support
 the QUIC DATAGRAM frame.
@@ -434,46 +434,46 @@ HTTP Datagram Payload:
 : The payload of the datagram, whose semantics are defined by the extension that
 is using HTTP Datagrams. Note that this field can be empty.
 
-HTTP Datagrams sent using the DATAGRAM capsule have the same semantics as those
+HTTP Datagrams sent using the DATAGRAM Capsule have the same semantics as those
 sent in QUIC DATAGRAM frames. In particular, the restrictions on when it is
 allowed to send an HTTP Datagram and how to process them (from {{format}}) also
-apply to HTTP Datagrams sent and received using the DATAGRAM capsule.
+apply to HTTP Datagrams sent and received using the DATAGRAM Capsule.
 
 An intermediary can re-encode HTTP Datagrams as it forwards them. In other
-words, an intermediary MAY send a DATAGRAM capsule to forward an HTTP Datagram
+words, an intermediary MAY send a DATAGRAM Capsule to forward an HTTP Datagram
 that was received in a QUIC DATAGRAM frame and vice versa. Intermediaries MUST
 NOT perform this re-encoding unless they have identified the use of the Capsule
 Protocol on the corresponding request stream; see {{capsule-protocol}}.
 
-Note that while DATAGRAM capsules that are sent on a stream are reliably
-delivered in order, intermediaries can re-encode DATAGRAM capsules into QUIC
+Note that while DATAGRAM Capsules that are sent on a stream are reliably
+delivered in order, intermediaries can re-encode DATAGRAM Capsules into QUIC
 DATAGRAM frames when forwarding messages, which could result in loss or
 reordering.
 
 If an intermediary receives an HTTP Datagram in a QUIC DATAGRAM frame and is
 forwarding it on a connection that supports QUIC DATAGRAM frames, the
-intermediary SHOULD NOT convert that HTTP Datagram to a DATAGRAM capsule. If the
+intermediary SHOULD NOT convert that HTTP Datagram to a DATAGRAM Capsule. If the
 HTTP Datagram is too large to fit in a DATAGRAM frame (for example, because the
 Path MTU (PMTU) of that QUIC connection is too low or if the maximum UDP payload
 size advertised on that connection is too low), the intermediary SHOULD drop the
-HTTP Datagram instead of converting it to a DATAGRAM capsule. This preserves the
+HTTP Datagram instead of converting it to a DATAGRAM Capsule. This preserves the
 end-to-end unreliability characteristic that methods such as Datagram
 Packetization Layer PMTU Discovery (DPLPMTUD) depend on {{?DPLPMTUD=RFC8899}}.
-An intermediary that converts QUIC DATAGRAM frames to DATAGRAM capsules allows
+An intermediary that converts QUIC DATAGRAM frames to DATAGRAM Capsules allows
 HTTP Datagrams to be arbitrarily large without suffering any loss. This can
 misrepresent the true path properties, defeating methods such as DPLPMTUD.
 
-While DATAGRAM capsules can theoretically carry a payload of length
+While DATAGRAM Capsules can theoretically carry a payload of length
 2<sup>62</sup>-1, most HTTP extensions that use HTTP Datagrams will have their
 own limits on what datagram payload sizes are practical. Implementations SHOULD
-take those limits into account when parsing DATAGRAM capsules. If an incoming
-DATAGRAM capsule has a length that is known to be so large as to not be usable,
-the implementation SHOULD discard the capsule without buffering its contents
+take those limits into account when parsing DATAGRAM Capsules. If an incoming
+DATAGRAM Capsule has a length that is known to be so large as to not be usable,
+the implementation SHOULD discard the Capsule without buffering its contents
 into memory.
 
 Since QUIC DATAGRAM frames are required to fit within a QUIC packet,
-implementations that re-encode DATAGRAM capsules into QUIC DATAGRAM frames might
-be tempted to accumulate the entire capsule in the stream before re-encoding it.
+implementations that re-encode DATAGRAM Capsules into QUIC DATAGRAM frames might
+be tempted to accumulate the entire Capsule in the stream before re-encoding it.
 This SHOULD be avoided, because it can cause flow control problems; see
 {{capsule-protocol}}.
 
@@ -612,7 +612,7 @@ IANA-POLICY}}.
 
 Capsule Types with a value of the form 0x29 * N + 0x17 for integer values of N
 are reserved to exercise the requirement that unknown Capsule Types be ignored.
-These capsules have no semantics and can carry arbitrary values. These values
+These Capsules have no semantics and can carry arbitrary values. These values
 MUST NOT be assigned by IANA and MUST NOT appear in the listing of assigned
 values.
 
