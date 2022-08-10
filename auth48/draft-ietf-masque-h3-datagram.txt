@@ -326,9 +326,9 @@ Table of Contents
       capsule.  An IANA registry is used to manage the assignment of
       Capsule Types; see Section 5.4.
 
-   Capsule Length:  The length in bytes of the Capsule Value field
-      following this field, encoded as a variable-length integer.  Note
-      that this field can have a value of zero.
+   Capsule Length:  The length, in bytes, of the Capsule Value field,
+      which follows this field, encoded as a variable-length integer.
+      Note that this field can have a value of zero.
 
    Capsule Value:  The payload of this capsule.  Its semantics are
       determined by the value of the Capsule Type field.
