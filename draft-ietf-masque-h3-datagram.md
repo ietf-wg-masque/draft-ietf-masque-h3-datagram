@@ -82,7 +82,7 @@ and the addition of unreliable delivery to WebSockets {{?WEBSOCKET=RFC6455}}.
 In {{datagrams}}, this document describes HTTP Datagrams: a convention that
 supports the bidirectional and optionally multiplexed exchange of data inside an
 HTTP connection. While HTTP Datagrams are associated with HTTP requests, they
-are not part of message content. Instead, they are intended for use by HTTP
+are not a part of message content. Instead, they are intended for use by HTTP
 extensions (such as the CONNECT method) and are compatible with all versions of
 HTTP.
 
@@ -442,7 +442,7 @@ NOT perform this re-encoding unless they have identified the use of the Capsule
 Protocol on the corresponding request stream; see {{capsule-protocol}}.
 
 Note that while DATAGRAM capsules that are sent on a stream are reliably
-delivered in order, intermediaries can reencode DATAGRAM capsules into QUIC
+delivered in order, intermediaries can re-encode DATAGRAM capsules into QUIC
 DATAGRAM frames when forwarding messages, which could result in loss or
 reordering.
 
@@ -450,7 +450,7 @@ If an intermediary receives an HTTP Datagram in a QUIC DATAGRAM frame and is
 forwarding it on a connection that supports QUIC DATAGRAM frames, the
 intermediary SHOULD NOT convert that HTTP Datagram to a DATAGRAM capsule. If the
 HTTP Datagram is too large to fit in a DATAGRAM frame (for example, because the
-path MTU (PMTU) of that QUIC connection is too low or if the maximum UDP payload
+Path MTU (PMTU) of that QUIC connection is too low or if the maximum UDP payload
 size advertised on that connection is too low), the intermediary SHOULD drop the
 HTTP Datagram instead of converting it to a DATAGRAM capsule. This preserves the
 end-to-end unreliability characteristic that methods such as Datagram
@@ -522,7 +522,7 @@ Default:
 Status:
 : permanent
 
-Specification:
+Reference:
 : RFC 9297
 
 Change Controller:
@@ -550,7 +550,7 @@ Description:
 Status:
 : permanent
 
-Specification:
+Reference:
 : RFC 9297
 
 Change Controller:
@@ -563,8 +563,9 @@ Contact:
 
 ## HTTP Header Field Name {#iana-hdr}
 
-IANA has registered the following entry in the "HTTP Field Name" registry
-maintained at <[](https://www.iana.org/assignments/http-fields)>:
+IANA has registered the following entry in the "Hypertext Transfer Protocol
+(HTTP) Field Name" registry maintained at
+<[](https://www.iana.org/assignments/http-fields)>:
 
 Field Name:
 : Capsule-Protocol
@@ -616,7 +617,7 @@ Capsule Type:
 Status:
 : permanent
 
-Specification:
+Reference:
 : RFC 9297
 
 Change Controller:
@@ -636,7 +637,7 @@ Notes:
 {:numbered="false"}
 
 Portions of this document were previously part of the QUIC DATAGRAM frame
-definition itself, the authors would like to acknowledge the authors of that
+definition itself; the authors would like to acknowledge the authors of that
 document and the members of the IETF MASQUE working group for their suggestions.
 Additionally, the authors would like to thank Martin Thomson for suggesting the
 use of an HTTP/3 setting. Furthermore, the authors would like to
