@@ -499,7 +499,7 @@ is not accessible from Web Platform APIs (such as those commonly accessed via
 JavaScript in web browsers).
 
 Definitions of new HTTP Upgrade Tokens that use the Capsule Protocol need to
-perform a security analysis that considers the impact of HTTP Datagrams and
+include a security analysis that considers the impact of HTTP Datagrams and
 Capsules in the context of their protocol.
 
 
