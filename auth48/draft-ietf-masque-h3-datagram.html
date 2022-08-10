@@ -1356,9 +1356,8 @@ the creation of the corresponding stream.<a href="#section-2.1-6" class="pilcrow
 <p id="section-2.1-7">If an HTTP/3 Datagram is received and its Quarter Stream ID maps to a stream
 that cannot be created due to client-initiated bidirectional stream limits, it
 <span class="bcp14">SHOULD</span> be treated as an HTTP/3 connection error of type H3_ID_ERROR. Generating
-an error is not mandatory in this case because HTTP/3 implementations might have
-practical barriers to determining the active stream concurrency limit that is
-applied by the QUIC layer.<a href="#section-2.1-7" class="pilcrow">¶</a></p>
+an error is not mandatory because the QUIC stream limit might be unknown to the
+HTTP/3 layer.<a href="#section-2.1-7" class="pilcrow">¶</a></p>
 <p id="section-2.1-8">Prioritization of HTTP/3 Datagrams is not defined in this document. Future
 extensions <span class="bcp14">MAY</span> define how to prioritize datagrams and <span class="bcp14">MAY</span> define signaling to
 allow communicating prioritization preferences.<a href="#section-2.1-8" class="pilcrow">¶</a></p>
