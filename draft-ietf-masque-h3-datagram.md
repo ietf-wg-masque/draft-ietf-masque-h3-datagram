@@ -90,11 +90,12 @@ When HTTP is running over a transport protocol that supports unreliable delivery
 (such as when the QUIC DATAGRAM extension {{DGRAM}} is available to HTTP/3
 {{H3}}), HTTP Datagrams can use that capability.
 
-In {{capsule}}, this document describes the HTTP Capsule Protocol, which allows
-the conveyance of HTTP Datagrams using reliable delivery. This addresses HTTP/3
-cases where use of the QUIC DATAGRAM frame is unavailable or undesirable or
-where the transport protocol only provides reliable delivery, such as with
-HTTP/1.1 {{H1}} or HTTP/2 {{H2}} over TCP {{!TCP=RFC0793}}.
+In {{capsule}}, this document describes HTTP Datagrams, a convention for
+conveying bidirectional and potentially unreliable datagrams inside an HTTP
+connection, with multiplexing when possible. This addresses HTTP/3 cases where
+use of the QUIC DATAGRAM frame is unavailable or undesirable or where the
+transport protocol only provides reliable delivery, such as with HTTP/1.1 {{H1}}
+or HTTP/2 {{H2}} over TCP {{!TCP=RFC0793}}.
 
 
 ## Conventions and Definitions {#defs}
