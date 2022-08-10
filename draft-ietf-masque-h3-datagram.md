@@ -75,9 +75,10 @@ not applications.
 
 HTTP extensions (as defined in {{Section 16 of !HTTP=RFC9110}}) sometimes need
 to access underlying transport protocol features such as unreliable delivery (as
-offered by {{!DGRAM=RFC9221}}) to enable desirable features. For example, this
-could allow for the introduction of an unreliable version of the CONNECT method
-and the addition of unreliable delivery to WebSockets {{?WEBSOCKET=RFC6455}}.
+offered by {{!QUIC-DGRAM=RFC9221}}) to enable desirable features. For example,
+this could allow for the introduction of an unreliable version of the CONNECT
+method and the addition of unreliable delivery to WebSockets
+{{?WEBSOCKET=RFC6455}}.
 
 In {{datagrams}}, this document describes HTTP Datagrams: a convention that
 supports the bidirectional and optionally multiplexed exchange of data inside an
@@ -87,7 +88,7 @@ extensions (such as the CONNECT method) and are compatible with all versions of
 HTTP.
 
 When HTTP is running over a transport protocol that supports unreliable delivery
-(such as when the QUIC DATAGRAM extension {{DGRAM}} is available to HTTP/3
+(such as when the QUIC DATAGRAM extension {{QUIC-DGRAM}} is available to HTTP/3
 {{H3}}), HTTP Datagrams can use that capability.
 
 In {{capsule}}, this document describes the HTTP Capsule Protocol, which allows
