@@ -242,14 +242,14 @@ using the Capsule Protocol; see {{datagram-capsule}}.
 
 # Capsules {#capsule}
 
-One mechanism to extend HTTP is to introduce new HTTP Upgrade Tokens; see
+One mechanism to extend HTTP is to introduce new HTTP upgrade tokens; see
 {{Section 16.7 of HTTP}}. In HTTP/1.x, these tokens are used via the Upgrade
 mechanism; see {{Section 7.8 of HTTP}}. In HTTP/2 and HTTP/3, these tokens are
 used via the Extended CONNECT mechanism; see {{?EXT-CONNECT2=RFC8441}} and
 {{?EXT-CONNECT3=RFC9220}}.
 
 This specification introduces the Capsule Protocol. The Capsule Protocol is a
-sequence of type-length-value tuples that definitions of new HTTP Upgrade Tokens
+sequence of type-length-value tuples that definitions of new HTTP upgrade tokens
 can choose to use. It allows endpoints to reliably communicate request-related
 information end-to-end on HTTP request streams, even in the presence of HTTP
 intermediaries. The Capsule Protocol can be used to exchange HTTP Datagrams,
@@ -287,7 +287,7 @@ control, and TCP flow control.
 
 ## The Capsule Protocol {#capsule-protocol}
 
-Definitions of new HTTP Upgrade Tokens can state that their associated request's
+Definitions of new HTTP upgrade tokens can state that their associated request's
 data stream uses the Capsule Protocol. If they do so, the contents of the
 associated request's data stream uses the following format:
 
@@ -345,7 +345,7 @@ By virtue of the definition of the data stream:
   do not carry HTTP content. A future extension MAY define a new capsule type to
   carry HTTP content.
 
-The Capsule Protocol only applies to definitions of new HTTP Upgrade Tokens;
+The Capsule Protocol only applies to definitions of new HTTP upgrade tokens;
 thus, in HTTP/2 and HTTP/3, it can only be used with the CONNECT method.
 Therefore, once both endpoints agree to use the Capsule Protocol, the frame
 usage requirements of the stream change as specified in {{Section 8.5 of H2}}
@@ -402,7 +402,7 @@ header field with a false value has the same semantics as when the header is not
 present.
 
 Intermediaries MAY use this header field to allow processing of HTTP Datagrams
-for unknown HTTP Upgrade Tokens. Note that this is only possible for HTTP
+for unknown HTTP upgrade tokens. Note that this is only possible for HTTP
 Upgrade or Extended CONNECT.
 
 The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
@@ -410,7 +410,7 @@ status code that is both different from 101 and outside the 2xx range.
 
 When using the Capsule Protocol, HTTP endpoints SHOULD send the Capsule-Protocol
 header field to simplify intermediary processing. Definitions of new HTTP
-Upgrade Tokens that use the Capsule Protocol MAY alter this recommendation.
+upgrade tokens that use the Capsule Protocol MAY alter this recommendation.
 
 
 ## The DATAGRAM Capsule {#datagram-capsule}
@@ -498,11 +498,11 @@ offer application services that use HTTP Datagrams, it's best for all
 implementations that support this feature to always send this setting; see
 {{setting}}.
 
-Since use of the Capsule Protocol is restricted to new HTTP Upgrade Tokens, it
+Since use of the Capsule Protocol is restricted to new HTTP upgrade tokens, it
 is not accessible from Web Platform APIs (such as those commonly accessed via
 JavaScript in web browsers).
 
-Definitions of new HTTP Upgrade Tokens that use the Capsule Protocol need to
+Definitions of new HTTP upgrade tokens that use the Capsule Protocol need to
 perform a security analysis that considers the impact of HTTP Datagrams and
 Capsules in the context of their protocol.
 
