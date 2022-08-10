@@ -530,6 +530,9 @@ Change Controller:
 
 Contact:
 : HTTP_WG; HTTP working group; ietf-http-wg@w3.org
+
+Notes:
+: None
 {: spacing="compact"}
 
 
@@ -558,6 +561,9 @@ Change Controller:
 
 Contact:
 : HTTP_WG; HTTP working group; ietf-http-wg@w3.org
+
+Notes:
+: None
 {: spacing="compact"}
 
 
