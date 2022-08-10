@@ -1271,7 +1271,6 @@ they are encoded using the variable-length integer encoding from <span><a href="
 necessary.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
 <p id="section-1.1-4">In this document, the term "intermediary" refers to an HTTP intermediary as
 defined in <span><a href="https://rfc-editor.org/rfc/rfc9110#section-3.7" class="relref">Section 3.7</a> of [<a href="#HTTP" class="xref">HTTP</a>]</span>.<a href="#section-1.1-4" class="pilcrow">¶</a></p>
-<p id="section-1.1-5">This document uses the following terminology from <span><a href="https://rfc-editor.org/rfc/rfc8941#section-3" class="relref">Section 3</a> of [<a href="#STRUCTURED-FIELDS" class="xref">STRUCTURED-FIELDS</a>]</span> to specify syntax and parsing: Item.<a href="#section-1.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1538,10 +1537,10 @@ codes 204 (No Content), 205 (Reset Content), and 206 (Partial Content) <span cla
 be sent on responses that use the Capsule Protocol. A receiver that observes a
 violation of these requirements <span class="bcp14">MUST</span> treat the HTTP message as malformed.<a href="#section-3.2-11" class="pilcrow">¶</a></p>
 <p id="section-3.2-12">When processing Capsules, a receiver might be tempted to accumulate the full
-length of the Capsule value in the data stream before handling it. This approach
-<span class="bcp14">SHOULD</span> be avoided because it can consume flow control in underlying layers, and
-that might lead to deadlocks if the Capsule data exhausts the flow control
-window.<a href="#section-3.2-12" class="pilcrow">¶</a></p>
+length of the Capsule Value field in the data stream before handling it. This
+approach <span class="bcp14">SHOULD</span> be avoided because it can consume flow control in underlying
+layers, and that might lead to deadlocks if the Capsule data exhausts the flow
+control window.<a href="#section-3.2-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="error-handling">
@@ -1572,11 +1571,11 @@ as if it were a malformed or incomplete message.<a href="#section-3.3-3" class="
         <h3 id="name-the-capsule-protocol-header">
 <a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-the-capsule-protocol-header" class="section-name selfRef">The Capsule-Protocol Header Field</a>
         </h3>
-<p id="section-3.4-1">The "Capsule-Protocol" header field is an Item; see <span><a href="https://rfc-editor.org/rfc/rfc8941#section-3.3" class="relref">Section 3.3</a> of [<a href="#STRUCTURED-FIELDS" class="xref">STRUCTURED-FIELDS</a>]</span>. Its value <span class="bcp14">MUST</span> be a Boolean; any other value type
-<span class="bcp14">MUST</span> be handled as if the field were not present by recipients (for example, if
-this field is included multiple times, its type will become a List and the field
-will be ignored). This document does not define any parameters for the
-Capsule-Protocol header field value, but future documents might define
+<p id="section-3.4-1">The "Capsule-Protocol" header field is an Item Structured Field; see <span><a href="https://rfc-editor.org/rfc/rfc8941#section-3.3" class="relref">Section 3.3</a> of [<a href="#STRUCTURED-FIELDS" class="xref">STRUCTURED-FIELDS</a>]</span>. Its value <span class="bcp14">MUST</span> be a Boolean; any other
+value type <span class="bcp14">MUST</span> be handled as if the field were not present by recipients (for
+example, if this field is included multiple times, its type will become a List
+and the field will be ignored). This document does not define any parameters for
+the Capsule-Protocol header field value, but future documents might define
 parameters. Receivers <span class="bcp14">MUST</span> ignore unknown parameters.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
 <p id="section-3.4-2">Endpoints indicate that the Capsule Protocol is in use on a data stream by
 sending a Capsule-Protocol header field with a true value. A Capsule-Protocol
