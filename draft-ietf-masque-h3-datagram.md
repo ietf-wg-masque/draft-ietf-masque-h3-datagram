@@ -610,7 +610,7 @@ between 0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
 Standards Action or IESG Approval as defined in {{Sections 4.9 and 4.10 of
 IANA-POLICY}}.
 
-Capsule types with a value of the form 0x29 * N + 0x17 for integer values of N
+Capsule Types with a value of the form 0x29 * N + 0x17 for integer values of N
 are reserved to exercise the requirement that unknown Capsule Types be ignored.
 These capsules have no semantics and can carry arbitrary values. These values
 MUST NOT be assigned by IANA and MUST NOT appear in the listing of assigned
