@@ -564,7 +564,7 @@ Contact:
 ## HTTP Header Field Name {#iana-hdr}
 
 IANA has registered the following entry in the "Hypertext Transfer Protocol
-(HTTP) Field Name" registry maintained at
+(HTTP) Field Name Registry" maintained at
 <[](https://www.iana.org/assignments/http-fields)>:
 
 Field Name:
