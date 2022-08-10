@@ -560,7 +560,7 @@ Table of Contents
 5.3.  HTTP Header Field Name
 
    IANA has registered the following entry in the "Hypertext Transfer
-   Protocol (HTTP) Field Name" registry maintained at
+   Protocol (HTTP) Field Name Registry" maintained at
    <https://www.iana.org/assignments/http-fields>:
 
    Field Name:  Capsule-Protocol
