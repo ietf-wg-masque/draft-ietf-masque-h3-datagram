@@ -1584,7 +1584,8 @@ present.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
 for unknown HTTP Upgrade Tokens. Note that this is only possible for HTTP
 Upgrade or Extended CONNECT.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
 <p id="section-3.4-4">The Capsule-Protocol header field <span class="bcp14">MUST NOT</span> be used on HTTP responses with a
-status code that is both different from 101 and outside the 2xx range.<a href="#section-3.4-4" class="pilcrow">¶</a></p>
+status code that is both different from 101 (Switching Protocols) and outside
+the 2xx (Successful) range.<a href="#section-3.4-4" class="pilcrow">¶</a></p>
 <p id="section-3.4-5">When using the Capsule Protocol, HTTP endpoints <span class="bcp14">SHOULD</span> send the Capsule-Protocol
 header field to simplify intermediary processing. Definitions of new HTTP
 Upgrade Tokens that use the Capsule Protocol <span class="bcp14">MAY</span> alter this recommendation.<a href="#section-3.4-5" class="pilcrow">¶</a></p>
