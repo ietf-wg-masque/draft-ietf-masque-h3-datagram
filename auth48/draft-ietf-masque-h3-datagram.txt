@@ -137,10 +137,10 @@ Table of Contents
    an HTTP request.
 
    When HTTP Datagrams are conveyed on an HTTP/3 connection, the QUIC
-   DATAGRAM frame can be used to achieve these goals, including
-   unreliable delivery; see Section 2.1.  Negotiating the use of QUIC
-   DATAGRAM frames for HTTP Datagrams is achieved via the exchange of
-   HTTP/3 settings; see Section 2.1.1.
+   DATAGRAM frame can be used to provide demultiplexing and unreliable
+   delivery; see Section 2.1.  Negotiating the use of QUIC DATAGRAM
+   frames for HTTP Datagrams is achieved via the exchange of HTTP/3
+   settings; see Section 2.1.1.
 
    When running over HTTP/2, demultiplexing is provided by the HTTP/2
    framing layer, but unreliable delivery is unavailable.  HTTP
