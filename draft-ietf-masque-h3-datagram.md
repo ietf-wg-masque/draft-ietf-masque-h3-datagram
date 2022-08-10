@@ -7,7 +7,7 @@ submissiontype: IETF
 category: std
 area: Transport
 wg: MASQUE
-number: 9298
+number: 9297
 date: 2022-08
 consensus: true
 venue:
@@ -523,7 +523,7 @@ Status:
 : permanent
 
 Specification:
-: RFC 9298
+: RFC 9297
 
 Change Controller:
 : IETF
@@ -551,7 +551,7 @@ Status:
 : permanent
 
 Specification:
-: RFC 9298
+: RFC 9297
 
 Change Controller:
 : IETF
@@ -576,7 +576,7 @@ Status:
 : permanent
 
 Reference:
-: RFC 9298
+: RFC 9297
 
 Comments:
 
@@ -617,7 +617,7 @@ Status:
 : permanent
 
 Specification:
-: RFC 9298
+: RFC 9297
 
 Change Controller:
 : IETF
