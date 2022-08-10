@@ -386,8 +386,8 @@ as if it were a malformed or incomplete message.
 ## The Capsule-Protocol Header Field {#hdr}
 
 The "Capsule-Protocol" header field is an Item Structured Field; see {{Section
-3.3 of !STRUCT-FIELD=RFC8941}}. Its value MUST be a Boolean; any other value
-type MUST be handled as if the field were not present by recipients (for
+3.3 of !STRUCTURED-FIELDS=RFC8941}}. Its value MUST be a Boolean; any other
+value type MUST be handled as if the field were not present by recipients (for
 example, if this field is included multiple times, its type will become a List
 and the field will be ignored). This document does not define any parameters for
 the Capsule-Protocol header field value, but future documents might define
