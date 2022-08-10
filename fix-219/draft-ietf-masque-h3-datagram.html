@@ -1508,7 +1508,7 @@ Capsule Type field.<a href="#section-3.2-4.6.1" class="pilcrow">¶</a></p>
 <p id="section-3.2-5">An intermediary can identify the use of the Capsule Protocol either through the
 presence of the Capsule-Protocol header field (<a href="#hdr" class="xref">Section 3.4</a>) or by understanding the
 chosen HTTP Upgrade token.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
-<p id="section-3.2-6">Because new protocols or extensions might define new capsule types,
+<p id="section-3.2-6">Because new protocols or extensions might define new Capsule Types,
 intermediaries that wish to allow for future extensibility <span class="bcp14">SHOULD</span> forward
 capsules without modification unless the definition of the Capsule Type in use
 specifies additional intermediary processing. One such Capsule Type is the
@@ -1522,7 +1522,7 @@ drop that Capsule and skip over it to parse the next Capsule.<a href="#section-3
 (Successful) or 101 (Switching Protocols) status code.<a href="#section-3.2-9.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-3.2-9.2">When the Capsule Protocol is in use, the associated HTTP request and response
-do not carry HTTP content. A future extension <span class="bcp14">MAY</span> define a new capsule type to
+do not carry HTTP content. A future extension <span class="bcp14">MAY</span> define a new Capsule Type to
 carry HTTP content.<a href="#section-3.2-9.2" class="pilcrow">¶</a>
 </li>
         </ul>
@@ -1596,7 +1596,7 @@ upgrade tokens that use the Capsule Protocol <span class="bcp14">MAY</span> alte
         <h3 id="name-the-datagram-capsule">
 <a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-the-datagram-capsule" class="section-name selfRef">The DATAGRAM Capsule</a>
         </h3>
-<p id="section-3.5-1">This document defines the DATAGRAM (0x00) capsule type. This capsule allows HTTP
+<p id="section-3.5-1">This document defines the DATAGRAM (0x00) Capsule Type. This capsule allows HTTP
 Datagrams to be sent on a stream using the Capsule Protocol. This is
 particularly useful when HTTP is running over a transport that does not support
 the QUIC DATAGRAM frame.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
@@ -1841,18 +1841,18 @@ maintained at &lt;<span><a href="https://www.iana.org/assignments/http3-paramete
         <h3 id="name-capsule-types">
 <a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-capsule-types" class="section-name selfRef">Capsule Types</a>
         </h3>
-<p id="section-5.4-1">This document establishes a registry for HTTP capsule type codes. The "HTTP
+<p id="section-5.4-1">This document establishes a registry for HTTP Capsule Type codes. The "HTTP
 Capsule Types" registry governs a 62-bit space and operates under the QUIC
 registration policy documented in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.1" class="relref">Section 22.1</a> of [<a href="#QUIC" class="xref">QUIC</a>]</span>. This new registry
 includes the common set of fields listed in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.1.1" class="relref">Section 22.1.1</a> of [<a href="#QUIC" class="xref">QUIC</a>]</span>. In
 addition to those common fields, all registrations in this registry <span class="bcp14">MUST</span> include
-a "Capsule Type" field that contains a short name or label for the capsule type.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+a "Capsule Type" field that contains a short name or label for the Capsule Type.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
 <p id="section-5.4-2">Permanent registrations in this registry are assigned using the Specification
 Required policy (<span><a href="https://rfc-editor.org/rfc/rfc8126#section-4.6" class="relref">Section 4.6</a> of [<a href="#IANA-POLICY" class="xref">IANA-POLICY</a>]</span>), except for values
 between 0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
 Standards Action or IESG Approval as defined in Sections <a href="https://rfc-editor.org/rfc/rfc8126#section-4.9" class="relref">4.9</a> and <a href="https://rfc-editor.org/rfc/rfc8126#section-4.10" class="relref">4.10</a> of <span>[<a href="#IANA-POLICY" class="xref">IANA-POLICY</a>]</span>.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
-<p id="section-5.4-3">Capsule types with a value of the form 0x29 * N + 0x17 for integer values of N
-are reserved to exercise the requirement that unknown capsule types be ignored.
+<p id="section-5.4-3">Capsule Types with a value of the form 0x29 * N + 0x17 for integer values of N
+are reserved to exercise the requirement that unknown Capsule Types be ignored.
 These capsules have no semantics and can carry arbitrary values. These values
 <span class="bcp14">MUST NOT</span> be assigned by IANA and <span class="bcp14">MUST NOT</span> appear in the listing of assigned
 values.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
