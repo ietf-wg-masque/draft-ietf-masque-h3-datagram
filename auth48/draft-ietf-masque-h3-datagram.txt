@@ -299,7 +299,7 @@ Table of Contents
    request prioritization.  For example, see Section 11 of [PRIORITY].
 
    Data streams are subject to the flow control mechanisms of the
-   underlying layers.  Examples include HTTP/2 stream flow control,
+   underlying layers; examples include HTTP/2 stream flow control,
    HTTP/2 connection flow control, and TCP flow control.
 
 3.2.  The Capsule Protocol
