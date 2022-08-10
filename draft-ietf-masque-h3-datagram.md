@@ -310,8 +310,9 @@ is used to manage the assignment of Capsule Types; see {{iana-types}}.
 
 Capsule Length:
 
-: The length in bytes of the Capsule Value field following this field, encoded
-as a variable-length integer. Note that this field can have a value of zero.
+:  The length, in bytes, of the Capsule Value field, which follows this field,
+encoded as a variable-length integer. Note that this field can have a value of
+zero.
 
 Capsule Value:
 
