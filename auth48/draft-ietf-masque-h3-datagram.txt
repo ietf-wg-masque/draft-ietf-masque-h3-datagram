@@ -93,9 +93,9 @@ Table of Contents
    In Section 2, this document describes HTTP Datagrams: a convention
    that supports the bidirectional and optionally multiplexed exchange
    of data inside an HTTP connection.  While HTTP Datagrams are
-   associated with HTTP requests, they are not part of message content.
-   Instead, they are intended for use by HTTP extensions (such as the
-   CONNECT method) and are compatible with all versions of HTTP.
+   associated with HTTP requests, they are not a part of message
+   content.  Instead, they are intended for use by HTTP extensions (such
+   as the CONNECT method) and are compatible with all versions of HTTP.
 
    When HTTP is running over a transport protocol that supports
    unreliable delivery (such as when the QUIC DATAGRAM extension [DGRAM]
@@ -463,7 +463,7 @@ Table of Contents
    request stream; see Section 3.2.
 
    Note that while DATAGRAM capsules that are sent on a stream are
-   reliably delivered in order, intermediaries can reencode DATAGRAM
+   reliably delivered in order, intermediaries can re-encode DATAGRAM
    capsules into QUIC DATAGRAM frames when forwarding messages, which
    could result in loss or reordering.
 
@@ -471,7 +471,7 @@ Table of Contents
    and is forwarding it on a connection that supports QUIC DATAGRAM
    frames, the intermediary SHOULD NOT convert that HTTP Datagram to a
    DATAGRAM capsule.  If the HTTP Datagram is too large to fit in a
-   DATAGRAM frame (for example, because the path MTU (PMTU) of that QUIC
+   DATAGRAM frame (for example, because the Path MTU (PMTU) of that QUIC
    connection is too low or if the maximum UDP payload size advertised
    on that connection is too low), the intermediary SHOULD drop the HTTP
    Datagram instead of converting it to a DATAGRAM capsule.  This
@@ -539,7 +539,7 @@ Table of Contents
    Setting Name:  SETTINGS_H3_DATAGRAM
    Default:  0
    Status:  permanent
-   Specification:  RFC 9297
+   Reference:  RFC 9297
    Change Controller:  IETF
    Contact:  HTTP_WG; HTTP working group; ietf-http-wg@w3.org
 
@@ -553,15 +553,15 @@ Table of Contents
    Name:  H3_DATAGRAM_ERROR
    Description:  Datagram or capsule protocol parse error
    Status:  permanent
-   Specification:  RFC 9297
+   Reference:  RFC 9297
    Change Controller:  IETF
    Contact:  HTTP_WG; HTTP working group; ietf-http-wg@w3.org
 
 5.3.  HTTP Header Field Name
 
-   IANA has registered the following entry in the "HTTP Field Name"
-   registry maintained at <https://www.iana.org/assignments/http-
-   fields>:
+   IANA has registered the following entry in the "Hypertext Transfer
+   Protocol (HTTP) Field Name" registry maintained at
+   <https://www.iana.org/assignments/http-fields>:
 
    Field Name:  Capsule-Protocol
    Template:  None
@@ -596,7 +596,7 @@ Table of Contents
    Value:  0x00
    Capsule Type:  DATAGRAM
    Status:  permanent
-   Specification:  RFC 9297
+   Reference:  RFC 9297
    Change Controller:  IETF
    Contact:  MASQUE Working Group masque@ietf.org
       (mailto:masque@ietf.org)
@@ -685,7 +685,7 @@ Table of Contents
 Acknowledgments
 
    Portions of this document were previously part of the QUIC DATAGRAM
-   frame definition itself, the authors would like to acknowledge the
+   frame definition itself; the authors would like to acknowledge the
    authors of that document and the members of the IETF MASQUE working
    group for their suggestions.  Additionally, the authors would like to
    thank Martin Thomson for suggesting the use of an HTTP/3 setting.

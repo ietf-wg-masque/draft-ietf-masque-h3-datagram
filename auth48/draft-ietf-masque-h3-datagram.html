@@ -1242,7 +1242,7 @@ and the addition of unreliable delivery to WebSockets <span>[<a href="#WEBSOCKET
 <p id="section-1-2">In <a href="#datagrams" class="xref">Section 2</a>, this document describes HTTP Datagrams: a convention that
 supports the bidirectional and optionally multiplexed exchange of data inside an
 HTTP connection. While HTTP Datagrams are associated with HTTP requests, they
-are not part of message content. Instead, they are intended for use by HTTP
+are not a part of message content. Instead, they are intended for use by HTTP
 extensions (such as the CONNECT method) and are compatible with all versions of
 HTTP.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">When HTTP is running over a transport protocol that supports unreliable delivery
@@ -1630,14 +1630,14 @@ words, an intermediary <span class="bcp14">MAY</span> send a DATAGRAM capsule to
 that was received in a QUIC DATAGRAM frame and vice versa. Intermediaries <span class="bcp14">MUST NOT</span> perform this re-encoding unless they have identified the use of the Capsule
 Protocol on the corresponding request stream; see <a href="#capsule-protocol" class="xref">Section 3.2</a>.<a href="#section-3.5-5" class="pilcrow">¶</a></p>
 <p id="section-3.5-6">Note that while DATAGRAM capsules that are sent on a stream are reliably
-delivered in order, intermediaries can reencode DATAGRAM capsules into QUIC
+delivered in order, intermediaries can re-encode DATAGRAM capsules into QUIC
 DATAGRAM frames when forwarding messages, which could result in loss or
 reordering.<a href="#section-3.5-6" class="pilcrow">¶</a></p>
 <p id="section-3.5-7">If an intermediary receives an HTTP Datagram in a QUIC DATAGRAM frame and is
 forwarding it on a connection that supports QUIC DATAGRAM frames, the
 intermediary <span class="bcp14">SHOULD NOT</span> convert that HTTP Datagram to a DATAGRAM capsule. If the
 HTTP Datagram is too large to fit in a DATAGRAM frame (for example, because the
-path MTU (PMTU) of that QUIC connection is too low or if the maximum UDP payload
+Path MTU (PMTU) of that QUIC connection is too low or if the maximum UDP payload
 size advertised on that connection is too low), the intermediary <span class="bcp14">SHOULD</span> drop the
 HTTP Datagram instead of converting it to a DATAGRAM capsule. This preserves the
 end-to-end unreliability characteristic that methods such as Datagram
@@ -1723,7 +1723,7 @@ maintained at &lt;<span><a href="https://www.iana.org/assignments/http3-paramete
             <p id="section-5.1-2.8.1">permanent<a href="#section-5.1-2.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.1-2.9">Specification:</dt>
+<dt id="section-5.1-2.9">Reference:</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-2.10">
             <p id="section-5.1-2.10.1">RFC 9297<a href="#section-5.1-2.10.1" class="pilcrow">¶</a></p>
 </dd>
@@ -1769,7 +1769,7 @@ maintained at &lt;<span><a href="https://www.iana.org/assignments/http3-paramete
             <p id="section-5.2-2.8.1">permanent<a href="#section-5.2-2.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.2-2.9">Specification:</dt>
+<dt id="section-5.2-2.9">Reference:</dt>
           <dd style="margin-left: 1.5em" id="section-5.2-2.10">
             <p id="section-5.2-2.10.1">RFC 9297<a href="#section-5.2-2.10.1" class="pilcrow">¶</a></p>
 </dd>
@@ -1792,8 +1792,9 @@ maintained at &lt;<span><a href="https://www.iana.org/assignments/http3-paramete
         <h3 id="name-http-header-field-name">
 <a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-http-header-field-name" class="section-name selfRef">HTTP Header Field Name</a>
         </h3>
-<p id="section-5.3-1">IANA has registered the following entry in the "HTTP Field Name" registry
-maintained at &lt;<span><a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a></span>&gt;:<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-1">IANA has registered the following entry in the "Hypertext Transfer Protocol
+(HTTP) Field Name" registry maintained at
+&lt;<span><a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a></span>&gt;:<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlCompact dlParallel" id="section-5.3-2">
           <dt id="section-5.3-2.1">Field Name:</dt>
           <dd style="margin-left: 1.5em" id="section-5.3-2.2">
@@ -1860,7 +1861,7 @@ values.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
             <p id="section-5.4-5.6.1">permanent<a href="#section-5.4-5.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.4-5.7">Specification:</dt>
+<dt id="section-5.4-5.7">Reference:</dt>
           <dd style="margin-left: 1.5em" id="section-5.4-5.8">
             <p id="section-5.4-5.8.1">RFC 9297<a href="#section-5.4-5.8.1" class="pilcrow">¶</a></p>
 </dd>
@@ -1974,7 +1975,7 @@ values.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
 <p id="appendix-A-1">Portions of this document were previously part of the QUIC DATAGRAM frame
-definition itself, the authors would like to acknowledge the authors of that
+definition itself; the authors would like to acknowledge the authors of that
 document and the members of the IETF MASQUE working group for their suggestions.
 Additionally, the authors would like to thank Martin Thomson for suggesting the
 use of an HTTP/3 setting. Furthermore, the authors would like to
