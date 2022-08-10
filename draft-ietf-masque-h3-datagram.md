@@ -269,7 +269,7 @@ upgraded (i.e., 101).
 In HTTP/1.x, the data stream consists of all bytes on the connection that follow
 the blank line that concludes either the request header section or the final
 response header section. As a result, only the last HTTP request on an HTTP/1.x
-connection can start the capsule protocol.
+connection can start the Capsule Protocol.
 
 In HTTP/2 and HTTP/3, the data stream of a given HTTP request consists of all
 bytes sent in DATA frames with the corresponding stream ID.
@@ -322,7 +322,7 @@ Capsule Value:
 : The payload of this capsule. Its semantics are determined by the value of the
 Capsule Type field.
 
-An intermediary can identify the use of the capsule protocol either through the
+An intermediary can identify the use of the Capsule Protocol either through the
 presence of the Capsule-Protocol header field ({{hdr}}) or by understanding the
 chosen HTTP Upgrade token.
 
@@ -552,7 +552,7 @@ Name:
 : H3_DATAGRAM_ERROR
 
 Description:
-: Datagram or capsule protocol parse error
+: Datagram or Capsule Protocol parse error
 
 Status:
 : permanent
