@@ -91,11 +91,12 @@ When HTTP is running over a transport protocol that supports unreliable delivery
 (such as when the QUIC DATAGRAM extension {{QUIC-DGRAM}} is available to HTTP/3
 {{H3}}), HTTP Datagrams can use that capability.
 
-In {{capsule}}, this document describes the HTTP Capsule Protocol, which allows
-the conveyance of HTTP Datagrams using reliable delivery. This addresses HTTP/3
-cases where use of the QUIC DATAGRAM frame is unavailable or undesirable or
-where the transport protocol only provides reliable delivery, such as with
-HTTP/1.1 {{H1}} or HTTP/2 {{H2}} over TCP {{!TCP=RFC0793}}.
+In {{capsule}}, this document describes HTTP Datagrams, a convention for
+conveying bidirectional and potentially unreliable datagrams inside an HTTP
+connection, with multiplexing when possible. This addresses HTTP/3 cases where
+use of the QUIC DATAGRAM frame is unavailable or undesirable or where the
+transport protocol only provides reliable delivery, such as with HTTP/1.1 {{H1}}
+or HTTP/2 {{H2}} over TCP {{!TCP=RFC0793}}.
 
 
 ## Conventions and Definitions {#defs}
@@ -124,7 +125,7 @@ unreliable datagrams inside an HTTP connection with multiplexing when
 possible. All HTTP Datagrams are associated with an HTTP request.
 
 When HTTP Datagrams are conveyed on an HTTP/3 connection, the QUIC DATAGRAM
-frame can be used to achieve these goals, including unreliable delivery; see
+frame can be used to provide demultiplexing and unreliable delivery; see
 {{format}}. Negotiating the use of QUIC DATAGRAM frames for HTTP Datagrams is
 achieved via the exchange of HTTP/3 settings; see {{setting}}.
 
@@ -194,9 +195,8 @@ the creation of the corresponding stream.
 If an HTTP/3 Datagram is received and its Quarter Stream ID maps to a stream
 that cannot be created due to client-initiated bidirectional stream limits, it
 SHOULD be treated as an HTTP/3 connection error of type H3_ID_ERROR. Generating
-an error is not mandatory in this case because HTTP/3 implementations might have
-practical barriers to determining the active stream concurrency limit that is
-applied by the QUIC layer.
+an error is not mandatory because the QUIC stream limit might be unknown to the
+HTTP/3 layer.
 
 Prioritization of HTTP/3 Datagrams is not defined in this document. Future
 extensions MAY define how to prioritize datagrams and MAY define signaling to
@@ -281,7 +281,7 @@ Data streams can be prioritized using any means suited to stream or request
 prioritization. For example, see {{Section 11 of ?PRIORITY=RFC9218}}.
 
 Data streams are subject to the flow control mechanisms of the underlying
-layers. Examples include HTTP/2 stream flow control, HTTP/2 connection flow
+layers; examples include HTTP/2 stream flow control, HTTP/2 connection flow
 control, and TCP flow control.
 
 
@@ -309,13 +309,14 @@ Capsule {
 
 Capsule Type:
 
-: A variable-length integer indicating the Type of the Capsule. An IANA registry
+: A variable-length integer indicating the type of the capsule. An IANA registry
 is used to manage the assignment of Capsule Types; see {{iana-types}}.
 
 Capsule Length:
 
-: The length in bytes of the Capsule Value field following this field, encoded
-as a variable-length integer. Note that this field can have a value of zero.
+:  The length, in bytes, of the Capsule Value field, which follows this field,
+encoded as a variable-length integer. Note that this field can have a value of
+zero.
 
 Capsule Value:
 
@@ -406,7 +407,8 @@ for unknown HTTP upgrade tokens. Note that this is only possible for HTTP
 Upgrade or Extended CONNECT.
 
 The Capsule-Protocol header field MUST NOT be used on HTTP responses with a
-status code that is both different from 101 and outside the 2xx range.
+status code that is both different from 101 (Switching Protocols) and outside
+the 2xx (Successful) range.
 
 When using the Capsule Protocol, HTTP endpoints SHOULD send the Capsule-Protocol
 header field to simplify intermediary processing. Definitions of new HTTP
@@ -502,8 +504,9 @@ Since use of the Capsule Protocol is restricted to new HTTP upgrade tokens, it
 is not accessible from Web Platform APIs (such as those commonly accessed via
 JavaScript in web browsers).
 
+
 Definitions of new HTTP upgrade tokens that use the Capsule Protocol need to
-perform a security analysis that considers the impact of HTTP Datagrams and
+include a security analysis that considers the impact of HTTP Datagrams and
 Capsules in the context of their protocol.
 
 
