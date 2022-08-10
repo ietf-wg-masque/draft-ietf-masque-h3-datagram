@@ -7,8 +7,8 @@ submissiontype: IETF
 category: std
 area: Transport
 wg: MASQUE
-number:
-date:
+number: 9298
+date: 2022-08
 consensus: true
 venue:
   group: "MASQUE"
@@ -229,21 +229,6 @@ It is RECOMMENDED that implementations that support receiving HTTP/3 Datagrams
 always send the SETTINGS_H3_DATAGRAM setting with a value of 1,
 even if the application does not intend to use HTTP/3 Datagrams. This helps to
 avoid "sticking out"; see {{security}}.
-
-
-#### Note About Draft Versions
-
-\[\[RFC editor: please remove this section before publication.]]
-
-Some revisions of this draft specification use a different value (the Identifier
-field of a Setting in the HTTP/3 SETTINGS frame) for the SETTINGS_H3_DATAGRAM
-setting. This allows new draft revisions to make incompatible changes. Multiple
-draft versions MAY be supported by sending multiple values for
-SETTINGS_H3_DATAGRAM. Once SETTINGS have been sent and received, an
-implementation that supports multiple drafts MUST compute the intersection of
-the values it has sent and received, and then it MUST select and use the most
-recent draft version from the intersection set. This ensures that both peers
-negotiate the same draft version.
 
 
 ## HTTP Datagrams using Capsules
