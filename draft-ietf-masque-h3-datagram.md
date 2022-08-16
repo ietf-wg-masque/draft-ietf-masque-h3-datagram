@@ -80,23 +80,22 @@ this could allow for the introduction of an unreliable version of the CONNECT
 method and the addition of unreliable delivery to WebSockets
 {{?WEBSOCKET=RFC6455}}.
 
-In {{datagrams}}, this document describes HTTP Datagrams: a convention that
-supports the bidirectional and optionally multiplexed exchange of data inside an
-HTTP connection. While HTTP Datagrams are associated with HTTP requests, they
-are not a part of message content. Instead, they are intended for use by HTTP
-extensions (such as the CONNECT method) and are compatible with all versions of
-HTTP.
+In {{datagrams}}, this document describes HTTP Datagrams, a convention for
+conveying bidirectional and potentially unreliable datagrams inside an HTTP
+connection, with multiplexing when possible. While HTTP Datagrams are associated
+with HTTP requests, they are not a part of message content. Instead, they are
+intended for use by HTTP extensions (such as the CONNECT method) and are
+compatible with all versions of HTTP.
 
 When HTTP is running over a transport protocol that supports unreliable delivery
 (such as when the QUIC DATAGRAM extension {{QUIC-DGRAM}} is available to HTTP/3
 {{H3}}), HTTP Datagrams can use that capability.
 
-In {{capsule}}, this document describes HTTP Datagrams, a convention for
-conveying bidirectional and potentially unreliable datagrams inside an HTTP
-connection, with multiplexing when possible. This addresses HTTP/3 cases where
-use of the QUIC DATAGRAM frame is unavailable or undesirable or where the
-transport protocol only provides reliable delivery, such as with HTTP/1.1 {{H1}}
-or HTTP/2 {{H2}} over TCP {{!TCP=RFC0793}}.
+In {{capsule}}, this document describes the HTTP Capsule Protocol, which allows
+the conveyance of HTTP Datagrams using reliable delivery. This addresses HTTP/3
+cases where use of the QUIC DATAGRAM frame is unavailable or undesirable or
+where the transport protocol only provides reliable delivery, such as with
+HTTP/1.1 {{H1}} or HTTP/2 {{H2}} over TCP {{!TCP=RFC0793}}.
 
 
 ## Conventions and Definitions {#defs}
