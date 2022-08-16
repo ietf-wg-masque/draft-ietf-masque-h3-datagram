@@ -1533,7 +1533,7 @@ carry HTTP content.<a href="#section-3.2-9.2" class="pilcrow">¶</a>
 thus, in HTTP/2 and HTTP/3, it can only be used with the CONNECT method.
 Therefore, once both endpoints agree to use the Capsule Protocol, the frame
 usage requirements of the stream change as specified in <span><a href="https://rfc-editor.org/rfc/rfc9113#section-8.5" class="relref">Section 8.5</a> of [<a href="#H2" class="xref">HTTP/2</a>]</span>
-and <span><a href="https://rfc-editor.org/rfc/rfc9114#section-4.2" class="relref">Section 4.2</a> of [<a href="#H3" class="xref">HTTP/3</a>]</span>.<a href="#section-3.2-10" class="pilcrow">¶</a></p>
+and <span><a href="https://rfc-editor.org/rfc/rfc9114#section-4.4" class="relref">Section 4.4</a> of [<a href="#H3" class="xref">HTTP/3</a>]</span>.<a href="#section-3.2-10" class="pilcrow">¶</a></p>
 <p id="section-3.2-11">The Capsule Protocol <span class="bcp14">MUST NOT</span> be used with messages that contain Content-Length,
 Content-Type, or Transfer-Encoding header fields. Additionally, HTTP status
 codes 204 (No Content), 205 (Reset Content), and 206 (Partial Content) <span class="bcp14">MUST NOT</span>
@@ -1554,7 +1554,7 @@ control window.<a href="#section-3.2-12" class="pilcrow">¶</a></p>
 <p id="section-3.3-1">When a receiver encounters an error processing the Capsule Protocol, the
 receiver <span class="bcp14">MUST</span> treat it as if it had received a malformed or incomplete HTTP
 message. For HTTP/3, the handling of malformed messages is described in
-<span><a href="https://rfc-editor.org/rfc/rfc9114#section-4.1.3" class="relref">Section 4.1.3</a> of [<a href="#H3" class="xref">HTTP/3</a>]</span>. For HTTP/2, the handling of malformed messages is
+<span><a href="https://rfc-editor.org/rfc/rfc9114#section-4.1.2" class="relref">Section 4.1.2</a> of [<a href="#H3" class="xref">HTTP/3</a>]</span>. For HTTP/2, the handling of malformed messages is
 described in <span><a href="https://rfc-editor.org/rfc/rfc9113#section-8.1.1" class="relref">Section 8.1.1</a> of [<a href="#H2" class="xref">HTTP/2</a>]</span>. For HTTP/1.x, the handling of incomplete
 messages is described in <span><a href="https://rfc-editor.org/rfc/rfc9112#section-8" class="relref">Section 8</a> of [<a href="#H1" class="xref">HTTP/1.1</a>]</span>.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.3-2">Each Capsule's payload <span class="bcp14">MUST</span> contain exactly the fields identified in its
@@ -1635,7 +1635,7 @@ apply to HTTP Datagrams sent and received using the DATAGRAM Capsule.<a href="#s
 words, an intermediary <span class="bcp14">MAY</span> send a DATAGRAM Capsule to forward an HTTP Datagram
 that was received in a QUIC DATAGRAM frame and vice versa. Intermediaries <span class="bcp14">MUST NOT</span> perform this re-encoding unless they have identified the use of the Capsule
 Protocol on the corresponding request stream; see <a href="#capsule-protocol" class="xref">Section 3.2</a>.<a href="#section-3.5-5" class="pilcrow">¶</a></p>
-<p id="section-3.5-6">Note that while DATAGRAM Capsules that are sent on a stream are reliably
+<p id="section-3.5-6">Note that while DATAGRAM Capsules which are sent on a stream are reliably
 delivered in order, intermediaries can re-encode DATAGRAM Capsules into QUIC
 DATAGRAM frames when forwarding messages, which could result in loss or
 reordering.<a href="#section-3.5-6" class="pilcrow">¶</a></p>
