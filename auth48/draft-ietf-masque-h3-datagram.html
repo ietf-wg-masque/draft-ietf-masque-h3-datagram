@@ -1689,8 +1689,8 @@ offer application services that use HTTP Datagrams, it's best for all
 implementations that support this feature to always send this setting; see
 <a href="#setting" class="xref">Section 2.1.1</a>.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">Since use of the Capsule Protocol is restricted to new HTTP upgrade tokens, it
-is not accessible from Web Platform APIs (such as those commonly accessed via
-JavaScript in web browsers).<a href="#section-4-2" class="pilcrow">¶</a></p>
+is not directly accessible from Web Platform APIs (such as those commonly
+accessed via JavaScript in web browsers).<a href="#section-4-2" class="pilcrow">¶</a></p>
 <p id="section-4-3">Definitions of new HTTP upgrade tokens that use the Capsule Protocol need to
 include a security analysis that considers the impact of HTTP Datagrams and
 Capsules in the context of their protocol.<a href="#section-4-3" class="pilcrow">¶</a></p>
@@ -1994,13 +1994,12 @@ values.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
 definition itself; the authors would like to acknowledge the authors of that
 document and the members of the IETF MASQUE working group for their suggestions.
 Additionally, the authors would like to thank Martin Thomson for suggesting the
-use of an HTTP/3 setting. Furthermore, the authors would like to
-thank Ben Schwartz for writing the first proposal that used two layers of
-indirection. The final design in this document came out of the HTTP Datagrams
-Design Team, whose members were Alan Frindell, Alex Chernyakhovsky, Ben
-Schwartz, Eric Rescorla, Marcus Ihlar, Martin Thomson, Mike Bishop, Tommy Pauly,
-Victor Vasiliev, and the authors of this document. The authors thank Mark
-Nottingham and Philipp Tiesel for their helpful comments.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+use of an HTTP/3 setting. Furthermore, the authors would like to thank Ben
+Schwartz for substantive input. The final design in this document came out of
+the HTTP Datagrams Design Team, whose members were Alan Frindell, Alex
+Chernyakhovsky, Ben Schwartz, Eric Rescorla, Marcus Ihlar, Martin Thomson, Mike
+Bishop, Tommy Pauly, Victor Vasiliev, and the authors of this document. The
+authors thank Mark Nottingham and Philipp Tiesel for their helpful comments.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
