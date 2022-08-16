@@ -366,7 +366,7 @@ control window.
 When a receiver encounters an error processing the Capsule Protocol, the
 receiver MUST treat it as if it had received a malformed or incomplete HTTP
 message. For HTTP/3, the handling of malformed messages is described in
-{{Section 4.1.3 of H3}}. For HTTP/2, the handling of malformed messages is
+{{Section 4.1.2 of H3}}. For HTTP/2, the handling of malformed messages is
 described in {{Section 8.1.1 of H2}}. For HTTP/1.x, the handling of incomplete
 messages is described in {{Section 8 of H1}}.
 
