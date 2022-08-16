@@ -497,8 +497,8 @@ implementations that support this feature to always send this setting; see
 {{setting}}.
 
 Since use of the Capsule Protocol is restricted to new HTTP upgrade tokens, it
-is not accessible from Web Platform APIs (such as those commonly accessed via
-JavaScript in web browsers).
+is not directly accessible from Web Platform APIs (such as those commonly
+accessed via JavaScript in web browsers).
 
 
 Definitions of new HTTP upgrade tokens that use the Capsule Protocol need to
