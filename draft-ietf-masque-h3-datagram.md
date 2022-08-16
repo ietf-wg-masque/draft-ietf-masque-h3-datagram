@@ -346,7 +346,7 @@ The Capsule Protocol only applies to definitions of new HTTP upgrade tokens;
 thus, in HTTP/2 and HTTP/3, it can only be used with the CONNECT method.
 Therefore, once both endpoints agree to use the Capsule Protocol, the frame
 usage requirements of the stream change as specified in {{Section 8.5 of H2}}
-and {{Section 4.2 of H3}}.
+and {{Section 4.4 of H3}}.
 
 The Capsule Protocol MUST NOT be used with messages that contain Content-Length,
 Content-Type, or Transfer-Encoding header fields. Additionally, HTTP status
