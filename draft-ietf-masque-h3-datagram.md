@@ -443,7 +443,7 @@ that was received in a QUIC DATAGRAM frame and vice versa. Intermediaries MUST
 NOT perform this re-encoding unless they have identified the use of the Capsule
 Protocol on the corresponding request stream; see {{capsule-protocol}}.
 
-Note that while DATAGRAM Capsules that are sent on a stream are reliably
+Note that while DATAGRAM Capsules which are sent on a stream are reliably
 delivered in order, intermediaries can re-encode DATAGRAM Capsules into QUIC
 DATAGRAM frames when forwarding messages, which could result in loss or
 reordering.
