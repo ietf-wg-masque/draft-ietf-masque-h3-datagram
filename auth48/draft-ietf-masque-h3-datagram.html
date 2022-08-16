@@ -381,23 +381,37 @@ ul.empty li, .ulEmpty li {
 
 /* definition lists */
 dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
 }
 dl > dt {
   float: left;
   margin-right: 1em;
+  min-width: 20ch;
+}
+dl.dlNewline > dt {
+  float: none;
 }
 dl > dd {
   margin-bottom: .8em;
-  min-height: 1.3em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
 }
 :is(dl.compact, .dlCompact) > dd {
-  margin-bottom: 0em;
+  margin-bottom: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:first-child, .break:first-child + *) {
+  margin-top: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:last-child) {
+  margin-bottom: 0;
 }
 dl > dd > dl {
   margin-top: 0.5em;
-  margin-bottom: 0em;
+  margin-bottom: 0;
 }
-dd.break {
+dl .break {
   display: none;
 }
 
@@ -592,11 +606,11 @@ hr {
   margin: 0;
   font-size: var(--small-font-size);
   line-height: 18px;
-  --identifier-width: 8em;
+  --identifier-width: 15ch;
 }
 #identifiers dt {
   width: var(--identifier-width);
-  margin: 0;
+  min-width: var(--identifier-width);
   clear: left;
   float: left;
   text-align: right;
@@ -925,16 +939,6 @@ a.toplink {
   margin: 8px 0.5em 0;
 }
 
-/* Fix the dl styling to match the RFC 7992 attributes */
-dl > dt,
-dl.dlParallel > dt {
-  float: left;
-  margin-right: 1em;
-}
-dl.dlNewline > dt {
-  float: none;
-}
-
 /* Provide styling for table cell text alignment */
 table .text-left {
   text-align: left;
@@ -1240,21 +1244,20 @@ offered by <span>[<a href="#QUIC-DGRAM" class="xref">QUIC-DGRAM</a>]</span>) to 
 this could allow for the introduction of an unreliable version of the CONNECT
 method and the addition of unreliable delivery to WebSockets
 <span>[<a href="#WEBSOCKET" class="xref">WEBSOCKET</a>]</span>.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">In <a href="#datagrams" class="xref">Section 2</a>, this document describes HTTP Datagrams: a convention that
-supports the bidirectional and optionally multiplexed exchange of data inside an
-HTTP connection. While HTTP Datagrams are associated with HTTP requests, they
-are not a part of message content. Instead, they are intended for use by HTTP
-extensions (such as the CONNECT method) and are compatible with all versions of
-HTTP.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-2">In <a href="#datagrams" class="xref">Section 2</a>, this document describes HTTP Datagrams, a convention for
+conveying bidirectional and potentially unreliable datagrams inside an HTTP
+connection, with multiplexing when possible. While HTTP Datagrams are associated
+with HTTP requests, they are not a part of message content. Instead, they are
+intended for use by HTTP extensions (such as the CONNECT method) and are
+compatible with all versions of HTTP.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">When HTTP is running over a transport protocol that supports unreliable delivery
 (such as when the QUIC DATAGRAM extension <span>[<a href="#QUIC-DGRAM" class="xref">QUIC-DGRAM</a>]</span> is available to HTTP/3
 <span>[<a href="#H3" class="xref">HTTP/3</a>]</span>), HTTP Datagrams can use that capability.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">In <a href="#capsule" class="xref">Section 3</a>, this document describes HTTP Datagrams, a convention for
-conveying bidirectional and potentially unreliable datagrams inside an HTTP
-connection, with multiplexing when possible. This addresses HTTP/3 cases where
-use of the QUIC DATAGRAM frame is unavailable or undesirable or where the
-transport protocol only provides reliable delivery, such as with HTTP/1.1 <span>[<a href="#H1" class="xref">HTTP/1.1</a>]</span>
-or HTTP/2 <span>[<a href="#H2" class="xref">HTTP/2</a>]</span> over TCP <span>[<a href="#TCP" class="xref">TCP</a>]</span>.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-4">In <a href="#capsule" class="xref">Section 3</a>, this document describes the HTTP Capsule Protocol, which allows
+the conveyance of HTTP Datagrams using reliable delivery. This addresses HTTP/3
+cases where use of the QUIC DATAGRAM frame is unavailable or undesirable or
+where the transport protocol only provides reliable delivery, such as with
+HTTP/1.1 <span>[<a href="#H1" class="xref">HTTP/1.1</a>]</span> or HTTP/2 <span>[<a href="#H2" class="xref">HTTP/2</a>]</span> over TCP <span>[<a href="#TCP" class="xref">TCP</a>]</span>.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <div id="defs">
 <section id="section-1.1">
         <h3 id="name-conventions-and-definitions">
