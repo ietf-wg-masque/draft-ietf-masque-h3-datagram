@@ -464,7 +464,7 @@ Table of Contents
    have identified the use of the Capsule Protocol on the corresponding
    request stream; see Section 3.2.
 
-   Note that while DATAGRAM Capsules which are sent on a stream are
+   Note that while DATAGRAM Capsules, which are sent on a stream, are
    reliably delivered in order, intermediaries can re-encode DATAGRAM
    Capsules into QUIC DATAGRAM frames when forwarding messages, which
    could result in loss or reordering.
@@ -657,8 +657,8 @@ Table of Contents
               HTTP", RFC 8941, DOI 10.17487/RFC8941, February 2021,
               <https://www.rfc-editor.org/rfc/rfc8941>.
 
-   [TCP]      Postel, J., "Transmission Control Protocol", STD 7,
-              RFC 793, DOI 10.17487/RFC0793, September 1981,
+   [TCP]      Postel, J., "Transmission Control Protocol", RFC 793,
+              DOI 10.17487/RFC0793, September 1981,
               <https://www.rfc-editor.org/rfc/rfc793>.
 
 6.2.  Informative References

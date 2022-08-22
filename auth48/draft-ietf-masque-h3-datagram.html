@@ -17,7 +17,7 @@ convention for conveying data in HTTP connections.
        HTTP Datagrams and the Capsule Protocol are intended for use by HTTP extensions,
 not applications. 
     " name="description">
-<meta content="xml2rfc 3.13.1" name="generator">
+<meta content="xml2rfc 3.14.0" name="generator">
 <meta content="quic" name="keyword">
 <meta content="http" name="keyword">
 <meta content="datagram" name="keyword">
@@ -28,7 +28,7 @@ not applications.
 <meta content="http-ng" name="keyword">
 <meta content="9297" name="rfc.number">
 <!-- Generator version information:
-  xml2rfc 3.13.1
+  xml2rfc 3.14.0
     Python 3.10.5
     appdirs 1.4.4
     ConfigArgParse 1.5.3
@@ -40,7 +40,6 @@ not applications.
     lxml 4.9.1
     MarkupSafe 2.1.1
     pycountry 22.3.5
-    pyflakes 2.4.0
     PyYAML 6.0
     requests 2.27.1
     setuptools 59.4.0
@@ -616,7 +615,8 @@ hr {
   text-align: right;
 }
 #identifiers dd {
-  margin: 0 0 0 calc(1em + var(--identifier-width));
+  margin: 0;
+  margin-left: calc(1em + var(--identifier-width)) !important;
   min-width: 5em;
 }
 #identifiers .authors .author {
@@ -672,7 +672,7 @@ hr {
   margin: 0 10px 0 -25px;
 }
 .references dd {
-  margin-left: 8em;
+  margin-left: 8em !important;
   overflow: auto;
 }
 
@@ -1635,7 +1635,7 @@ apply to HTTP Datagrams sent and received using the DATAGRAM Capsule.<a href="#s
 words, an intermediary <span class="bcp14">MAY</span> send a DATAGRAM Capsule to forward an HTTP Datagram
 that was received in a QUIC DATAGRAM frame and vice versa. Intermediaries <span class="bcp14">MUST NOT</span> perform this re-encoding unless they have identified the use of the Capsule
 Protocol on the corresponding request stream; see <a href="#capsule-protocol" class="xref">Section 3.2</a>.<a href="#section-3.5-5" class="pilcrow">¶</a></p>
-<p id="section-3.5-6">Note that while DATAGRAM Capsules which are sent on a stream are reliably
+<p id="section-3.5-6">Note that while DATAGRAM Capsules, which are sent on a stream, are reliably
 delivered in order, intermediaries can re-encode DATAGRAM Capsules into QUIC
 DATAGRAM frames when forwarding messages, which could result in loss or
 reordering.<a href="#section-3.5-6" class="pilcrow">¶</a></p>
@@ -1953,7 +1953,7 @@ values.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="TCP">[TCP]</dt>
       <dd>
-<span class="refAuthor">Postel, J.</span>, <span class="refTitle">"Transmission Control Protocol"</span>, <span class="seriesInfo">STD 7</span>, <span class="seriesInfo">RFC 793</span>, <span class="seriesInfo">DOI 10.17487/RFC0793</span>, <time datetime="1981-09" class="refDate">September 1981</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc793">https://www.rfc-editor.org/rfc/rfc793</a>&gt;</span>. </dd>
+<span class="refAuthor">Postel, J.</span>, <span class="refTitle">"Transmission Control Protocol"</span>, <span class="seriesInfo">RFC 793</span>, <span class="seriesInfo">DOI 10.17487/RFC0793</span>, <time datetime="1981-09" class="refDate">September 1981</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc793">https://www.rfc-editor.org/rfc/rfc793</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
