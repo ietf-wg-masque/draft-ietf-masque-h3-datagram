@@ -1,0 +1,3 @@
+# Automatically generated CODEOWNERS
+# Regenerate with `make update-codeowners`
+draft-ietf-masque-h3-datagram.md dschinazi.ietf@gmail.com lucaspardue.24.7@gmail.com
